@@ -95,7 +95,7 @@ export default function RegisterForm() {
             <button
                 type="submit"
                 disabled={isSubmitting || pending}
-                className="h-10 w-full rounded-md bg-foreground text-background text-sm font-semibold hover:opacity-90 disabled:opacity-60"
+                className="h-10 w-full rounded-md bg-[#4CAF50] text-white text-sm font-semibold hover:opacity-90 disabled:opacity-60"
             >
                 { isSubmitting || pending ? "Creating account..." : "Create account"}
             </button>

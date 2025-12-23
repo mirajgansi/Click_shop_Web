@@ -24,7 +24,7 @@ export default function LoginForm() {
         // GOTO
         setTransition( async () => {
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            // router.push("/");
+            router.push("/dashboard");
         })
         console.log("login", values);
     };
@@ -67,6 +67,7 @@ export default function LoginForm() {
                 className="h-10 w-full rounded-md bg-[#4CAF50] text-white  text-sm font-semibold hover:opacity-90 disabled:opacity-60"
             >
                 { isSubmitting || pending ? "Logging in..." : "Log in"}
+
             </button>
 
             <div className="mt-1 text-center text-sm">

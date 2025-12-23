@@ -28,7 +28,6 @@ export default function AuthLayout({
             className="rounded-full"
           />
         </div>
-
         {children}
       </div>
     </div>
