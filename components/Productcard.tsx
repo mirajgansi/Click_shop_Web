@@ -33,12 +33,13 @@ export default function ProductCard({
       </button>
 
       <div className="bg-gray-100 rounded-2xl p-4 flex justify-center items-center">
-         <Image
-    src={image}
-    alt={name}
-    fill
-    className="object-contain"
-  />
+                <Image
+            src={image}
+            alt={name}
+            width={120}
+            height={100}
+            className="object"
+          />
       </div>
 
       <div className="mt-3 inline-flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">

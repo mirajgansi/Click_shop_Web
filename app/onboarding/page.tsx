@@ -10,8 +10,8 @@ const OnBoarding = () => {
       src="/8140 1.jpg"
       width={200}
       height={350}
-      alt="Picture of the author"
-      className='rounded-full'
+      alt="Product Image"
+      className='border rounded-full'
     />
         </div>
 
