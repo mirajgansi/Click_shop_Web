@@ -38,6 +38,7 @@ const homePage = () => {
 
         <section className="max-w-7xl mx-auto px-6 py-12">
   <h2 className="text-2xl font-semibold mb-6 text-black">Category</h2>
+  <h2 className="text-md mb-6 text-gray-600">see All</h2>
 <div className="grid grid-cols-4 md:grid-cols-8 gap-6">
       <CategoryCard
         title="Meat & Fish"
@@ -86,8 +87,7 @@ const homePage = () => {
       name="Wai Wai"
       price={5}
       onAddToCart={() => console.log('Added to cart')}
-      onToggleWishlist={() => console.log('Wishlist toggled')}
-    />
+      onToggleWishlist={() => console.log('Wishlist toggled')} isFavorite={false}    />
   ))}
 
   {/* for real data */}

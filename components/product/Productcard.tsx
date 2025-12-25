@@ -1,6 +1,7 @@
 'use client';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import Image from "next/image";
+import { useState } from 'react';
 
 type ProductCardProps = {
   image: string;
@@ -8,10 +9,12 @@ type ProductCardProps = {
   price: number;
   unit?: string;
   stock?: string;
+  isFavorite: boolean;          
   onAddToCart?: () => void;
   onToggleWishlist?: () => void;
 };
 
+  
 export default function ProductCard({
   image,
   name,
@@ -19,17 +22,23 @@ export default function ProductCard({
   unit = 'per kg',
   stock = '50+ in stock',
   onAddToCart,
+  isFavorite,
   onToggleWishlist,
 }: ProductCardProps) {
   return (
     <div className="w-64 bg-white rounded-3xl p-4 shadow-sm relative">
       
-      <button
+        <button
         onClick={onToggleWishlist}
         className="absolute top-4 right-4"
         aria-label="Add to wishlist"
       >
-        <Heart className="w-6 h-6 text-gray-400 hover:text-red-500 transition" />
+        <Heart
+          className={`w-6 h-6 transition ${
+            isFavorite ? 'text-red-500' : 'text-gray-400'
+          }`}
+          fill={isFavorite ? 'currentColor' : 'none'}
+        />
       </button>
 
       <div className="bg-gray-100 rounded-2xl p-4 flex justify-center items-center">
@@ -61,10 +70,11 @@ export default function ProductCard({
 
         <button
           onClick={onAddToCart}
-          className="bg-green-500 text-white p-3 rounded-full shadow-md hover:bg-green-600 transition"
+          className="bg-green-500 text-white p-3 rounded-full shadow-md hover:bg-green-600 transition cursor-pointer"
           aria-label="Add to cart"
+
         >
-          <ShoppingCart size={18} />
+         <svg xmlns="http://www.w3.org/2000/svg" width={24} height={20} viewBox="0 0 24 24"><circle cx={10.5} cy={19.5} r={1.5} fill="currentColor"></circle><circle cx={17.5} cy={19.5} r={1.5} fill="currentColor"></circle><path fill="currentColor" d="M13 13h2v-2.99h2.99v-2H15V5.03h-2v2.98h-2.99v2H13z"></path><path fill="currentColor" d="M10 17h8a1 1 0 0 0 .93-.64L21.76 9h-2.14l-2.31 6h-6.64L6.18 4.23A2 2 0 0 0 4.33 3H2v2h2.33l4.75 11.38A1 1 0 0 0 10 17"></path></svg>
         </button>
       </div>
     </div>
