@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const OnBoarding = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 ">
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6  ">
         <div>
              <Image
       src="/8140 1.jpg"
