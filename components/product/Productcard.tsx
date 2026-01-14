@@ -28,18 +28,19 @@ export default function ProductCard({
   return (
     <div className="w-64 bg-white rounded-3xl p-4 shadow-sm relative">
       
-        <button
-        onClick={onToggleWishlist}
-        className="absolute top-4 right-4"
-        aria-label="Add to wishlist"
-      >
-        <Heart
-          className={`w-6 h-6 transition ${
-            isFavorite ? 'text-red-500' : 'text-gray-400'
-          }`}
-          fill={isFavorite ? 'currentColor' : 'none'}
-        />
-      </button>
+      <button
+  type="button"
+  onClick={() => onToggleWishlist?.()}
+  className="absolute top-4 right-4 z-10 cursor-pointer"
+  aria-label="Add to wishlist"
+>
+  <Heart
+    className={`w-6 h-6 transition ${
+      isFavorite ? "text-red-500" : "text-gray-400"
+    }`}
+    fill={isFavorite ? "currentColor" : "none"}
+  />
+</button>
 
       <div className="bg-gray-100 rounded-2xl p-4 flex justify-center items-center">
                 <Image
