@@ -1,8 +1,6 @@
 "use client";
 
 import RegisterForm from "../_componets/RegistrationForm";
-
-
 export default function Page() {
     return (
         <div className="space-y-6 w-full">
