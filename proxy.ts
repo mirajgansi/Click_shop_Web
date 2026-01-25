@@ -6,9 +6,10 @@ const publicRoutes = [
   "/forget-password",
   "/register",
   "/reset-password",
-  "/dashboard",
 ];
+
 const adminRoutes = ["/admin"];
+const userRoutes = ["/user"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -18,15 +19,22 @@ export async function proxy(request: NextRequest) {
     (route) => pathname === route || pathname.startsWith(route + "/"),
   );
   const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));
-
+  const isUserRoute = userRoutes.some((route) => pathname.startsWith(route));
   if (!token && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (token && isPublicRoute) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   // Authenticated → role-based access
   if (token && user) {
     if (isAdminRoute && user.role !== "admin") {
-      return NextResponse.redirect(new URL("/unauthorized", request.url));
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+    if (isUserRoute && user.role !== "user" && user.role !== "admin") {
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
