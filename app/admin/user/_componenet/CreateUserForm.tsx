@@ -46,7 +46,11 @@ export default function CreateUserForm() {
                 formData.append('username', data.username);
                 formData.append('password', data.password);
                 formData.append('confirmPassword', data.confirmPassword);
-
+                formData.append('role',data.role);
+                formData.append('phoneNumber',data.phoneNumber??"");
+                formData.append("location", data.location ?? "");
+                formData.append("DOB", data.DOB ?? "");
+                formData.append("gender", data.gender ?? "");
                 if (data.image) {
                     formData.append('image', data.image);
                 }
@@ -147,8 +151,125 @@ export default function CreateUserForm() {
                     <p className="text-xs text-red-600">{errors.username.message}</p>
                 )}
             </div>
+             <div className="space-y-1">
+                <label className="text-sm font-medium" htmlFor="location">Location</label>
+                <input
+                    id="location"
+                    type="text"
+                    autoComplete="location"
+                    className="h-10 w-full rounded-md border border-black/10 dark:border-white/15 bg-background px-3 text-sm outline-none focus:border-foreground/40"
+                    {...register("location")}
+                    placeholder="eg: Dillibazar, Kathmandu"
+                />
+                {errors.location?.message && (
+                    <p className="text-xs text-red-600">{errors.location.message}</p>
+                )}
+            </div>
+             <div className="space-y-1">
+  <label className="text-sm font-medium" htmlFor="DOB">
+    Date of Birth
+  </label>
+
+  <input
+    id="DOB"
+    type="date"
+    autoComplete="bday"
+    className="h-10 w-full rounded-md border border-black/10 dark:border-white/15 bg-background px-3 text-sm outline-none focus:border-foreground/40"
+    {...register("DOB")}
+  />
+
+  {errors.DOB?.message && (
+    <p className="text-xs text-red-600">{errors.DOB.message}</p>
+  )}
+</div>
             <div className="space-y-1">
-                <label className="text-sm font-medium" htmlFor="password">Password</label>
+                <label className="text-sm font-medium" htmlFor="phone number">Phone Number</label>
+                <input
+                    id="PhoneNumber"
+                    type="calendar"
+                    autoComplete="PhoneNumber"
+                    className="h-10 w-full rounded-md border border-black/10 dark:border-white/15 bg-background px-3 text-sm outline-none focus:border-foreground/40"
+                    {...register("phoneNumber")}
+                    placeholder="98XXXXXXX"
+                />
+                {errors.phoneNumber?.message && (
+                    <p className="text-xs text-red-600">{errors.phoneNumber.message}</p>
+                )}
+            </div>
+            <div className="space-y-2">
+  <label className="text-sm font-medium">Gender</label>
+
+  <div className="flex gap-4">
+    <label className="flex items-center gap-2">
+      <input
+        type="radio"
+        value="male"
+        {...register("gender")}
+      />
+      Male
+    </label>
+
+    <label className="flex items-center gap-2">
+      <input
+        type="radio"
+        value="female"
+        {...register("gender")}
+      />
+      Female
+    </label>
+  <label className="flex items-center gap-2">
+      <input
+        type="radio"
+        value="other"
+        {...register("gender")}
+      />
+      Other
+    </label>
+  </div>
+
+  {errors.gender?.message && (
+    <p className="text-xs text-red-600">{errors.gender.message}</p>
+  )}
+</div>
+ <div className="space-y-2">
+  <label className="text-sm font-medium">Role</label>
+
+  <div className="flex gap-4">
+    <label className="flex items-center gap-2">
+      <input
+        type="radio"
+        value="user"
+        {...register("role")}
+      />
+      User
+    </label>
+
+    <label className="flex items-center gap-2">
+      <input
+        type="radio"
+        value="admin"
+        {...register("role")}
+      />
+      Admin
+    </label>
+
+    <label className="flex items-center gap-2">
+      <input
+        type="radio"
+        value="driver"
+        {...register("role")}
+      />
+      Driver
+    </label>
+  </div>
+
+  {errors.role?.message && (
+    <p className="text-xs text-red-600">{errors.role.message}</p>
+  )}
+</div>
+
+            <div className="space-y-1">
+                <label className="text-sm font-medium" htmlFor="password">Create Password</label>
                 <input
                     id="password"
                     type="password"

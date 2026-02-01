@@ -8,6 +8,11 @@ export const UserSchema = z.object({
        email: z.email({ message: "Enter a valid email" }),
        password: z.string().min(8, { message: "Minimum 8 characters" }),
        confirmPassword: z.string().min(8, { message: "Minimum 8 characters" }),
+       role:z.enum(['user','admin','driver']),
+        phoneNumber: z.string().max(10).optional(),
+        location: z.string().optional(),
+        gender: z.enum(["male", "female", "other"]).optional(),
+        DOB: z.string().optional(),
     image: z
         .instanceof(File)
         .optional()
