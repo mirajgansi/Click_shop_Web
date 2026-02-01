@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 
 import { z } from "zod";
 import { handleUpdateProfile } from "@/lib/actions/auth-actions";
+import { getNextBuildDebuggerPortOffset } from "next/dist/lib/worker";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
@@ -24,6 +25,10 @@ export const updateUserSchema = z.object({
         .refine((file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type), {
             message: "Only .jpg, .jpeg, .png and .webp formats are supported",
         }),
+        phoneNumber: z.string().max(10).optional(),
+        location: z.string().optional(),
+        DOB: z.string().optional(),
+        gender: z.string().optional(),
 })
 export type UpdateUserData = z.infer<typeof updateUserSchema>;
 
@@ -35,7 +40,11 @@ export default function UpdateUserForm({
             resolver: zodResolver(updateUserSchema),
             values: {
                 email: user?.email || '',
-                username: user?.username || ''
+                username: user?.username || '',
+                phoneNumber: user?.phoneNumber || '',
+                location: user?.location || '',
+                DOB: user?.DOB || '',
+                gender: user?.gender || '',
             }
         });
 
@@ -70,6 +79,10 @@ export default function UpdateUserForm({
             const formData = new FormData();
             formData.append('email', data.email);
             formData.append('username', data.username);
+            formData.append('phoneNumber', data.phoneNumber || '');
+            formData.append('location', data.location || '');
+            formData.append('DOB', data.DOB || '');
+            formData.append('gender', data.gender || '');
             if (data.image) {
                 formData.append('image', data.image);
             }
@@ -85,7 +98,6 @@ export default function UpdateUserForm({
             setError(error.message || 'Profile update failed');
         }
     };
-
     return (
         <div>
             <h1 className="text-2xl font-bold mb-4">Profile Page</h1>
@@ -117,9 +129,9 @@ export default function UpdateUserForm({
                                 )}
                             />
                         </div>
-                    ) : user?.imageUrl ? (
+                    ) : user?.image ? (
                         <Image
-                            src={process.env.NEXT_PUBLIC_API_BASE_URL + user.imageUrl}
+                            src={process.env.NEXT_PUBLIC_API_BASE_URL + user.image}
                             alt="Profile Image"
                             width={100}
                             height={100}
@@ -169,31 +181,46 @@ export default function UpdateUserForm({
                     />
                     {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
                 </div>
-                {/* First Name Input */}
-                {/* <div>
-                    <label className="block text-sm font-medium mb-1" htmlFor="firstName">First Name</label>
+         <div>
+                    <label className="block text-sm font-medium mb-1" htmlFor="PhoneNumber">Phone Number</label>
                     <input
-                        id="firstName"
-                        type="text"
-                        {...register("firstName")}
+                        id="PhoneNumber"
+                        type="tel"
+                        {...register("phoneNumber")}
                         className="w-full border border-gray-300 rounded px-3 py-2"
                     />
-                    {errors.firstName && <p className="text-sm text-red-600">{errors.firstName.message}</p>}
+                    {errors.phoneNumber && <p className="text-sm text-red-600">{errors.phoneNumber.message}</p>}
+                </div> <div>
+                    <label className="block text-sm font-medium mb-1" htmlFor="location">Location</label>
+                    <input
+                        id="location"
+                        type="text"
+                        {...register("location")}
+                        className="w-full border border-gray-300 rounded px-3 py-2"
+                    />
+                    {errors.location && <p className="text-sm text-red-600">{errors.location.message}</p>}
+                </div>
+                 <div>
+                    <label className="block text-sm font-medium mb-1" htmlFor="DOB">Date of Birth</label>
+                    <input
+                        id="DOB"
+                        type="date"
+                        {...register("DOB")}
+                        className="w-full border border-gray-300 rounded px-3 py-2"
+                    />
+                    {errors.DOB && <p className="text-sm text-red-600">{errors.DOB.message}</p>}
+                </div>
+                 <div>
+                    <label className="block text-sm font-medium mb-1" htmlFor="gender">Gender</label>
+                    <input
+                        id="gender"
+                        type="text"
+                        {...register("gender")}
+                        className="w-full border border-gray-300 rounded px-3 py-2"
+                    />
+                    {errors.gender && <p className="text-sm text-red-600">{errors.gender.message}</p>}
                 </div>
 
-                {/* Last Name Input */}
-                        {/* <div>
-                            <label className="block text-sm font-medium mb-1" htmlFor="lastName">Last Name</label>
-                            <input
-                                id="lastName"
-                                type="text"
-                                {...register("lastName")}
-                                className="w-full border border-gray-300 rounded px-3 py-2"
-                            />
-                            {errors.lastName && <p className="text-sm text-red-600">{errors.lastName.message}</p>}
-                        // </div>  }
-
-                {/* Submit Button */}
                 <button
                     type="submit"
                     disabled={isSubmitting}

@@ -1,8 +1,16 @@
 'use client';
 
+import { useAuth } from '@/context/AuthContext';
+import { API } from '@/lib/api/endpoint';
 import { Heart, ShoppingCart, Search, User } from 'lucide-react';
+import { useRouter } from "next/navigation";
 
 export default function Actions() {
+   const router = useRouter();
+
+   const { logout, loading } = useAuth();
+  if (loading) return null;
+
   return (
     <div className="flex items-center gap-5">
       
@@ -27,9 +35,12 @@ export default function Actions() {
       </button>
 
       {/* User */}
-      <button className="text-gray-600 hover:text-black transition">
-        <User size={20} />
-      </button>
+       <button
+      onClick={logout}
+      className="text-gray-600 hover:text-black transition"
+    >
+      <User size={20} />
+    </button>
     </div>
   );
 }

@@ -8,47 +8,50 @@ import { useRouter } from "next/navigation";
 import { LoginData, loginSchema } from "../schema";
 import { Eye, EyeOff } from "lucide-react";
 import { handleLogin } from "@/lib/actions/auth-actions";
-import { useAuth } from "../context/AuthContext";
 
 export default function LoginForm() {
   const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginData>({
-    resolver: zodResolver(loginSchema),
-    mode: "onSubmit",
-  });
+   const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<LoginData>({
+        resolver: zodResolver(loginSchema),
+        mode: "onSubmit",
+    });
 
-  const [pending, startTransition] = useTransition();
+  const [pending, setTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const {checkAuth} = useAuth()
-  const onSubmit = async (data: LoginData) => {
-    setError("");
+  const [error, setError] = useState<string | null>(null);
 
-    try {
-      const result = await handleLogin(data);
-
-      if (!result.success) {
-        setError(result.message || "Login failed");
-        return;
-      }
-
-      startTransition(async () => {
-        await checkAuth();
-        router.push("/dashboard");
-      });
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Something went wrong";
-      setError(message);
-    }
-  };
+const submit = async (values: LoginData) => {
+        setError(null);
+        setTransition(async () => {
+            try {
+                const response = await handleLogin(values);
+                if (!response.success) {
+                    throw new Error(response.message);
+                }
+                if (response.success) {
+                    if (response.data?.role == 'admin') {
+                        return router.replace("/admin");
+                    }
+                    if (response.data?.role === 'user') {
+                        return router.replace("/dashboard");
+                    }
+                    return router.replace("/");
+                } else {
+                    setError('Login failed');
+                }
+            } catch (err: Error | any) {
+                setError(err.message || 'Login failed');
+            }
+        })
+    };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(submit)} className="space-y-4">
       <div className="space-y-1">
         <label className="text-sm font-medium" htmlFor="email">
           Email
