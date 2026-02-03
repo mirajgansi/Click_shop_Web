@@ -1,5 +1,5 @@
 "use server";
-import { createUser, getAllUsers } from "@/lib/api/admin/user";
+import { createUser, deleteUser, getAllUsers } from "@/lib/api/admin/user";
 import { revalidatePath } from "next/cache";
 
 export const handleCreateUser = async (data: FormData) => {
@@ -54,3 +54,24 @@ export const handleGetAllUSER = async (params?: {
     };
   }
 };
+
+export async function handleDeleteUser(userId: string) {
+  try {
+    const result = await deleteUser(userId);
+
+    if (result.success) {
+      revalidatePath("/admin/users");
+      return {
+        success: true,
+        message: result.message || "User deleted successfully",
+      };
+    }
+
+    return {
+      success: false,
+      message: result.message || "Failed to delete user",
+    };
+  } catch (err: any) {
+    return { success: false, message: err.message || "Failed to delete user" };
+  }
+}

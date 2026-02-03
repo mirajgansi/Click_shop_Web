@@ -32,3 +32,18 @@ export const getAllUsers = async (params?: {
     );
   }
 };
+
+export async function deleteUser(userId: string) {
+  try {
+    const response = await axios.delete(API.ADMIN.USER.DELETEUSER(userId), {
+      headers: {
+        "Content-Type": "multipart/form-data", // for file upload/multer
+      },
+    });
+    return response.data;
+  } catch (error: Error | any) {
+    throw new Error(
+      error.response?.data?.message || error.message || "Create user failed",
+    );
+  }
+}

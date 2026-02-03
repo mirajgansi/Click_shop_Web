@@ -1,10 +1,21 @@
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
 interface DeleteModalProps {
-  isOpen: null | boolean;
+  isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   title: string;
   description: string;
 }
+
 export default function DeleteModal({
   isOpen,
   onClose,
@@ -12,25 +23,28 @@ export default function DeleteModal({
   title,
   description,
 }: DeleteModalProps) {
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-      <div className="bg-black p-6 shadow-lg w-[300px]">
-        <h2>{title}</h2>
-        <p >{description}</p>
-        <div>
-          <button onClick={onClose} className="px-4 py-2 bg-gray-300 rounded mr-2 text-black">
+    <Dialog open={isOpen} onOpenChange={(open: any) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[400px]">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold">
+            {title}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            {description}
+          </DialogDescription>
+        </DialogHeader>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white rounded"
-          >
+          </Button>
+
+          <Button variant="destructive" onClick={onConfirm}>
             Delete
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

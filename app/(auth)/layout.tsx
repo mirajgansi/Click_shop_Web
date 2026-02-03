@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ToastContainer } from "react-toastify";
 
 export default function AuthLayout({
   children,
@@ -51,6 +52,8 @@ export default function AuthLayout({
         </div>
 
         {children}
+              <ToastContainer position="top-right" autoClose={3000} />
+
       </div>
     </div>
   );

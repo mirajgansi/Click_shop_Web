@@ -26,21 +26,30 @@ export async function handleRegister(formData: any) {
 
 export async function handleLogin(formData: any) {
   try {
-    //how to ake data from componenets
     const result = await login(formData);
-    // how to send data to componenet
-    if (result.success) {
+
+    // ✅ success
+    if (result?.success === true) {
       await setUserData(result.data);
       await setAuthToken(result.token);
+
       return {
         success: true,
-        message: "message successfull",
+        message: "Login successful",
         data: result.data,
       };
     }
-    return { success: false, message: "Login failed" };
-  } catch (err: Error | any) {
-    return { success: false, message: err.message };
+
+    return {
+      success: false,
+      field: result?.field, // "email" | "password" (optional)
+      message: result?.message || "Invalid email or password",
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err?.message || "Server error. Please try again.",
+    };
   }
 }
 

@@ -1,234 +1,369 @@
 "use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import {  useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
-
 import { z } from "zod";
 import { handleUpdateProfile } from "@/lib/actions/auth-actions";
-import { getNextBuildDebuggerPortOffset } from "next/dist/lib/worker";
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+import { Pencil } from "lucide-react";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export const updateUserSchema = z.object({
-    // firstName: z.string().min(2, { message: "Minimum 2 characters" }),
-    // lastName: z.string().min(2, { message: "Minimum 2 characters" }),
-    email: z.string(),
-    username: z.string().min(3, { message: "Minimum 3 characters" }),
-    image: z
-        .instanceof(File)
-        .optional()
-        .refine((file) => !file || file.size <= MAX_FILE_SIZE, {
-            message: "Max file size is 5MB",
-        })
-        .refine((file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type), {
-            message: "Only .jpg, .jpeg, .png and .webp formats are supported",
-        }),
-        phoneNumber: z.string().max(10).optional(),
-        location: z.string().optional(),
-        DOB: z.string().optional(),
-        gender: z.string().optional(),
-})
+  email: z.string().email("Email is invalid"),
+  username: z.string().min(3, { message: "Minimum 3 characters" }),
+  image: z
+    .instanceof(File)
+    .optional()
+    .refine((file) => !file || file.size <= MAX_FILE_SIZE, {
+      message: "Max file size is 5MB",
+    })
+    .refine((file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type), {
+      message: "Only .jpg, .jpeg, .png and .webp formats are supported",
+    }),
+  phoneNumber: z.string().max(10, "Max 10 digits").optional(),
+  location: z.string().optional(),
+  DOB: z.string().optional(),
+  gender: z.string().optional(),
+});
+
 export type UpdateUserData = z.infer<typeof updateUserSchema>;
 
-export default function UpdateUserForm({
-    user
-}: { user: any }) {
-    const { register, handleSubmit, control, formState: { errors, isSubmitting } } =
-        useForm<UpdateUserData>({
-            resolver: zodResolver(updateUserSchema),
-            values: {
-                email: user?.email || '',
-                username: user?.username || '',
-                phoneNumber: user?.phoneNumber || '',
-                location: user?.location || '',
-                DOB: user?.DOB || '',
-                gender: user?.gender || '',
-            }
-        });
+export default function UpdateUserForm({ user }: { user: any }) {
+  const {
+    register,
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors, isSubmitting, isDirty },
+  } = useForm<UpdateUserData>({
+    resolver: zodResolver(updateUserSchema),
+    defaultValues: {
+      email: user?.email || "",
+      username: user?.username || "",
+      phoneNumber: user?.phoneNumber || "",
+      location: user?.location || "",
+      DOB: user?.DOB || "",
+      gender: user?.gender || "",
+    },
+    mode: "onSubmit",
+  });
 
-    const [error, setError] = useState<string | null>(null);
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+  const [editing, setEditing] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleImageChange = (file: File | undefined, onChange: (file: File | undefined) => void) => {
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreviewImage(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            setPreviewImage(null);
-        }
-        onChange(file);
-    };
+  useEffect(() => {
+    // When user changes (or on first mount), sync form
+    reset({
+      email: user?.email || "",
+      username: user?.username || "",
+      phoneNumber: user?.phoneNumber || "",
+      location: user?.location || "",
+      DOB: user?.DOB || "",
+      gender: user?.gender || "",
+    });
+  }, [user, reset]);
 
-    const handleDismissImage = (onChange?: (file: File | undefined) => void) => {
-        setPreviewImage(null);
-        onChange?.(undefined);
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
-    };
+  const handleImageChange = (
+    file: File | undefined,
+    onChange: (file: File | undefined) => void
+  ) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPreviewImage(reader.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewImage(null);
+    }
+    onChange(file);
+  };
 
-    const onSubmit = async (data: UpdateUserData) => {
-        setError(null);
-        try {
-            const formData = new FormData();
-            formData.append('email', data.email);
-            formData.append('username', data.username);
-            formData.append('phoneNumber', data.phoneNumber || '');
-            formData.append('location', data.location || '');
-            formData.append('DOB', data.DOB || '');
-            formData.append('gender', data.gender || '');
-            if (data.image) {
-                formData.append('image', data.image);
-            }
-            const response = await handleUpdateProfile(formData);
-            if (!response.success) {
-                throw new Error(response.message || 'Update profile failed');
-            }
+  const clearImage = (onChange?: (file: File | undefined) => void) => {
+    setPreviewImage(null);
+    onChange?.(undefined);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
-            handleDismissImage();
-            toast.success('Profile updated successfully');
-        } catch (error: Error | any) {
-            toast.error(error.message || 'Profile update failed');
-            setError(error.message || 'Profile update failed');
-        }
-    };
-    return (
-        <div className="bg-amber-50">
-            <h1 className="text-2xl font-bold mb-4">Profile Page</h1>
-            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-                {error && (
-                    <p className="text-sm text-red-600">{error}</p>
+  const onSubmit = async (data: UpdateUserData) => {
+    try {
+      const formData = new FormData();
+      formData.append("email", data.email);
+      formData.append("username", data.username);
+      formData.append("phoneNumber", data.phoneNumber || "");
+      formData.append("location", data.location || "");
+      formData.append("DOB", data.DOB || "");
+      formData.append("gender", data.gender || "");
+      if (data.image) formData.append("image", data.image);
+
+      const response = await handleUpdateProfile(formData);
+
+      if (!response?.success) {
+        toast.error(response?.message || "Update profile failed");
+        return;
+      }
+
+      toast.success("Profile updated successfully");
+      setEditing(false);
+      clearImage();
+      // optional: reset dirty state after save
+      reset(
+        {
+          email: data.email,
+          username: data.username,
+          phoneNumber: data.phoneNumber || "",
+          location: data.location || "",
+          DOB: data.DOB || "",
+          gender: data.gender || "",
+        },
+        { keepDirty: false }
+      );
+    } catch (err: any) {
+      toast.error(err?.message || "Profile update failed");
+    }
+  };
+
+  const inputBase =
+    "h-11 w-full rounded-xl border border-black/10 dark:border-white/15 bg-white/70 dark:bg-white/5 px-4 text-sm outline-none focus:border-black/30 dark:focus:border-white/30 disabled:opacity-70 disabled:cursor-not-allowed";
+
+  return (
+    <div className="min-h-screen bg-[#FAFAFA] px-4 py-10">
+      <div className="mx-auto w-full max-w-4xl">
+        <div className="rounded-3xl bg-white shadow-sm border border-black/5 p-6 md:p-8">
+          {/* Header */}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-xl md:text-2xl font-semibold text-black">
+                Personal Information
+              </h2>
+              <p className="text-sm text-black/50 mt-1">
+                Update your personal details and contact information.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="h-11 rounded-full border-2 border-[#35C759] px-4 text-sm font-semibold text-[#35C759] hover:bg-[#35C759]/10 flex items-center gap-2"
+              >
+                <Pencil size={16} />
+                Edit Information
+              </button>
+
+              <button
+                type="submit"
+                form="profile-form"
+                disabled={!editing || isSubmitting}
+                className="h-11 rounded-full bg-[#35C759] px-6 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+
+          {/* Body */}
+          <form id="profile-form" onSubmit={handleSubmit(onSubmit)} className="mt-8">
+            {/* Avatar + Upload (optional) */}
+            <div className="flex items-center gap-5 mb-8">
+              <div className="relative h-16 w-16 overflow-hidden rounded-full border border-black/10">
+                {previewImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={previewImage}
+                    alt="Profile preview"
+                    className="h-full w-full object-cover"
+                  />
+                ) : user?.image ? (
+                  <Image
+                    src={process.env.NEXT_PUBLIC_API_BASE_URL + user.image}
+                    alt="Profile"
+                    width={64}
+                    height={64}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-black/5 flex items-center justify-center text-xs text-black/40">
+                    No Image
+                  </div>
                 )}
+              </div>
 
-                {/* Profile Image Display */}
-                <div className="mb-4">
-                    { previewImage ? (
-                        <div className="relative w-24 h-24">
-                            <img
-                                src={previewImage}
-                                alt="Profile Image Preview"
-                                className="w-24 h-24 rounded-full object-cover"
-                            />
-                            <Controller
-                                name="image"
-                                control={control}
-                                render={({ field: { onChange } }) => (
-                                    <button
-                                        type="button"
-                                        onClick={() => handleDismissImage(onChange)}
-                                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600"
-                                    >
-                                        ✕
-                                    </button>
-                                )}
-                            />
-                        </div>
-                    ) : user?.image ? (
-                        <Image
-                            src={process.env.NEXT_PUBLIC_API_BASE_URL + user.image}
-                            alt="Profile Image"
-                            width={100}
-                            height={100}
-                            className="w-24 h-24 rounded-full object-cover"
-                        />
-                    ) : (
-                        <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
-                            <span className="text-gray-600">No Image</span>
-                        </div>
+              <div className="flex flex-col gap-2">
+                <div className="text-sm font-medium text-black">Profile photo</div>
+
+                <div className="flex items-center gap-3">
+                  <Controller
+                    name="image"
+                    control={control}
+                    render={({ field: { onChange } }) => (
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        disabled={!editing}
+                        accept=".jpg,.jpeg,.png,.webp"
+                        onChange={(e) =>
+                          handleImageChange(e.target.files?.[0], onChange)
+                        }
+                        className="text-sm"
+                      />
                     )}
+                  />
+
+                  <Controller
+                    name="image"
+                    control={control}
+                    render={({ field: { onChange } }) => (
+                      <button
+                        type="button"
+                        disabled={!editing}
+                        onClick={() => clearImage(onChange)}
+                        className="text-sm font-semibold text-black/60 hover:text-black disabled:opacity-50"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  />
                 </div>
 
-                {/* Profile Image Input */}
-                <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">Profile Image</label>
-                    <Controller
-                        name="image"
-                        control={control}
-                        render={({ field: { onChange } }) => (
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                onChange={(e) => handleImageChange(e.target.files?.[0], onChange)}
-                                accept=".jpg,.jpeg,.png,.webp"
-                            />
-                        )}
-                    />
-                    {errors.image && <p className="text-sm text-red-600">{errors.image.message}</p>}
-                </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1" htmlFor="username">Username</label>
-                    <input
-                        id="username"
-                        type="text"
-                        {...register("username")}
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                    />
-                    {errors.username && <p className="text-sm text-red-600">{errors.username.message}</p>}
-                </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1" htmlFor="email">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        {...register("email")}
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                    />
-                    {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
-                </div>
-         <div>
-                    <label className="block text-sm font-medium mb-1" htmlFor="PhoneNumber">Phone Number</label>
-                    <input
-                        id="PhoneNumber"
-                        type="tel"
-                        {...register("phoneNumber")}
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                    />
-                    {errors.phoneNumber && <p className="text-sm text-red-600">{errors.phoneNumber.message}</p>}
-                </div> <div>
-                    <label className="block text-sm font-medium mb-1" htmlFor="location">Location</label>
-                    <input
-                        id="location"
-                        type="text"
-                        {...register("location")}
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                    />
-                    {errors.location && <p className="text-sm text-red-600">{errors.location.message}</p>}
-                </div>
-                 <div>
-                    <label className="block text-sm font-medium mb-1" htmlFor="DOB">Date of Birth</label>
-                    <input
-                        id="DOB"
-                        type="date"
-                        {...register("DOB")}
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                    />
-                    {errors.DOB && <p className="text-sm text-red-600">{errors.DOB.message}</p>}
-                </div>
-                 <div>
-                    <label className="block text-sm font-medium mb-1" htmlFor="gender">Gender</label>
-                    <input
-                        id="gender"
-                        type="text"
-                        {...register("gender")}
-                        className="w-full border border-gray-300 rounded px-3 py-2"
-                    />
-                    {errors.gender && <p className="text-sm text-red-600">{errors.gender.message}</p>}
-                </div>
+                {errors.image?.message && (
+                  <p className="text-xs text-red-600">{errors.image.message}</p>
+                )}
+              </div>
+            </div>
 
+            {/* Grid like screenshot */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Username -> Like "First Name" */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-black/80">
+                  Username
+                </label>
+                <input
+                  {...register("username")}
+                  disabled={!editing}
+                  className={inputBase}
+                  placeholder="Username"
+                />
+                {errors.username?.message && (
+                  <p className="text-xs text-red-600">{errors.username.message}</p>
+                )}
+              </div>
+
+              {/* Gender -> Like "Last Name" */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-black/80">
+                  Gender
+                </label>
+                <input
+                  {...register("gender")}
+                  disabled={!editing}
+                  className={inputBase}
+                  placeholder="male / female / other"
+                />
+                {errors.gender?.message && (
+                  <p className="text-xs text-red-600">{errors.gender.message}</p>
+                )}
+              </div>
+
+              {/* Location -> Like "Shipping Address" (full width) */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-black/80">
+                  Shipping Address
+                </label>
+                <input
+                  {...register("location")}
+                  disabled={!editing}
+                  className={inputBase}
+                  placeholder="Enter your address"
+                />
+                {errors.location?.message && (
+                  <p className="text-xs text-red-600">{errors.location.message}</p>
+                )}
+              </div>
+
+              {/* Email */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-black/80">
+                  Email Address
+                </label>
+                <input
+                  {...register("email")}
+                  disabled={!editing}
+                  className={inputBase}
+                  placeholder="you@example.com"
+                />
+                {errors.email?.message && (
+                  <p className="text-xs text-red-600">{errors.email.message}</p>
+                )}
+              </div>
+
+              {/* Phone */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-black/80">
+                  Phone Number
+                </label>
+                <input
+                  {...register("phoneNumber")}
+                  disabled={!editing}
+                  className={inputBase}
+                  placeholder="(xxx) xxx-xxxx"
+                />
+                {errors.phoneNumber?.message && (
+                  <p className="text-xs text-red-600">
+                    {errors.phoneNumber.message}
+                  </p>
+                )}
+              </div>
+
+              {/* DOB */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-black/80">
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  {...register("DOB")}
+                  disabled={!editing}
+                  className={inputBase}
+                />
+                {errors.DOB?.message && (
+                  <p className="text-xs text-red-600">{errors.DOB.message}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom row like screenshot (optional) */}
+            <div className="mt-8 flex items-center justify-end gap-3">
+              {editing && (
                 <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                  type="button"
+                  onClick={() => {
+                    setEditing(false);
+                    setPreviewImage(null);
+                    reset(undefined, { keepDirty: false });
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                  }}
+                  className="h-11 rounded-full px-5 text-sm font-semibold text-black/70 hover:bg-black/5"
                 >
-                    {isSubmitting ? 'Updating...' : 'Update Profile'}
+                  Cancel
                 </button>
-            </form>
+              )}
+
+              <button
+                type="submit"
+                disabled={!editing || isSubmitting || (!isDirty && !previewImage)}
+                className="h-11 rounded-full bg-[#35C759] px-6 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </form>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

@@ -8,50 +8,72 @@ import { useRouter } from "next/navigation";
 import { LoginData, loginSchema } from "../schema";
 import { Eye, EyeOff } from "lucide-react";
 import { handleLogin } from "@/lib/actions/auth-actions";
+import { toast } from "react-toastify";
 
 export default function LoginForm() {
   const router = useRouter();
 
-   const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-    } = useForm<LoginData>({
-        resolver: zodResolver(loginSchema),
-        mode: "onSubmit",
-    });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onSubmit",
+  });
 
-  const [pending, setTransition] = useTransition();
+  const [pending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-const submit = async (values: LoginData) => {
-        setError(null);
-        setTransition(async () => {
-            try {
-                const response = await handleLogin(values);
-                if (!response.success) {
-                    throw new Error(response.message);
-                }
-                if (response.success) {
-                    if (response.data?.role == 'admin') {
-                        return router.replace("/admin");
-                    }
-                    if (response.data?.role === 'user') {
-                        return router.replace("/dashboard");
-                    }
-                    return router.replace("/");
-                } else {
-                    setError('Login failed');
-                }
-            } catch (err: Error | any) {
-                setError(err.message || 'Login failed');
-            }
-        })
-    };
+  /** ✅ Handle submit */
+  const submit = async (values: LoginData) => {
+    startTransition(async () => {
+      try {
+        const response = await handleLogin(values);
 
+    if (response?.success !== true) {
+      // If backend sends field
+      if (response?.field === "email") {
+        toast.error("Email is incorrect");
+        setError("email", { message: response.message || "Email is incorrect" });
+        return;
+      }
+
+      if (response?.field === "password") {
+        toast.error("Password is incorrect");
+        setError("password", {
+          message: response.message || "Password is incorrect",
+        });
+        return;
+      }
+
+      return;
+    }
+
+    toast.success("Login successful 🎉");
+    // redirect...
+  
+        if (response.data?.role === "admin") {
+          router.replace("/admin");
+        } else if (response.data?.role === "user") {
+          router.replace("/user/dashboard");
+        } else {
+          router.replace("/");
+        }
+      } catch (err: any) {
+        toast.error(err.message || "Something went wrong");
+      }
+    });
+  };
+const onInvalid = () => {
+  toast.error("Please fix the validation errors");
+};
   return (
-    <form onSubmit={handleSubmit(submit)} className="space-y-4">
+    <form
+      onSubmit={handleSubmit(submit, onInvalid)}
+      className="space-y-4"
+    >
+      {/* Email */}
       <div className="space-y-1">
         <label className="text-sm font-medium" htmlFor="email">
           Email
@@ -59,9 +81,8 @@ const submit = async (values: LoginData) => {
         <input
           id="email"
           type="email"
-          autoComplete="email"
-          className="h-10 w-full rounded-md border border-black/10 dark:border-white/15 bg-background px-3 text-sm outline-none focus:border-foreground/40"
           {...register("email")}
+          className="h-10 w-full rounded-md border border-black/10 px-3 text-sm"
           placeholder="you@example.com"
         />
         {errors.email?.message && (
@@ -69,6 +90,7 @@ const submit = async (values: LoginData) => {
         )}
       </div>
 
+      {/* Password */}
       <div className="space-y-1">
         <label className="text-sm font-medium" htmlFor="password">
           Password
@@ -78,17 +100,15 @@ const submit = async (values: LoginData) => {
           <input
             id="password"
             type={showPassword ? "text" : "password"}
-            autoComplete="current-password"
-            className="h-10 w-full rounded-md border border-black/10 dark:border-white/15 bg-background px-3 text-sm outline-none focus:border-foreground/40"
             {...register("password")}
+            className="h-10 w-full rounded-md border border-black/10 px-3 text-sm"
             placeholder="••••••"
           />
 
           <button
             type="button"
-            onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-            aria-label={showPassword ? "Hide Password" : "Show Password"}
+            onClick={() => setShowPassword((p) => !p)}
+            className="absolute inset-y-0 right-3 flex items-center text-gray-500"
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -99,19 +119,16 @@ const submit = async (values: LoginData) => {
         )}
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-
       <button
         type="submit"
         disabled={isSubmitting || pending}
-        className="h-10 w-full rounded-md bg-[#4CAF50] text-white text-sm font-semibold hover:opacity-90 disabled:opacity-60"
+        className="h-10 w-full rounded-md bg-[#4CAF50] text-white font-semibold disabled:opacity-60"
       >
-        
         {isSubmitting || pending ? "Logging in..." : "Log in"}
       </button>
 
-      <div className="mt-1 text-center text-sm">
-        Don't have an account?{" "}
+      <div className="text-center text-sm">
+        Don&apos;t have an account?{" "}
         <Link href="/register" className="font-semibold hover:underline">
           Sign up
         </Link>
@@ -119,3 +136,7 @@ const submit = async (values: LoginData) => {
     </form>
   );
 }
+function setError(arg0: string, arg1: { message: any; }) {
+  throw new Error("Function not implemented.");
+}
+

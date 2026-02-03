@@ -1,4 +1,3 @@
-import { UsersTable } from "../user/_componenet/usersTable";
 
 export default function Dashboard() {
   return (
