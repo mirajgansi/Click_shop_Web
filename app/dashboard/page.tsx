@@ -1,10 +1,10 @@
 'use client';
 
-import Header from '@/components/header/Header';
 import Image from "next/image";
 import CategoryCard from '@/components/Catregorycard';
 import ProductSection from '@/components/ProductSection';
 import ProductFilterBar from '@/components/ProductFillterBar';
+import Header from "./_components/header/Header";
 
 const HomePage = () => {
   return (

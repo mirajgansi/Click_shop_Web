@@ -6,14 +6,16 @@ export const API = {
     WHOAMI: "/api/auth/whoami",
     UPDATEPROFILE: "/api/auth/update-profile",
   },
-  PRODUCT: {
-    CREATEPRODUCT: "/api/products/CreateProduct",
-    GETAllPRODUCTS: "/api/products",
-    GET1PRODUCTS: "/api/products/:id",
-  },
+ PRODUCT: {
+      CREATE: "/api/products/",
+      GET_ALL: "/api/products/",
+      GET_ONE: (id: string) => `/api/products/${id}`,
+    },
   ADMIN: {
     USER: {
       CREATE: "/api/admin/users/",
+      GETALLUSER: "/api/admin/users/",
     },
+   
   },
 };

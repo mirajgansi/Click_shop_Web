@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 const ADMIN_LINKS = [
     { href: "/admin", label: "Dashboard" },
     { href: "/admin/user", label: "Users" },
+        { href: "/admin/products", label: "Products" },
+
 ];
 
 export default function Sidebar() {
@@ -15,18 +17,21 @@ export default function Sidebar() {
 
     return (
         <>
-            {/* Sidebar */}
-            <aside className={`
-                fixed md:static 
-                top-0 left-0 
-                h-screen w-64 
-                bg-white dark:bg-gray-900 
-                border-r border-gray-200 dark:border-gray-800 
-                z-40 overflow-y-auto`}
-            >
+                        <aside
+                className={`
+                    fixed md:static
+                    inset-y-0 left-0
+                    w-64
+                    min-h-screen
+                    bg-white dark:bg-gray-900
+                    border-r border-gray-200 dark:border-gray-800
+                    z-40
+                    overflow-y-auto
+                `}
+                >
                 <div className="p-4 border-b border-gray-200 dark:border-gray-800">
                     <Link href="/admin" className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded bg-gray-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center font-bold">A</div>
+                        <div className="h-8 w-8 rounded bg-black-900 dark:bg-white text-white dark:text-gray-900 flex items-center justify-center font-bold">A</div>
                         <span className="font-semibold">Admin Panel</span>
                     </Link>
                 </div>

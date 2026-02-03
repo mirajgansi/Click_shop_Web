@@ -1,10 +1,10 @@
-import CreateUserForm from "../_componenet/CreateUserForm";
+import CreateProductForm from "../_components/createProductForm";
 
 
 export default function Page() {
     return (
         <div>
-            <CreateUserForm/>
+            <CreateProductForm/>
                 
         </div>
     );

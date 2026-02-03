@@ -15,3 +15,20 @@ export const createUser = async (userData: any) => {
     );
   }
 };
+
+export const getAllUsers = async (params?: {
+  page?: number;
+  size?: number;
+  search?: string;
+}) => {
+  try {
+    const response = await axios.get(API.ADMIN.USER.GETALLUSER, {
+      params,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || error.message || "Failed to fetch users",
+    );
+  }
+};

@@ -1,7 +1,7 @@
 'use client';
 
+import ProductCard from "@/app/dashboard/_components/product/Productcard";
 import { useState } from "react";
-import ProductCard from "./product/Productcard";
 
 function ProductSection({ title }: { title: string }) {
    const [favorites, setFavorites] = useState<boolean[]>([false, false]);
