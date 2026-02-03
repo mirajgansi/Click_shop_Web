@@ -1,6 +1,6 @@
 'use client';
 
-import ProductCard from "@/app/dashboard/_components/product/Productcard";
+import ProductCard from "@/app/user/dashboard/_components/Productcard";
 import { useState } from "react";
 
 function ProductSection({ title }: { title: string }) {

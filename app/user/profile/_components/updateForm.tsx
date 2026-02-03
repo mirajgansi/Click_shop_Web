@@ -99,7 +99,7 @@ export default function UpdateUserForm({
         }
     };
     return (
-        <div>
+        <div className="bg-amber-50">
             <h1 className="text-2xl font-bold mb-4">Profile Page</h1>
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                 {error && (

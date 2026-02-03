@@ -1,5 +1,6 @@
 'use client';
 
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/context/AuthContext';
 import {
   Heart,
@@ -11,12 +12,6 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 export default function Actions() {
   const router = useRouter();
@@ -47,7 +42,7 @@ export default function Actions() {
       {/* User Dropdown */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="text-gray-600 hover:text-black transition outline-none">
+          <button className="text-gray-600 hover:text-black transition outline-none cursor-pointer">
             <User size={20} />
           </button>
         </DropdownMenuTrigger>
