@@ -1,9 +1,9 @@
 'use client';
 
 import Image from "next/image";
-import CategoryCard from '@/components/Catregorycard';
-import ProductSection from '@/components/ProductSection';
-import ProductFilterBar from '@/components/ProductFillterBar';
+import CategoryCard from '@/app/user/dashboard/_components/Catregorycard';
+import ProductSection from '@/app/user/dashboard/_components/ProductSection';
+import ProductFilterBar from '@/app/user/dashboard/_components/ProductFillterBar';
 
 const HomePage = () => {
   return (

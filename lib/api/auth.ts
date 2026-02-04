@@ -47,6 +47,7 @@ export const updateProfile = async (profileData: any) => {
     throw new Error(err.response?.data?.message || "Updating Profile Failed");
   }
 };
+
 export const requestPasswordReset = async (email: string) => {
   try {
     const response = await axios.post(API.AUTH.REQUEST_PASSWORD_RESET, {

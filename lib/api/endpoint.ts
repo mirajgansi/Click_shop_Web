@@ -12,7 +12,21 @@ export const API = {
     CREATE: "/api/products/",
     GET_ALL: "/api/products/",
     GET_ONE: (id: string) => `/api/products/${id}`,
+
+    UPDATE: (id: string) => `/api/products/${id}`,
+    DELETE: (id: string) => `/api/products/${id}`,
+
+    UPDATE_IMAGE: "/api/products/update-image",
+
+    BY_CATEGORY: (category: string) =>
+      `/api/products/category/${encodeURIComponent(category)}`,
+
+    RECENT: "/api/products/recent",
+    TRENDING: "/api/products/trending",
+    POPULAR: "/api/products/popular",
+    TOP_RATED: "/api/products/top-rated",
   },
+
   ADMIN: {
     USER: {
       CREATE: "/api/admin/users/",

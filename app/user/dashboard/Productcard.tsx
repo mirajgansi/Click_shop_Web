@@ -48,6 +48,8 @@ export default function ProductCard({
             alt={name}
             width={120}
             height={100}
+              unoptimized
+
             className="object"
           />
       </div>
@@ -63,7 +65,7 @@ export default function ProductCard({
 
       <div className="mt-2 flex items-center justify-between">
         <p className="text-green-600 text-lg font-bold">
-          ${price.toFixed(2)}
+          RS{price.toFixed(2)}
           <span className="text-gray-500 text-sm font-normal">
             /{unit}
           </span>

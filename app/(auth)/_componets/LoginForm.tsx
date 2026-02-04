@@ -126,7 +126,12 @@ const onInvalid = () => {
       >
         {isSubmitting || pending ? "Logging in..." : "Log in"}
       </button>
-
+      <div className="text-right text-sm">
+         <Link href="/request-reset-password" className="font-medium hover:underline ">
+          Forgot password?
+        </Link>
+      </div>
+         
       <div className="text-center text-sm">
         Don&apos;t have an account?{" "}
         <Link href="/register" className="font-semibold hover:underline">

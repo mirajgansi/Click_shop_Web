@@ -6,6 +6,8 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { handleDeleteUser } from "@/lib/actions/admin/user-action";
 import DeleteModal from "@/app/_componets/DeleteModal";
+import { FormSelect, SelectOption } from "@/app/_componets/dropdown";
+import { useForm } from "react-hook-form";
 
 type User = {
   _id: string;
@@ -23,6 +25,7 @@ type Pagination = {
   total: number;
   totalPages: number;
 };
+type RoleFilter = "all" | "user" | "admin" | "driver";
 
 export default function UsersTable({
   users,
@@ -51,10 +54,7 @@ export default function UsersTable({
   };
 
   const onSearch = () => pushWithParams({ page: 1, search: searchTerm });
-  const onClear = () => {
-    setSearchTerm("");
-    router.push("/admin/users");
-  };
+ 
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   
@@ -73,31 +73,95 @@ export default function UsersTable({
     }
   };
   
+const roleOptions: SelectOption[] = [
+  { value: "all", label: "All roles" },
+  { value: "user", label: "User" },
+  { value: "driver", label: "Driver" },
+  { value: "admin", label: "Admin" },
+];
+const { control, watch } = useForm<{ role: RoleFilter }>({
+  defaultValues: { role: "all" },
+});
+
+const selectedRole = watch("role");
+
+const filteredUsers = users.filter((u) => {
+  if (selectedRole === "all") return true;
+  return u.role === selectedRole;
+});
+
   return (
     <div className="space-y-4">
       {/* Search */}
-      <div className="flex items-center gap-3">
-        <input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search by username, email, phone, location..."
-          className="h-10 w-full rounded-md border border-black/10 dark:border-white/15 bg-background px-3 text-sm outline-none focus:border-foreground/40"
-        />
-        <button
-          type="button"
-          onClick={onSearch}
-          className="h-10 whitespace-nowrap rounded-md border px-3 text-sm"
-        >
-          Search
-        </button>
-        <button
-          type="button"
-          onClick={onClear}
-          className="h-10 whitespace-nowrap rounded-md border px-3 text-sm"
-        >
-          Clear
-        </button>
-      </div>
+ <div className="flex w-full items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 shadow-sm dark:border-white/15 dark:bg-background">
+  {/* Search input */}
+  <div className="flex flex-1 items-center gap-2">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4 text-gray-400"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 3.5a7.5 7.5 0 0013.15 13.15z"
+      />
+    </svg>
+
+    <input
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      placeholder="Search"
+      className="h-9 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
+      onKeyDown={(e) => {
+        if (e.key === "Enter") onSearch();
+      }}
+    />
+  </div>
+
+  {/* Search button (icon) ✅ */}
+  <button
+    type="button"
+    onClick={onSearch}
+    className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/5 dark:hover:bg-white/10"
+    aria-label="Search"
+    title="Search"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4 text-gray-600 dark:text-gray-300"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 3.5a7.5 7.5 0 0013.15 13.15z"
+      />
+    </svg>
+  </button>
+
+  {/* Divider */}
+  <div className="h-6 w-px bg-gray-200 dark:bg-white/20" />
+
+  {/* Role filter */}
+  <div className="w-40">
+    <FormSelect
+      control={control}
+      name="role"
+      placeholder="Role"
+      options={roleOptions}
+      className="h-9 border-none shadow-none focus:ring-0"
+    />
+  </div>
+</div>
+
+
 
       {/* Table */}
       {users.length === 0 ? (
@@ -118,7 +182,7 @@ export default function UsersTable({
             </thead>
 
             <tbody>
-              {users.map((user) => (
+{filteredUsers.map((user) => (
                 <tr key={user._id} className="border-t">
                   <td className="px-4 py-2">{user.username}</td>
                   <td className="px-4 py-2">{user.email}</td>

@@ -37,7 +37,7 @@ export const handleGetAllProducts = async (params?: {
       return {
         success: true,
         message: "All products fetched successfully",
-        products: response.data.products ?? response.data, // ✅ FIX
+        products: response.data.products ?? response.data,
         pagination: response.data.pagination,
       };
     }
@@ -49,7 +49,7 @@ export const handleGetAllProducts = async (params?: {
   } catch (error: any) {
     return {
       success: false,
-      message: error.message || "Failed to fetch products", // ✅ FIX
+      message: error.message || "Failed to fetch products",
     };
   }
 };
