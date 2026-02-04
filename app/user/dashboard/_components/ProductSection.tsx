@@ -1,8 +1,10 @@
 "use client";
 
-import ProductCard from "@/app/user/dashboard/Productcard";
+import ProductCard from "@/app/user/_components/Productcard";
 import { useEffect, useMemo, useState } from "react";
 import { getAllProduct } from "@/lib/api/product"; // ✅ adjust path to your product.ts
+import { toast } from "react-toastify";
+import { handleAddCartItem } from "@/lib/actions/cart-action";
 
 type Product = {
   _id: string;
@@ -27,7 +29,7 @@ export default function ProductSection({ title }: { title: string }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+ const [adding, setAdding] = useState<Record<string, boolean>>({}); 
   // favorites stored by product id (best for refresh)
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
 
@@ -70,6 +72,13 @@ export default function ProductSection({ title }: { title: string }) {
     return [...products, ...Array.from({ length: 10 - products.length }).map(() => null)];
   }, [products]);
 
+
+const onAddCart = async (id: string) => {
+  const res = await handleAddCartItem({ productId: id, quantity: 1 });
+  if (!res.success) return toast.error(res.message);
+  toast.success(res.message || "Added");
+};
+
   return (
     <section className="max-w mx-auto px-10 py-12">
       <div className="mb-6 flex items-center justify-between">
@@ -95,16 +104,23 @@ export default function ProductSection({ title }: { title: string }) {
           }
 
           return (
-            <ProductCard
-              key={p._id}
-              image={buildImageUrl(p.image)}
-              name={p.name}
-              price={Number(p.price)}
-              stock={`${p.inStock ?? 0}+ in stock`}
-              isFavorite={!!favorites[p._id]}
-              onToggleWishlist={() => toggleFavorite(p._id)}
-              onAddToCart={() => console.log("add to cart", p._id)}
-            />
+            <div key={p._id} className="relative">
+              <ProductCard
+                image={buildImageUrl(p.image)}
+                name={p.name}
+                price={Number(p.price)}
+                stock={`${p.inStock ?? 0}+ in stock`}
+                isFavorite={!!favorites[p._id]}
+                onToggleWishlist={() => toggleFavorite(p._id)}
+                onAddToCart={() => onAddCart(p._id)} // ✅ here
+              />
+
+              {adding[p._id] && (
+                <div className="absolute inset-0 grid place-items-center rounded-3xl bg-white/60">
+                  <span className="text-sm font-medium">Adding…</span>
+                </div>
+              )}
+            </div>
           );
         })}
       </div>

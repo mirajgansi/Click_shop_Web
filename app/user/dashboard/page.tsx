@@ -1,6 +1,6 @@
 import { handleWhoami } from "@/lib/actions/auth-actions";
 import { notFound } from "next/navigation";
-import Dashboard from "../../admin/dashboard/page";
+import HomePage from "./_components/HomePage";
 
 export default async function Page() {
   const result = await handleWhoami();
@@ -15,7 +15,7 @@ export default async function Page() {
 
   return (
     <>
-      <Dashboard />
+     <HomePage/>
     </>
   );
 }

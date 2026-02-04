@@ -34,4 +34,11 @@ export const API = {
       DELETEUSER: (id: string) => `/api/admin/users/${id}`,
     },
   },
+  CART: {
+    GET_MY_CART: "/api/cart/",
+    ADD_ITEM: "/api/cart/items",
+    UPDATE_ITEM_QTY: (productId: string) => `/api/cart/items/${productId}`,
+    REMOVE_ITEM: (productId: string) => `/api/cart/items/${productId}`,
+    CLEAR: "/api/cart/",
+  },
 };
