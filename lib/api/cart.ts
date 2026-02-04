@@ -33,11 +33,9 @@ export const updateCartItemQuantity = async (
   quantity: number,
 ) => {
   try {
-    const res = await axios.patch(
-      API.CART.UPDATE_ITEM_QTY(productId),
-      { quantity },
-      { withCredentials: false },
-    );
+    const res = await axios.patch(API.CART.UPDATE_ITEM_QTY(productId), {
+      quantity,
+    });
     return res.data;
   } catch (error: any) {
     throw new Error(
@@ -50,9 +48,7 @@ export const updateCartItemQuantity = async (
 
 export const removeCartItem = async (productId: string) => {
   try {
-    const res = await axios.delete(API.CART.REMOVE_ITEM(productId), {
-      withCredentials: true,
-    });
+    const res = await axios.delete(API.CART.REMOVE_ITEM(productId), {});
     return res.data;
   } catch (error: any) {
     throw new Error(
@@ -63,9 +59,7 @@ export const removeCartItem = async (productId: string) => {
 
 export const clearCart = async () => {
   try {
-    const res = await axios.delete(API.CART.CLEAR, {
-      withCredentials: true,
-    });
+    const res = await axios.delete(API.CART.CLEAR, {});
     return res.data;
   } catch (error: any) {
     throw new Error(

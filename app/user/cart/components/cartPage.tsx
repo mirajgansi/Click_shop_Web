@@ -102,7 +102,6 @@ export default function CartPage() {
     return <div className="p-10 text-sm text-gray-500">Loading cart...</div>;
   }
 
-  // ✅ Empty state
   if (!cart.items.length) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-16 text-center">
@@ -133,12 +132,10 @@ export default function CartPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Items */}
         <div className="lg:col-span-2 space-y-4">
           {cart.items.map((item) => {
             const product = getProduct(item);
 
-            // If backend does NOT populate product, you need to fetch product details by id.
             if (!product) {
               return (
                 <div key={String(item.productId)} className="rounded-2xl border p-4">
@@ -170,6 +167,7 @@ export default function CartPage() {
                     alt={product.name}
                     fill
                     className="object-cover"
+                    unoptimized
                   />
                 </div>
 
@@ -191,7 +189,6 @@ export default function CartPage() {
                   </div>
 
                   <div className="mt-3 flex items-center justify-between">
-                    {/* Qty controls */}
                     <div className="inline-flex items-center rounded-full border">
                       <button
                         type="button"
@@ -224,7 +221,6 @@ export default function CartPage() {
           })}
         </div>
 
-        {/* Summary */}
         <div className="rounded-2xl border bg-white p-5 h-fit">
           <h3 className="text-lg font-semibold">Order Summary</h3>
 
