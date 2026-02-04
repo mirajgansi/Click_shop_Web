@@ -6,6 +6,9 @@ export const createProduct = async (formData: FormData) => {
   try {
     const response = await axios.post(API.PRODUCT.CREATE, formData, {
       withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
     });
     return response.data;
   } catch (error: any) {

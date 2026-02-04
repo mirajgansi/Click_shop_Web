@@ -7,7 +7,7 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { handleUpdateProfile } from "@/lib/actions/auth-actions";
-import { Pencil } from "lucide-react";
+import { Camera, Pencil, User, X } from "lucide-react";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -169,70 +169,83 @@ export default function UpdateUserForm({ user }: { user: any }) {
           <form id="profile-form" onSubmit={handleSubmit(onSubmit)} className="mt-8">
             {/* Avatar + Upload (optional) */}
             <div className="flex items-center gap-5 mb-8">
-              <div className="relative h-16 w-16 overflow-hidden rounded-full border border-black/10">
-                {previewImage ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={previewImage}
-                    alt="Profile preview"
-                    className="h-full w-full object-cover"
-                  />
-                ) : user?.image ? (
-                  <Image
-                    src={process.env.NEXT_PUBLIC_API_BASE_URL + user.image}
-                    alt="Profile"
-                    width={64}
-                    height={64}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="h-full w-full bg-black/5 flex items-center justify-center text-xs text-black/40">
-                    No Image
-                  </div>
-                )}
-              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-gray-700">Profile Image</label>
 
-              <div className="flex flex-col gap-2">
-                <div className="text-sm font-medium text-black">Profile photo</div>
+                        <Controller
+                        name="image"
+                        control={control}
+                        render={({ field: { onChange } }) => (
+                        <div className="flex items-center gap-6">
+                        {/* Avatar */}
+                        <div className="relative h-28 w-28">
+                        <div className="h-28 w-28 overflow-hidden rounded-full border-2 border-gray-200 bg-gray-100 shadow">
+                            {previewImage ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={previewImage}
+                                alt="Profile preview"
+                                className="h-full w-full object-cover"
+                            />
+                            ) : user?.image ? (
+                            <Image
+                                src={process.env.NEXT_PUBLIC_API_BASE_URL + user.image}
+                                alt="Profile"
+                                width={112}
+                                height={112}
+                                className="h-full w-full object-cover"
+                            />
+                            ) : (
+                            <div className="h-full w-full flex items-center justify-center text-black/40">
+                                <User size={40} />
+                            </div>
+                            )}
+                        </div>
 
-                <div className="flex items-center gap-3">
-                  <Controller
-                    name="image"
-                    control={control}
-                    render={({ field: { onChange } }) => (
-                      <input
+                        {/* ❌ REMOVE BUTTON — ONLY FOR NEW UPLOAD */}
+                        {previewImage && (
+                            <button
+                            type="button"
+                            onClick={() => clearImage(onChange)}
+                            className="absolute -top-2 -right-2 flex h-9 w-9 items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-600"
+                            title="Remove uploaded image"
+                            >
+                            <X size={18} />
+                            </button>
+                        )}
+
+                        {/* 📷 CHANGE BUTTON — ALWAYS AVAILABLE (or gate with editing) */}
+                        <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="absolute bottom-1 right-1 flex h-10 w-10 items-center justify-center rounded-full bg-green-500 text-white shadow-md hover:opacity-90"
+                            title="Change photo"
+                        >
+                            <Camera size={18} />
+                        </button>
+                        </div>
+
+                        {/* Hidden file input */}
+                        <input
                         ref={fileInputRef}
                         type="file"
-                        disabled={!editing}
                         accept=".jpg,.jpeg,.png,.webp"
-                        onChange={(e) =>
-                          handleImageChange(e.target.files?.[0], onChange)
-                        }
-                        className="text-sm"
-                      />
-                    )}
-                  />
+                        onChange={(e) => handleImageChange(e.target.files?.[0], onChange)}
+                        className="hidden"
+                        />
+                        </div>
+                        )}
+                        />
 
-                  <Controller
-                    name="image"
-                    control={control}
-                    render={({ field: { onChange } }) => (
-                      <button
-                        type="button"
-                        disabled={!editing}
-                        onClick={() => clearImage(onChange)}
-                        className="text-sm font-semibold text-black/60 hover:text-black disabled:opacity-50"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  />
-                </div>
 
-                {errors.image?.message && (
+
+
+                {errors.image && (
                   <p className="text-xs text-red-600">{errors.image.message}</p>
                 )}
               </div>
+
+              <div />
             </div>
 
             {/* Grid like screenshot */}

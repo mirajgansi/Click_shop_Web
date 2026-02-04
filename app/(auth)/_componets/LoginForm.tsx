@@ -50,7 +50,7 @@ export default function LoginForm() {
       return;
     }
 
-    toast.success("Login successful 🎉");
+    toast.success("Login successfull");
     // redirect...
   
         if (response.data?.role === "admin") {
