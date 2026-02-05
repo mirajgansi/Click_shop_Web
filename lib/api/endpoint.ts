@@ -41,4 +41,12 @@ export const API = {
     REMOVE_ITEM: (productId: string) => `/api/cart/items/${productId}`,
     CLEAR: "/api/cart/",
   },
+  ORDER: {
+    CREATE: "/api/orders",
+    GET_MY: "/api/orders/me",
+    GET_ONE: (id: string) => `/api/orders/${id}`,
+    // admin
+    GET_ALL: "/api/orders",
+    UPDATE_STATUS: (id: string) => `/api/orders/${id}/status`,
+  },
 };

@@ -30,7 +30,6 @@ export const ProductSchema = z
               message: "Only .jpg, .jpeg, .png and .webp formats are supported",
           }),
 
-    available: z.boolean().default(true),
     inStock: z.number().int("Stock must be an integer").min(0).default(0),
 
     sku: z.string().optional(),

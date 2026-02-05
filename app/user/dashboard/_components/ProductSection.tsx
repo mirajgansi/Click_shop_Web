@@ -15,12 +15,8 @@ type Product = {
 };
 
 function buildImageUrl(image?: string) {
-  // If backend returns full URL -> use directly
   if (!image) return "/cookie.jpg";
   if (image.startsWith("http")) return image;
-
-  // If backend returns something like "uploads/xxx.jpg"
-  // Make sure NEXT_PUBLIC_API_BASE_URL is set to your backend, eg: http://localhost:5050
   const base = process.env.NEXT_PUBLIC_API_BASE_URL || "";
   return `${base}/${image.replace(/^\/+/, "")}`;
 }
@@ -32,6 +28,7 @@ export default function ProductSection({ title }: { title: string }) {
  const [adding, setAdding] = useState<Record<string, boolean>>({}); 
   // favorites stored by product id (best for refresh)
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
+const isOutOfStock = (p: Product) => (p.inStock ?? 0) <= 0;
 
   const toggleFavorite = (id: string) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -41,11 +38,7 @@ export default function ProductSection({ title }: { title: string }) {
     try {
       setError(null);
 
-      // If your backend supports "size", request 5 only:
-      const res = await getAllProduct({ page: 1, size: 5 });
-
-      // Your API response shape might be:
-      // res.data or res.data.products etc
+      const res = await getAllProduct({ page: 1, size: 5 }); 
       const list: Product[] =
         res?.data?.products || res?.data || res?.products || [];
 
@@ -73,11 +66,31 @@ export default function ProductSection({ title }: { title: string }) {
   }, [products]);
 
 
-const onAddCart = async (id: string) => {
-  const res = await handleAddCartItem({ productId: id, quantity: 1 });
-  if (!res.success) return toast.error(res.message);
-  toast.success(res.message || "Added");
+const onAddCart = async (p: Product) => {
+  if ((p.inStock ?? 0) <= 0) {
+    toast.error("Out of stock");
+    return;
+  }
+
+  try {
+    setAdding((prev) => ({ ...prev, [p._id]: true }));
+
+    const res = await handleAddCartItem({
+      productId: p._id,
+      quantity: 1,
+    });
+
+    if (!res.success) {
+      toast.error(res.message);
+      return;
+    }
+
+    toast.success(res.message || "Added to cart");
+  } finally {
+    setAdding((prev) => ({ ...prev, [p._id]: false }));
+  }
 };
+
 
   return (
     <section className="max-w mx-auto px-10 py-12">
@@ -105,15 +118,15 @@ const onAddCart = async (id: string) => {
 
           return (
             <div key={p._id} className="relative">
-              <ProductCard
-                image={buildImageUrl(p.image)}
-                name={p.name}
-                price={Number(p.price)}
-                stock={`${p.inStock ?? 0}+ in stock`}
-                isFavorite={!!favorites[p._id]}
-                onToggleWishlist={() => toggleFavorite(p._id)}
-                onAddToCart={() => onAddCart(p._id)} // ✅ here
-              />
+             <ProductCard
+              image={buildImageUrl(p.image)}
+              name={p.name}
+              price={Number(p.price)}
+              inStock={p.inStock ?? 0}
+              isFavorite={!!favorites[p._id]}
+              onToggleWishlist={() => toggleFavorite(p._id)}
+              onAddToCart={() => onAddCart(p)}
+            />
 
               {adding[p._id] && (
                 <div className="absolute inset-0 grid place-items-center rounded-3xl bg-white/60">

@@ -148,7 +148,6 @@ const stepFields: Record<number, (keyof WizardData)[]> = {
     "manufactureDate",
     "expireDate",
     "nutritionalInfo",
-    "available",
     "sku",
   ],
 };
@@ -179,7 +178,6 @@ export default function CreateProductWizard() {
     resolver: zodResolver(ProductSchema),
     mode: "onSubmit",
     defaultValues: {
-      available: true,
       inStock: 0,
       // currency: "NPR",
     },
@@ -263,7 +261,6 @@ export default function CreateProductWizard() {
 
         if (data.currency) formData.append("currency", data.currency);
 
-        formData.append("available", String(data.available ?? true));
         formData.append("inStock", String(data.inStock ?? 0));
         if (data.image) formData.append("image", data.image);
         if (data.sku?.trim()) formData.append("sku", data.sku.trim());
@@ -559,13 +556,6 @@ export default function CreateProductWizard() {
               )}
             </div>
 
-            {/* Available */}
-            <div className="flex items-center gap-2">
-              <input id="available" type="checkbox" {...register("available")} />
-              <label htmlFor="available" className="text-sm font-medium">
-                Available
-              </label>
-            </div>
 
             {/* SKU */}
             <div className="space-y-1">

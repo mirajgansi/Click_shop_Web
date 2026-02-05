@@ -6,6 +6,7 @@ import { ShoppingCart, Trash2, Plus, Minus } from "lucide-react";
 import { toast } from "react-toastify";
 
 import { getMyCart, updateCartItemQuantity, removeCartItem, clearCart } from "@/lib/api/cart";
+import { createOrder } from "@/lib/api/order";
 
 type Product = {
   _id: string;
@@ -97,6 +98,31 @@ export default function CartPage() {
       toast.error(e.message || "Failed to clear cart");
     }
   };
+
+const onCheckout = async () => {
+  try {
+    const res = await createOrder({
+      shippingFee: 0, // or calculate later
+      // you can add shippingAddress here later
+    });
+
+    if (!res.success) {
+      toast.error(res.message || "Checkout failed");
+      return;
+    }
+
+    toast.success("Order placed successfully 🎉");
+
+    // refresh cart UI
+    await fetchCart();
+
+    // optional redirect
+    // router.push("/user/orders");
+  } catch (e: any) {
+    toast.error(e.message || "Checkout failed");
+  }
+};
+
 
   if (loading) {
     return <div className="p-10 text-sm text-gray-500">Loading cart...</div>;
@@ -234,13 +260,14 @@ export default function CartPage() {
             <span className="text-lg font-semibold">${total.toFixed(2)}</span>
           </div>
 
-          <button
-            type="button"
-            className="mt-5 w-full rounded-full bg-green-600 py-3 text-sm font-semibold text-white hover:opacity-90"
-            onClick={() => toast.info("Checkout coming soon")}
-          >
-            Checkout
-          </button>
+         <button
+  type="button"
+  disabled={!cart.items.length}
+  onClick={onCheckout}
+  className="mt-5 w-full rounded-full bg-green-600 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+>
+  Checkout
+</button>
         </div>
       </div>
     </div>
