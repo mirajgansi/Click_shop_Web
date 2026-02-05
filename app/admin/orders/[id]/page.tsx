@@ -122,9 +122,12 @@ export default async function OrderDetailPage({
                   </span>
                 </div>
 
-                <button className="rounded-2xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600">
-                  Create Shipping Label →
-                </button>
+<Link
+  href={`/admin/orders/${order._id}/shipping`}
+  className="rounded-2xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+>
+  Create Shipping Label →
+</Link>
               </div>
 
               <div className="mt-4">
