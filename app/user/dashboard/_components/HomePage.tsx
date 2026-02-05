@@ -7,10 +7,8 @@ import ProductFilterBar from '@/app/user/dashboard/_components/ProductFillterBar
 
 const HomePage = () => {
   return (
-    <div className="bg-white">
-     
-
-      {/* HERO SECTION */}
+<div className="flex-1 min-h-screen ">
+{/* HERO SECTION */}
       <section className="relative h-[70vh] w-full">
         <Image
           src="/hero-store.jpg"

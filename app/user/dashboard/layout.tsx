@@ -2,8 +2,8 @@
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen w-full">
-          {children}
-      </div>
+<main className="max-w mx-auto bg-white">
+  {children}
+</main>
   );
 }

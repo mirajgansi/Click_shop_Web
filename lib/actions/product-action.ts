@@ -1,5 +1,9 @@
 "use server";
-import { createProduct, getAllProduct } from "@/lib/api/product";
+import {
+  createProduct,
+  getAllProduct,
+  getProductById,
+} from "@/lib/api/product";
 import { revalidatePath } from "next/cache";
 
 export const handleCreateProduct = async (data: FormData) => {
@@ -50,6 +54,30 @@ export const handleGetAllProducts = async (params?: {
     return {
       success: false,
       message: error.message || "Failed to fetch products",
+    };
+  }
+};
+export const handleGetProductById = async (id: string) => {
+  try {
+    if (!id) return { success: false, message: "Missing product id" };
+
+    const response = await getProductById(id);
+
+    if (response.success) {
+      return {
+        success: true,
+        product: response.data,
+      };
+    }
+
+    return {
+      success: false,
+      message: response.message || "Failed to fetch product",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Failed to fetch product",
     };
   }
 };

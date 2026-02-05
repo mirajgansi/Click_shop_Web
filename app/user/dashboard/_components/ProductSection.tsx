@@ -28,7 +28,6 @@ export default function ProductSection({ title }: { title: string }) {
  const [adding, setAdding] = useState<Record<string, boolean>>({}); 
   // favorites stored by product id (best for refresh)
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
-const isOutOfStock = (p: Product) => (p.inStock ?? 0) <= 0;
 
   const toggleFavorite = (id: string) => {
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -52,14 +51,11 @@ const isOutOfStock = (p: Product) => (p.inStock ?? 0) <= 0;
 
   useEffect(() => {
     fetchProducts();
-
-    // refresh every 15 seconds (change to 10000 or 20000)
     const interval = setInterval(fetchProducts, 15000);
 
     return () => clearInterval(interval);
   }, []);
 
-  // always show exactly 5 slots (nice layout)
   const fiveSlots = useMemo(() => {
     if (products.length >= 10) return products.slice(0, 10);
     return [...products, ...Array.from({ length: 10 - products.length }).map(() => null)];
@@ -119,6 +115,7 @@ const onAddCart = async (p: Product) => {
           return (
             <div key={p._id} className="relative">
              <ProductCard
+               id={p._id}
               image={buildImageUrl(p.image)}
               name={p.name}
               price={Number(p.price)}

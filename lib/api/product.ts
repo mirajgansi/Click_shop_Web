@@ -1,6 +1,6 @@
+import axiosInstance from "./axios";
 import axios from "./axios";
 import { API } from "./endpoint";
-import axiosInstance from "./axios";
 
 export const createProduct = async (formData: FormData) => {
   try {
@@ -27,7 +27,6 @@ export const getAllProduct = async (params?: {
     const response = await axios.get(API.PRODUCT.GET_ALL, {
       params,
     });
-    console.log("BASE:", axiosInstance.defaults.baseURL);
     return response.data;
   } catch (error: any) {
     throw new Error(
@@ -38,8 +37,9 @@ export const getAllProduct = async (params?: {
   }
 };
 export const getProductById = async (id: string) => {
+  if (!id) throw new Error("Product id is required");
   try {
-    const response = await axios.get(API.PRODUCT.GET_ONE(id));
+    const response = await axiosInstance.get(API.PRODUCT.GET_ONE(id));
     return response.data;
   } catch (error: any) {
     throw new Error(
@@ -69,7 +69,6 @@ export const updateProductImage = async (formData: FormData) => {
   try {
     const response = await axios.put(API.PRODUCT.UPDATE_IMAGE, formData, {
       withCredentials: true,
-      // ✅ Don't set Content-Type manually for FormData
     });
     return response.data;
   } catch (error: any) {
