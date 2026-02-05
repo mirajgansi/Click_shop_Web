@@ -7,7 +7,7 @@ export const ProductSchema = z
   .object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     description: z.string().min(10, "Description must be at least 10 characters"),
-    price: z.number().positive("Price must be greater than 0"),
+price: z.coerce.number().positive("Price must be greater than 0"),
     manufacturer: z.string().min(1, "Manufacturer is required"),
 
     manufactureDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
@@ -21,16 +21,17 @@ export const ProductSchema = z
     category: z.string().min(1, "Category is required"),
 
    image: z
-          .instanceof(File)
-          .optional()
-          .refine((file) => !file || file.size <= MAX_FILE_SIZE, {
-              message: "Max file size is 5MB",
-          })
-          .refine((file) => !file || ACCEPTED_IMAGE_TYPES.includes(file.type), {
-              message: "Only .jpg, .jpeg, .png and .webp formats are supported",
-          }),
+  .array(z.instanceof(File))
+  .min(1, "At least 1 image is required")
+  .max(5, "You can upload up to 3 images")
+  .refine((files) => files.every((f) => f.size <= MAX_FILE_SIZE), {
+    message: "Each image must be max 5MB",
+  })
+  .refine((files) => files.every((f) => ACCEPTED_IMAGE_TYPES.includes(f.type)), {
+    message: "Only .jpg, .jpeg, .png and .webp formats are supported",
+  }),
 
-    inStock: z.number().int("Stock must be an integer").min(0).default(0),
+inStock: z.coerce.number().int("Stock must be an integer").min(0).default(0),
 
     sku: z.string().optional(),
 

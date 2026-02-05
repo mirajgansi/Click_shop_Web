@@ -30,21 +30,21 @@ const ProductFilterBar = ({
 
 
       <div className="flex flex-col md:flex-row gap-4 items-center">
-<div className="relative w-full md:flex-1">
-  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+    <div className="relative w-full md:flex-1">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
 
-  <input
-    type="text"
-    placeholder="What are you looking for"
-    value={search}
-    onChange={(e) => {
-      setSearch(e.target.value);
-      onSearch(e.target.value);
-    }}
-    className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm
-               focus:outline-none focus:ring-2 focus:ring-green-500"
-  />
-</div>
+    <input
+      type="text"
+      placeholder="What are you looking for"
+      value={search}
+      onChange={(e) => {
+        setSearch(e.target.value);
+        onSearch(e.target.value);
+      }}
+      className="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm
+                focus:outline-none focus:ring-2 focus:ring-green-500"
+    />
+  </div>
 
         {/* Category dropdown */}
       <div className="relative w-full md:w-90">

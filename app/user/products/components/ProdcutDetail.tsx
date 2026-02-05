@@ -48,10 +48,10 @@ const shortDescription = isLong
   ? fullDescription.slice(0, DESCRIPTION_LIMIT) + "..."
   : fullDescription;
 
-  const totalPrice = useMemo(() => {
-    const base = Number(product.price || 0);
-  }, [product.price, quantity, ]);
-
+ const totalPrice = useMemo(() => {
+  const base = Number(product.price || 0);
+  return (base * quantity).toFixed(2);
+}, [product.price, quantity]);
   const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
   const onAddToCart = () => {
@@ -59,7 +59,6 @@ const shortDescription = isLong
 
     startTransition(async () => {
       try {
-        // ✅ adjust payload to match your backend
         const res = await handleAddCartItem({
           productId: product._id,
           quantity,
@@ -124,23 +123,23 @@ const shortDescription = isLong
 
         {/* Thumbnails */}
         <div className="flex items-center gap-4">
-          {safeImages.slice(0, 4).map((img) => {
-            const isActive = img === activeImage;
-            return (
-              <button
-                key={img}
-                type="button"
-                onClick={() => setActiveImage(img)}
-                className={`h-24 w-28 rounded-2xl border bg-white p-2 shadow-sm transition ${
-                  isActive ? "border-green-500 ring-2 ring-green-200" : "border-transparent hover:border-gray-200"
-                }`}
-              >
-                <div className="relative h-full w-full">
-                  <Image src={img} alt="thumb" fill className="object-contain" unoptimized />
-                </div>
-              </button>
-            );
-          })}
+        {safeImages.slice(0, 4).map((img, idx) => {
+  const isActive = img === activeImage;
+  return (
+    <button
+      key={`${img}-${idx}`}
+      type="button"
+      onClick={() => setActiveImage(img)}
+      className={`h-24 w-28 rounded-2xl border bg-white p-2 shadow-sm transition ${
+        isActive ? "border-green-500 ring-2 ring-green-200" : "border-transparent hover:border-gray-200"
+      }`}
+    >
+      <div className="relative h-full w-full">
+        <Image src={img} alt="thumb" fill className="object-contain" unoptimized />
+      </div>
+    </button>
+  );
+})}
         </div>
       </div>
 

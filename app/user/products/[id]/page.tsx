@@ -27,8 +27,9 @@ export default async function ProductDetailPage({
 
   // If you only have 1 image, we still create thumbnails using it.
   // If later you add product.images (array), you can map it here.
-  const images = [buildImageUrl(product.image)];
-
+const images = product.images?.length
+  ? product.images.map(buildImageUrl)
+  : [buildImageUrl(product.image)];
   return (
     <div className="mx-auto max-w px-6 py-10 m-10">
       <ProductDetailClient product={product} images={images} />

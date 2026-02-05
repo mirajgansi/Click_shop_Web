@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getAllProduct } from "@/lib/api/product"; // ✅ adjust path to your product.ts
 import { toast } from "react-toastify";
 import { handleAddCartItem } from "@/lib/actions/cart-action";
+import { SkeletonCard } from "../../_components/skeletonCard";
 
 type Product = {
   _id: string;
@@ -35,6 +36,7 @@ export default function ProductSection({ title }: { title: string }) {
 
   const fetchProducts = async () => {
     try {
+      setLoading(true);          
       setError(null);
 
       const res = await getAllProduct({ page: 1, size: 5 }); 
@@ -57,8 +59,8 @@ export default function ProductSection({ title }: { title: string }) {
   }, []);
 
   const fiveSlots = useMemo(() => {
-    if (products.length >= 10) return products.slice(0, 10);
-    return [...products, ...Array.from({ length: 10 - products.length }).map(() => null)];
+    if (products.length >= 5) return products.slice(0, 5);
+    return [...products, ...Array.from({ length: 5 - products.length }).map(() => null)];
   }, [products]);
 
 
@@ -88,6 +90,7 @@ const onAddCart = async (p: Product) => {
 };
 
 
+const showSkeleton = loading && products.length === 0;
   return (
     <section className="max-w mx-auto px-10 py-12">
       <div className="mb-6 flex items-center justify-between">
@@ -97,25 +100,16 @@ const onAddCart = async (p: Product) => {
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        {fiveSlots.map((p, idx) => {
-          if (!p) {
-            return (
-              <div
-                key={`skeleton-${idx}`}
-                className="w-64 rounded-3xl p-4 border bg-white animate-pulse"
-              >
-                <div className="h-36 rounded-2xl bg-gray-100" />
-                <div className="mt-4 h-6 w-3/4 rounded bg-gray-100" />
-                <div className="mt-2 h-5 w-1/2 rounded bg-gray-100" />
-              </div>
-            );
-          }
+     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+  {showSkeleton
+    ? Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} idx={i} />)
+    : fiveSlots.map((p, idx) => {
+        if (!p) return <SkeletonCard key={idx} idx={idx} />;
 
-          return (
-            <div key={p._id} className="relative">
-             <ProductCard
-               id={p._id}
+        return (
+          <div key={p._id} className="relative">
+            <ProductCard
+              id={p._id}
               image={buildImageUrl(p.image)}
               name={p.name}
               price={Number(p.price)}
@@ -125,15 +119,15 @@ const onAddCart = async (p: Product) => {
               onAddToCart={() => onAddCart(p)}
             />
 
-              {adding[p._id] && (
-                <div className="absolute inset-0 grid place-items-center rounded-3xl bg-white/60">
-                  <span className="text-sm font-medium">Adding…</span>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+            {adding[p._id] && (
+              <div className="absolute inset-0 grid place-items-center rounded-3xl bg-white/60">
+                <span className="text-sm font-medium">Adding…</span>
+              </div>
+            )}
+          </div>
+        );
+      })}
+</div>
 
       {loading && !products.length && (
         <p className="mt-4 text-sm text-gray-500">Loading products...</p>

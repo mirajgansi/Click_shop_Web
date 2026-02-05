@@ -45,17 +45,16 @@ export default function ProductCard({
       </button>
   <Link href={`/user/products/${id}`} className="block">
 
-      <div className="bg-gray-100 rounded-2xl p-4 flex justify-center items-center">
-                <Image
-            src={image}
-            alt={name}
-            width={120}
-            height={100}
-              unoptimized
-
-            className="object"
-          />
-      </div>
+       <div className="bg-gray-100 rounded-2xl h-36 w-full relative overflow-hidden flex items-center justify-center">
+      <Image
+        src={image}
+        alt={name}
+        fill
+        unoptimized
+        className="object-contain p-3" // contain = no cropping (cover = cropped)
+        sizes="256px"
+      />
+    </div>
 
       <div className="mt-3 inline-flex items-center  px-3 py-1 rounded-full text-sm font-medium">
 

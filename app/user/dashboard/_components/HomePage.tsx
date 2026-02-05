@@ -4,6 +4,7 @@ import Image from "next/image";
 import CategoryCard from '@/app/user/dashboard/_components/Catregorycard';
 import ProductSection from '@/app/user/dashboard/_components/ProductSection';
 import ProductFilterBar from '@/app/user/dashboard/_components/ProductFillterBar';
+import Link from "next/link";
 
 const HomePage = () => {
   return (
@@ -42,7 +43,6 @@ const HomePage = () => {
       <section className="max-w-7xl mx-auto px-6 py-12">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-black">Category</h2>
-          <button className="text-green-600 font-medium">See all</button>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-6">
@@ -56,6 +56,12 @@ const HomePage = () => {
       </section>
 
       {/* PRODUCT SECTIONS */}
+
+<Link href="/user/products">
+  <button className="text-green-600 font-medium text-right px-10 hover:underline">
+    See all
+  </button>
+</Link>
       <ProductSection title="Trending items" />
       <ProductSection title="Recently Added" />
       <ProductSection title="Best Seller" />

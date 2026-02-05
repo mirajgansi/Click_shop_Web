@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import DeleteModal from "@/app/_componets/DeleteModal";
+import { handleDeleteProduct } from "@/lib/actions/product-action";
 // import { handleDeleteProduct } from "@/lib/actions/admin/product-action"; // if you have it
 
 export default function ProductTable({
@@ -27,9 +28,9 @@ export default function ProductTable({
     if (!deleteId) return;
 
     try {
-      // ✅ Uncomment when you have delete action ready
-      // const res = await handleDeleteProduct(deleteId);
-      // if (!res.success) throw new Error(res.message || "Failed to delete product");
+      //  Uncomment when you have delete action ready
+      const res = await handleDeleteProduct(deleteId);
+      if (!res.success) throw new Error(res.message || "Failed to delete product");
 
       toast.success("Product deleted successfully");
       router.refresh(); // refresh list (or revalidatePath in server action)
@@ -54,14 +55,7 @@ export default function ProductTable({
         Search
       </button>
 
-      {/* Delete modal */}
-      {/* <DeleteModal
-        isOpen={deleteId}
-        onClose={() => setDeleteId(null)}
-        onConfirm={onDelete}
-        title="Delete Confirmation"
-        description="Are you sure you want to delete this product? This action cannot be undone."
-      /> */}
+   
 
       {/* Table */}
       <table className="table p-2 border">
@@ -112,7 +106,14 @@ export default function ProductTable({
           )}
         </tbody>
       </table>
-
+   {/* Delete modal */}
+      <DeleteModal
+  isOpen={!!deleteId}
+  onClose={() => setDeleteId(null)}
+  onConfirm={onDelete}
+  title="Delete Confirmation"
+  description="Are you sure you want to delete this product? This action cannot be undone."
+/>
       {/* Pagination */}
       <div className="pagination mt-4 flex items-center gap-3">
         {pagination && (

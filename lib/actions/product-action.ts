@@ -1,6 +1,7 @@
 "use server";
 import {
   createProduct,
+  deleteProduct,
   getAllProduct,
   getProductById,
 } from "@/lib/api/product";
@@ -81,3 +82,31 @@ export const handleGetProductById = async (id: string) => {
     };
   }
 };
+
+export async function handleDeleteProduct(id: string) {
+  try {
+    const result = await deleteProduct(id);
+
+    if (result?.success) {
+      // ✅ refresh pages that show products
+      revalidatePath("/admin/products");
+      revalidatePath("/user/products");
+
+      return {
+        success: true,
+        message: result.message || "Product deleted successfully",
+        data: result.data,
+      };
+    }
+
+    return {
+      success: false,
+      message: result?.message || "Delete product failed",
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.message || "Delete product failed",
+    };
+  }
+}

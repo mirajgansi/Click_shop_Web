@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { handleCreateProduct } from "@/lib/actions/product-action";
 import { ProductData, ProductSchema } from "../schema";
+import { Camera } from "lucide-react";
 
 /** ---------------- helpers ---------------- */
 type ActionResponse =
@@ -54,7 +55,7 @@ function CategoryModal({
 }) {
   const [q, setQ] = useState("");
   const categories = useMemo(
-    () => ["Meat", "Cooking oil and Ghee", "Pulse", "Bakery", "Snackd", "'Baverage"],
+    () => ["Meat", "Cooking oil and Ghee", "Pulse", "Bakery", "Snacks", "Baverage"],
     [],
   );
 
@@ -192,37 +193,25 @@ export default function CreateProductWizard() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleImageChange = (file: File | undefined, onChange: (file: File | undefined) => void) => {
-    if (!file) {
-      setPreviewImage(null);
-      onChange(undefined);
-      return;
-    }
+const handleImagesChange = (
+  newFiles: File[],
+  onChange: (files: File[]) => void,
+  current: File[] = [],
+) => {
+  const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+  const maxSize = 5 * 1024 * 1024;
+  const maxCount = 5;
 
-    const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    const max = 5 * 1024 * 1024;
+  const valid = newFiles.filter((f) => allowed.includes(f.type) && f.size <= maxSize);
 
-    if (!allowed.includes(file.type)) {
-      clearImage(onChange);
-      toast.error("Only JPG, PNG, WEBP images are allowed");
-      return;
-    }
-    if (file.size > max) {
-      clearImage(onChange);
-      toast.error("Max image size is 5MB");
-      return;
-    }
+  if (valid.length !== newFiles.length) toast.error("Only JPG/PNG/WEBP under 5MB allowed");
 
-    const reader = new FileReader();
-    reader.onloadend = () => setPreviewImage(reader.result as string);
-    reader.onerror = () => {
-      setPreviewImage(null);
-      toast.error("Failed to read image");
-    };
-    reader.readAsDataURL(file);
+  const merged = [...current, ...valid].slice(0, maxCount);
 
-    onChange(file);
-  };
+  if (current.length + valid.length > maxCount) toast.error(`Max ${maxCount} images allowed`);
+
+  onChange(merged);
+};
 
   const goNext = async () => {
     const fields = stepFields[step];
@@ -258,11 +247,10 @@ export default function CreateProductWizard() {
         formData.append("expireDate", data.expireDate);
         formData.append("nutritionalInfo", data.nutritionalInfo);
         formData.append("category", data.category);
-
-        if (data.currency) formData.append("currency", data.currency);
+        
 
         formData.append("inStock", String(data.inStock ?? 0));
-        if (data.image) formData.append("image", data.image);
+      data.image?.forEach((file: File) => formData.append("image", file));
         if (data.sku?.trim()) formData.append("sku", data.sku.trim());
 
         const raw = await handleCreateProduct(formData);
@@ -337,7 +325,7 @@ export default function CreateProductWizard() {
                 type="text"
                 className="h-10 w-full rounded-md border border-black/10 px-3 text-sm outline-none focus:border-black/40"
                 {...register("name")}
-                placeholder="e.g. Beach Towel"
+                placeholder="e.g. Wai Wai noodles"
               />
               {errors.name?.message && <p className="text-xs text-red-600">{errors.name.message}</p>}
             </div>
@@ -346,57 +334,82 @@ export default function CreateProductWizard() {
             <div className="space-y-2">
               <label className="text-sm font-medium">Product Images</label>
 
-              <Controller
-                name="image"
-                control={control}
-                render={({ field: { onChange } }) => (
-                  <div
-                    className="rounded-xl border border-dashed border-gray-300 p-6"
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      const f = e.dataTransfer.files?.[0];
-                      handleImageChange(f, onChange);
-                    }}
-                  >
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".jpg,.jpeg,.png,.webp"
-                      className="hidden"
-                      onChange={(e) => handleImageChange(e.target.files?.[0], onChange)}
-                    />
+             <Controller
+  name="image"
+  control={control}
+  render={({ field: { value = [], onChange } }) => (
+    <div
+      className="rounded-xl border border-dashed border-gray-300 p-6"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        const files = Array.from(e.dataTransfer.files || []);
+        handleImagesChange(files, onChange);
+      }}
+    >
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple 
+        accept=".jpg,.jpeg,.png,.webp"
+        className="hidden"
+        onChange={(e) => {
+          const files = Array.from(e.target.files || []);
+          handleImagesChange(files, onChange);
+        }}
+      />
 
-                    {previewImage ? (
-                      <div className="flex items-start gap-4">
-                        <img src={previewImage} alt="Preview" className="h-24 w-24 rounded-lg object-cover" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">Image selected</p>
-                          <button
-                            type="button"
-                            onClick={() => clearImage(onChange)}
-                            className="mt-3 inline-flex items-center rounded-md bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full">
-                        <div className="grid place-items-center gap-2 py-6">
-                          <div className="grid h-10 w-10 place-items-center rounded-full bg-gray-100">
-                            <span className="text-lg">📷</span>
-                          </div>
-                          <p className="text-sm text-gray-600">Browser or Desktop</p>
-                          <p className="text-xs text-gray-400">Drag & drop an image here, or click to browse</p>
-                        </div>
-                      </button>
-                    )}
-                  </div>
-                )}
-              />
+      {/* Preview */}
+      {value.length ? (
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-3">
+            {value.map((file: File, idx: number) => (
+              <div key={idx} className="relative">
+                <img
+                  src={URL.createObjectURL(file)}
+                  className="h-24 w-24 rounded-lg object-cover"
+                  alt={`preview-${idx}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = value.filter((_: any, i: number) => i !== idx);
+                    onChange(next);
+                  }}
+                  className="absolute -right-2 -top-2 rounded-full bg-red-500 px-2 py-1 text-xs text-white"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white"
+          >
+            Add more images
+          </button>
+        </div>
+      ) : (
+        <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full">
+          <div className="grid place-items-center gap-2 py-6">
+            <div className="grid h-10 w-10 place-items-center rounded-full bg-gray-100">
+              <Camera className="h-6 w-6" />
+            </div>
+            <p className="text-sm text-gray-600">Browse or Drag & Drop</p>
+            <p className="text-xs text-gray-400">Select up to 3 images</p>
+          </div>
+        </button>
+      )}
+    </div>
+  )}
+/>
+
               {errors.image?.message && <p className="text-xs text-red-600">{String(errors.image.message)}</p>}
             </div>
+
 
             {/* Product Description */}
             <div className="space-y-1">
@@ -555,7 +568,6 @@ export default function CreateProductWizard() {
                 <p className="text-xs text-red-600">{errors.nutritionalInfo.message}</p>
               )}
             </div>
-
 
             {/* SKU */}
             <div className="space-y-1">
