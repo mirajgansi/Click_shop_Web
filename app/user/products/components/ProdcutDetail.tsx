@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useMemo, useState, useTransition } from "react";
-import { Heart, Share2, Minus, Plus } from "lucide-react";
+import { Heart, Share2, Minus, Plus, BadgePercent, BadgeX } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { handleAddCartItem } from "@/lib/actions/cart-action";
@@ -217,12 +217,12 @@ const shortDescription = isLong
           <div className="flex items-end">
             {outOfStock ? (
               <span className="inline-flex items-center gap-2 rounded-full bg-red-100 px-3 py-2 text-sm font-semibold text-red-700">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+    <BadgeX className="h-5 w-5" />
                 Out of stock
               </span>
             ) : (
               <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-2 text-sm font-semibold text-green-700">
-                <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
+    <BadgePercent className="h-5 w-5" />
                 {inStock}+ in stock
               </span>
             )}

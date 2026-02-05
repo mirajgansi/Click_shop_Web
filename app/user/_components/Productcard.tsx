@@ -1,5 +1,5 @@
 'use client';
-import { Heart,  } from 'lucide-react';
+import { BadgePercent, BadgeX, Heart,  } from 'lucide-react';
 import Image from "next/image";
 import Link from 'next/link';
 
@@ -57,16 +57,19 @@ export default function ProductCard({
           />
       </div>
 
-      <div className="mt-3 inline-flex items-center gap-2 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+      <div className="mt-3 inline-flex items-center  px-3 py-1 rounded-full text-sm font-medium">
+
        {inStock! <= 0 ? (
   <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
-    <span className="h-3 w-3 rounded-full bg-red-500" />
+    <BadgeX className="h-5 w-5" />
     Out of stock
   </div>
 ) : (
   <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-    <span className="h-3 w-3 rounded-full bg-green-500" />
-    {inStock} in stock
+        <BadgePercent className="h-5 w-5" />
+
+    {inStock} in stock            
+
   </div>
 )}
       </div>
