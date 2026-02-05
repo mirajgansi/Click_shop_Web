@@ -1,4 +1,5 @@
-import axiosInstance from "./axios";
+import axios from "./axios";
+
 import { API } from "./endpoint";
 
 /* ---------------- CREATE ORDER ---------------- */
@@ -13,7 +14,7 @@ export const createOrder = async (payload: {
   notes?: string;
 }) => {
   try {
-    const res = await axiosInstance.post(API.ORDER.CREATE, payload);
+    const res = await axios.post(API.ORDER.CREATE, payload);
     return res.data;
   } catch (error: any) {
     throw new Error(
@@ -27,7 +28,7 @@ export const createOrder = async (payload: {
 /* ---------------- GET MY ORDERS ---------------- */
 export const getMyOrders = async () => {
   try {
-    const res = await axiosInstance.get(API.ORDER.GET_MY);
+    const res = await axios.get(API.ORDER.GET_MY);
     return res.data;
   } catch (error: any) {
     throw new Error(
@@ -41,7 +42,7 @@ export const getMyOrders = async () => {
 /* ---------------- GET ORDER BY ID ---------------- */
 export const getOrderById = async (orderId: string) => {
   try {
-    const res = await axiosInstance.get(API.ORDER.GET_ONE(orderId));
+    const res = await axios.get(API.ORDER.GET_ONE(orderId));
     return res.data;
   } catch (error: any) {
     throw new Error(
@@ -53,15 +54,21 @@ export const getOrderById = async (orderId: string) => {
 };
 
 /* ---------------- ADMIN: GET ALL ORDERS ---------------- */
-export const getAllOrders = async () => {
+export const getAllOrders = async (params?: {
+  page?: number;
+  size?: number;
+  search?: string;
+}) => {
   try {
-    const res = await axiosInstance.get(API.ORDER.GET_ALL);
-    return res.data;
+    const response = await axios.get(API.ORDER.GET_ALL, {
+      params,
+    });
+    return response.data;
   } catch (error: any) {
     throw new Error(
-      error?.response?.data?.message ||
-        error?.message ||
-        "Failed to fetch all orders",
+      error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch orders",
     );
   }
 };
@@ -75,10 +82,7 @@ export const updateOrderStatus = async (
   },
 ) => {
   try {
-    const res = await axiosInstance.patch(
-      API.ORDER.UPDATE_STATUS(orderId),
-      payload,
-    );
+    const res = await axios.patch(API.ORDER.UPDATE_STATUS(orderId), payload);
     return res.data;
   } catch (error: any) {
     throw new Error(

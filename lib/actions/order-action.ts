@@ -1,7 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createOrder, getMyOrders, getOrderById } from "@/lib/api/order";
+import {
+  createOrder,
+  getAllOrders,
+  getMyOrders,
+  getOrderById,
+  updateOrderStatus,
+} from "@/lib/api/order";
 
 type ActionResponse<T = any> =
   | { success: true; message?: string; data?: T }
@@ -61,7 +67,34 @@ export async function handleCreateOrder(payload: {
     };
   }
 }
+export const handleGetAllOrders = async (params?: {
+  page?: number;
+  size?: number;
+  search?: string;
+}) => {
+  try {
+    const response = await getAllOrders(params);
 
+    if (response.success) {
+      return {
+        success: true,
+        message: "Orders fetched successfully",
+        orders: response.data.orders ?? response.data,
+        pagination: response.data.pagination,
+      };
+    }
+
+    return {
+      success: false,
+      message: response.message || "Failed to fetch orders",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch orders",
+    };
+  }
+};
 export async function handleGetMyOrders(): Promise<ActionResponse> {
   try {
     const res = await getMyOrders();
@@ -100,5 +133,37 @@ export async function handleGetOrderById(
     return { success: true, data: res?.data };
   } catch (err: any) {
     return { success: false, message: getErrMsg(err, "Failed to fetch order") };
+  }
+}
+
+export async function handleUpdateOrderStatus(
+  orderId: string,
+  payload: {
+    status: "pending" | "paid" | "shipped" | "delivered" | "cancelled";
+    paymentStatus?: "unpaid" | "paid";
+  },
+) {
+  try {
+    if (!orderId) {
+      return { success: false, message: "Order ID is required" };
+    }
+
+    const result = await updateOrderStatus(orderId, payload);
+
+    // Revalidate admin & user order pages (adjust paths)
+    revalidatePath("/admin/orders");
+    revalidatePath(`/admin/orders/${orderId}`);
+    revalidatePath("/user/orders");
+
+    return {
+      success: true,
+      message: "Order status updated successfully",
+      data: result?.data ?? result,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Failed to update order status",
+    };
   }
 }
