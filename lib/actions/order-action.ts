@@ -24,14 +24,13 @@ function getErrMsg(err: any, fallback = "Something went wrong") {
 export async function handleCreateOrder(payload: {
   shippingFee?: number;
   shippingAddress?: {
-    fullName?: string;
+    userName?: string;
     phone?: string;
     address1?: string;
     address2?: string;
     city?: string;
     state?: string;
     zip?: string;
-    country?: string;
   };
   notes?: string;
 }): Promise<ActionResponse> {

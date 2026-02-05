@@ -7,6 +7,9 @@ import { toast } from "react-toastify";
 
 import { getMyCart, updateCartItemQuantity, removeCartItem, clearCart } from "@/lib/api/cart";
 import { createOrder } from "@/lib/api/order";
+import { useRouter } from "next/navigation";
+import { handleWhoami } from "@/lib/actions/auth-actions";
+import ShippingAddressModal from "./shippingAddressModal";
 
 type Product = {
   _id: string;
@@ -23,6 +26,18 @@ type CartItem = {
 type Cart = {
   items: CartItem[];
 };
+
+
+type ShippingAddress = {
+  userName?: string;
+  phone?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+};
+
 
 function buildImageUrl(image?: string) {
   if (!image) return "/cookie.jpg";
@@ -68,6 +83,11 @@ export default function CartPage() {
     }, 0);
   }, [cart.items]);
 
+
+  const [shippingOpen, setShippingOpen] = useState(false);
+const [shippingAddress, setShippingAddress] = useState<ShippingAddress | undefined>();
+const [loadingUser, setLoadingUser] = useState(false);
+
   const changeQty = async (productId: string, nextQty: number) => {
     if (nextQty < 1) return;
 
@@ -98,12 +118,46 @@ export default function CartPage() {
       toast.error(e.message || "Failed to clear cart");
     }
   };
+const router = useRouter();
 
+// const onCheckout = () => {
+//   router.push("/user/checkout"); // or "/user/checkout"
+// };
+
+const loadUserShippingData = async () => {
+  try {
+    setLoadingUser(true);
+    const res = await handleWhoami(); // must be authenticated
+
+    const user = res?.data || res;
+
+    if (!user) return;
+
+    setShippingAddress({
+      userName: user.userName || user.username || "",
+      phone: user.phone || user.phoneNumber || "",
+      address1: user.address1 || user.location || "",
+      address2: user.address2 || "",
+      city: user.city || "",
+      state: user.state || "",
+      zip: user.zip || "",
+    });
+  } catch {
+    // silently fail → user can enter manually
+    setShippingAddress(undefined);
+  } finally {
+    setLoadingUser(false);
+  }
+};
 const onCheckout = async () => {
+  await loadUserShippingData();
+  setShippingOpen(true);
+};
+const onConfirmShipping = async (address: ShippingAddress) => {
   try {
     const res = await createOrder({
-      shippingFee: 0, // or calculate later
-      // you can add shippingAddress here later
+      shippingFee: 0,
+      shippingAddress: address,
     });
 
     if (!res.success) {
@@ -113,8 +167,8 @@ const onCheckout = async () => {
 
     toast.success("Order placed successfully 🎉");
 
-    // refresh cart UI
-    await fetchCart();
+    setShippingOpen(false);
+    await fetchCart(); // cart should now be empty
 
     // optional redirect
     // router.push("/user/orders");
@@ -122,7 +176,6 @@ const onCheckout = async () => {
     toast.error(e.message || "Checkout failed");
   }
 };
-
 
   if (loading) {
     return <div className="p-10 text-sm text-gray-500">Loading cart...</div>;
@@ -259,7 +312,12 @@ const onCheckout = async () => {
             <span className="text-gray-600">Total</span>
             <span className="text-lg font-semibold">${total.toFixed(2)}</span>
           </div>
-
+<ShippingAddressModal
+  open={shippingOpen}
+  initialData={shippingAddress}
+  onClose={() => setShippingOpen(false)}
+  onSave={onConfirmShipping}
+/>
          <button
   type="button"
   disabled={!cart.items.length}

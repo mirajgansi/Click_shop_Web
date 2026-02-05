@@ -6,7 +6,7 @@ import { API } from "./endpoint";
 export const createOrder = async (payload: {
   shippingFee?: number;
   shippingAddress?: {
-    fullName?: string;
+    userName?: string;
     phone?: string;
     address1?: string;
     city?: string;
