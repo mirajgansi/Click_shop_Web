@@ -6,8 +6,10 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import { z } from "zod";
-import { handleUpdateProfile } from "@/lib/actions/auth-actions";
+import { handleDeleteMe, handleUpdateProfile } from "@/lib/actions/auth-actions";
 import { Camera, Pencil, User, X } from "lucide-react";
+import DeleteAccountModal from "@/app/_componets/DeleteAccountModal";
+import { useAuth } from "@/context/AuthContext";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -125,6 +127,34 @@ export default function UpdateUserForm({ user }: { user: any }) {
       toast.error(err?.message || "Profile update failed");
     }
   };
+const [deletePassword, setDeletePassword] = useState("");
+const [deleting, setDeleting] = useState(false);
+const [deleteOpen, setDeleteOpen] = useState(false);
+  const { logout, loading } = useAuth();
+
+const onDeleteAccount = async () => {
+  if (!deletePassword) {
+    toast.error("Please enter your password");
+    return;
+  }
+
+  setDeleting(true);
+
+  const res = await handleDeleteMe(deletePassword);
+  if (!res.success) {
+    setDeleting(false);
+    toast.error(res.message);
+    return;
+  }
+
+  await logout(); 
+
+  setDeleting(false);
+  toast.success("Account deleted");
+
+  window.location.href = "/login";
+};
+
 
   const inputBase =
     "h-11 w-full rounded-xl border border-black/10 dark:border-white/15 bg-white/70 dark:bg-white/5 px-4 text-sm outline-none focus:border-black/30 dark:focus:border-white/30 disabled:opacity-70 disabled:cursor-not-allowed";
@@ -365,6 +395,24 @@ export default function UpdateUserForm({ user }: { user: any }) {
                   Cancel
                 </button>
               )}
+  <button
+    type="button"
+    onClick={() => setDeleteOpen(true)}
+    className="rounded-full bg-red-600 px-6 py-2 text-sm font-semibold text-white hover:bg-red-700"
+  >
+    Delete Account
+  </button>
+<DeleteAccountModal
+  open={deleteOpen}
+  password={deletePassword}
+  setPassword={setDeletePassword}
+  deleting={deleting}
+  onClose={() => {
+    setDeleteOpen(false);
+    setDeletePassword("");
+  }}
+  onConfirm={onDeleteAccount}
+/>
 
               <button
                 type="submit"

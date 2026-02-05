@@ -7,12 +7,12 @@ export const API = {
     UPDATEPROFILE: "/api/auth/update-profile",
     REQUEST_PASSWORD_RESET: "/api/auth/request-password-reset",
     RESET_PASSWORD: (token: string) => `/api/auth/reset-password/${token}`,
+    DELETEME: "/api/auth/me",
   },
   PRODUCT: {
     CREATE: "/api/products/",
     GET_ALL: "/api/products/",
     GET_ONE: (id: string) => `/api/products/${id}`,
-
     UPDATE: (id: string) => `/api/products/${id}`,
     DELETE: (id: string) => `/api/products/${id}`,
 

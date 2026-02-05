@@ -9,6 +9,7 @@ import {
   updateProfile,
   requestPasswordReset,
   resetPassword,
+  deleteMe,
 } from "../api/auth";
 import { setAuthToken, setUserData } from "../cookie";
 import { revalidatePath } from "next/cache";
@@ -142,3 +143,22 @@ export const handleResetPassword = async (
     };
   }
 };
+export async function handleDeleteMe(password: string) {
+  try {
+    const result = await deleteMe(password);
+
+    if (result.success) {
+      return {
+        success: true,
+        message: "Account deleted successfully",
+      };
+    }
+
+    return {
+      success: false,
+      message: result.message ?? "Deleting failed",
+    };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}

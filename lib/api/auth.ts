@@ -75,3 +75,16 @@ export const resetPassword = async (token: string, newPassword: string) => {
     );
   }
 };
+
+export const deleteMe = async (password: string) => {
+  try {
+    const response = await axios.delete(API.AUTH.DELETEME, {
+      data: { password },
+      withCredentials: true,
+    });
+
+    return response.data;
+  } catch (err: any) {
+    throw new Error(err.response?.data?.message || "Deleting account failed");
+  }
+};
