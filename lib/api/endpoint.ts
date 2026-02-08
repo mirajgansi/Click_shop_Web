@@ -48,5 +48,6 @@ export const API = {
     // admin
     GET_ALL: "/api/orders",
     UPDATE_STATUS: (id: string) => `/api/orders/${id}/status`,
+    CANCEL: (id: string) => `/api/orders/${id}/cancel`,
   },
 };

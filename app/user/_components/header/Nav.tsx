@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+import { CATEGORIES } from '@/lib/categories';
+
 
 export default function Nav() {
   return (
@@ -15,10 +17,10 @@ export default function Nav() {
       </Link>
 
       <Link
-        href="/user/shop"
+        href="/user/my_orders"
         className="text-sm font-medium text-gray-700 hover:text-green-600 transition"
       >
-        Shop
+        My orders
       </Link>
 
       <div className="relative group">
@@ -26,17 +28,18 @@ export default function Nav() {
           Categories <ChevronDown size={16} />
         </button>
 
-        <div className="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition">
-          <Link href="/user/category/fruits" className="block px-4 py-2 hover:bg-gray-100">
-            Fruits
+        
+      <div className="absolute left-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition">
+        {CATEGORIES.map((c) => (
+          <Link
+            key={c.slug}
+            href={`/user/category/${c.slug}`}
+            className="block px-4 py-2 hover:bg-gray-100"
+          >
+            {c.label}
           </Link>
-          <Link href="/user/category/vegetables" className="block px-4 py-2 hover:bg-gray-100">
-            Vegetables
-          </Link>
-          <Link href="/user/category/snacks" className="block px-4 py-2 hover:bg-gray-100">
-            Snacks
-          </Link>
-        </div>
+        ))}
+      </div>
       </div>
 
       <Link

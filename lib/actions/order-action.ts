@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import {
+  cancelOrder,
   createOrder,
   getAllOrders,
   getMyOrders,
@@ -164,5 +165,24 @@ export async function handleUpdateOrderStatus(
       success: false,
       message: error?.message || "Failed to update order status",
     };
+  }
+}
+export async function handleCancelMyOrder(
+  orderId: string,
+): Promise<ActionResponse> {
+  try {
+    const res = await cancelOrder(orderId);
+
+    if (!res?.success) {
+      return { success: false, message: res?.message || "Cancel failed" };
+    }
+
+    return {
+      success: true,
+      message: res?.message || "Order cancelled",
+      data: res?.data,
+    };
+  } catch (err: any) {
+    return { success: false, message: err?.message || "Cancel failed" };
   }
 }

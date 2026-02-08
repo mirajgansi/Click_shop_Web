@@ -92,3 +92,13 @@ export const updateOrderStatus = async (
     );
   }
 };
+export const cancelOrder = async (id: string) => {
+  try {
+    const res = await axios.put(API.ORDER.CANCEL(id), {
+      withCredentials: true,
+    });
+    return res.data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message || "Cancel failed (400)");
+  }
+};
