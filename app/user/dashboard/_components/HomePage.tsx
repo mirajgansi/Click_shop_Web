@@ -5,8 +5,11 @@ import CategoryCard from '@/app/user/dashboard/_components/Catregorycard';
 import ProductSection from '@/app/user/dashboard/_components/ProductSection';
 import ProductFilterBar from '@/app/user/dashboard/_components/ProductFillterBar';
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const HomePage = () => {
+    const router = useRouter();
+
   return (
 <div className="flex-1 min-h-screen ">
 {/* HERO SECTION */}
@@ -32,11 +35,17 @@ const HomePage = () => {
 
       {/* FILTER BAR */}
       <section className="max-w-7xl mx-auto px-6 -mt-10 relative z-10">
-        <ProductFilterBar
-          onSearch={(query) => console.log('Search:', query)}
-          onCategoryChange={(category) => console.log('Category:', category)}
-          onFind={() => console.log('Find product clicked')}
-        />
+ <ProductFilterBar
+      onSearch={(query) => {
+        router.push(`/user/products?search=${encodeURIComponent(query)}`);
+      }}
+      onCategoryChange={(category) => {
+        router.push(`/category/${category}`);
+      }}
+      onFind={() => {
+        router.push("/user/products");
+      }}
+    />
       </section>
 
       {/* CATEGORY */}
@@ -45,14 +54,14 @@ const HomePage = () => {
           <h2 className="text-2xl font-semibold text-black">Category</h2>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-6">
-          <CategoryCard title="Meat & Fish" image="/categories/meat.png" href="/category/meat" />
-          <CategoryCard title="Cooking Oil & Ghee" image="/categories/oil.png" href="/category/oil" />
-          <CategoryCard title="Pulses" image="/categories/pluse.png" href="/category/pulses" />
-          <CategoryCard title="Bakery" image="/categories/bakery.png" href="/category/bakery" />
-          <CategoryCard title="Snacks" image="/categories/snacks.png" href="/category/snacks" />
-          <CategoryCard title="Beverages" image="/categories/beverages.png" href="/category/beverages" />
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-6">
+  <CategoryCard title="Meat & Fish" image="/categories/meat.png" href="/user/category/meat" />
+  <CategoryCard title="Cooking Oil & Ghee" image="/categories/oil.png" href="/user/category/oil" />
+  <CategoryCard title="Pulses" image="/categories/pluse.png" href="/user/category/pulses" />
+  <CategoryCard title="Bakery" image="/categories/bakery.png" href="/user/category/bakery" />
+  <CategoryCard title="Snacks" image="/categories/snacks.png" href="/user/category/snacks" />
+  <CategoryCard title="Beverages" image="/categories/beverages.png" href="/user/category/beverages" />
+</div>
       </section>
 
       {/* PRODUCT SECTIONS */}

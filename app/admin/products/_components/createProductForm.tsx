@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { handleCreateProduct } from "@/lib/actions/product-action";
-import { ProductData, ProductSchema } from "../schema";
+import { CATEGORIES, ProductData, ProductSchema } from "../schema";
 import { Camera } from "lucide-react";
 
 /** ---------------- helpers ---------------- */
@@ -54,10 +54,8 @@ function CategoryModal({
   selected?: string;
 }) {
   const [q, setQ] = useState("");
-  const categories = useMemo(
-    () => ["Meat", "Cooking oil and Ghee", "Pulse", "Bakery", "Snacks", "Baverage"],
-    [],
-  );
+  const categories = useMemo(() => [...CATEGORIES], []);
+
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -500,7 +498,7 @@ const handleImagesChange = (
                 open={categoryOpen}
                 onClose={() => setCategoryOpen(false)}
                 selected={selectedCategory}
-                onSave={(value) => setValue("category", value as any, { shouldValidate: true })}
+          onSave={(value) => setValue("category", value as any, { shouldValidate: true })}
               />
             </div>
           </motion.div>

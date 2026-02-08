@@ -2,6 +2,13 @@ import { z } from "zod";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+export const CATEGORIES = [
+  "fruits",
+  "vegetables",
+  "snacks",
+  "dairy",
+  "beverages",
+] as const;
 
 export const ProductSchema = z
   .object({
@@ -18,7 +25,7 @@ price: z.coerce.number().positive("Price must be greater than 0"),
     }),
 
     nutritionalInfo: z.string().min(1, "Nutritional info is required"),
-    category: z.string().min(1, "Category is required"),
+  category: z.enum(CATEGORIES, { message: "Category is required" }),
 
    image: z
   .array(z.instanceof(File))

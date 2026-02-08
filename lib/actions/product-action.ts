@@ -4,6 +4,7 @@ import {
   deleteProduct,
   getAllProduct,
   getProductById,
+  getProductsByCategory,
 } from "@/lib/api/product";
 import { revalidatePath } from "next/cache";
 
@@ -110,3 +111,36 @@ export async function handleDeleteProduct(id: string) {
     };
   }
 }
+export const handleGetProductsByCategory = async (
+  category: string,
+  params?: {
+    page?: number;
+    size?: number;
+    search?: string;
+  },
+) => {
+  try {
+    if (!category) return { success: false, message: "Missing category" };
+
+    const response = await getProductsByCategory(category); // or pass params if your backend supports it
+
+    if (response.success) {
+      return {
+        success: true,
+        message: "Category products fetched successfully",
+        products: response.data.products ?? response.data,
+        pagination: response.data.pagination,
+      };
+    }
+
+    return {
+      success: false,
+      message: response.message || "Failed to fetch category products",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch category products",
+    };
+  }
+};
