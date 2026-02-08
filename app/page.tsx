@@ -28,7 +28,7 @@ export default function Home() {
   // Not logged in → show onboarding
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-green-100">
+      <div className="flex min-h-screen items-center justify-center ">
         <OnBoarding />
       </div>
     );

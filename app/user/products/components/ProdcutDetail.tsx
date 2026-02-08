@@ -16,7 +16,11 @@ type Product = {
   price: number;
   category?: string;
   inStock?: number;
-  unit?: string; 
+  unit?: string;
+
+  manufacturer?: string;
+  manufactureDate?: string;
+  expireDate?: string;
 };
 
 export default function ProductDetailClient({
@@ -167,6 +171,33 @@ const shortDescription = isLong
             </button>
           </div>
         </div>
+            
+<div className="rounded-2xl border bg-white p-4 shadow-sm">
+  <h3 className="text-sm font-semibold text-gray-900">Product details</h3>
+
+  <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">
+    <div>
+      <p className="text-xs font-semibold text-gray-500">Manufacturer</p>
+      <p className="mt-1 font-medium text-gray-900">{product.manufacturer ?? "—"}</p>
+    </div>
+
+    <div>
+      <p className="text-xs font-semibold text-gray-500">Expiry date</p>
+      <p className="mt-1 font-medium text-gray-900">{product.expireDate ?? "—"}</p>
+    </div>
+
+    <div>
+      <p className="text-xs font-semibold text-gray-500">Manufacture date</p>
+      <p className="mt-1 font-medium text-gray-900">{product.manufactureDate ?? "—"}</p>
+    </div>
+
+    <div>
+      <p className="text-xs font-semibold text-gray-500">Category</p>
+      <p className="mt-1 font-medium text-gray-900">{product.category ?? "—"}</p>
+    </div>
+  </div>
+</div>
+      <p className="text-xs font-semibold text-gray-500">Description</p>
 
        <p className="text-sm leading-relaxed text-gray-600">
             {expanded ? fullDescription : shortDescription}
@@ -181,11 +212,10 @@ const shortDescription = isLong
                 </button>
             )}
             </p>
-
         <hr />
 
         {/* Controls row like screenshot */}
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-2 sm:grid-cols-3">
           {/* Quantity */}
           <div>
             <p className="mb-2 text-xs font-semibold text-gray-500">Quantity</p>
@@ -216,12 +246,12 @@ const shortDescription = isLong
           <div className="flex items-end">
             {outOfStock ? (
               <span className="inline-flex items-center gap-2 rounded-full bg-red-100 px-3 py-2 text-sm font-semibold text-red-700">
-    <BadgeX className="h-5 w-5" />
+     <BadgeX className="h-5 w-5" />
                 Out of stock
               </span>
             ) : (
               <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-2 text-sm font-semibold text-green-700">
-    <BadgePercent className="h-5 w-5" />
+      <BadgePercent className="h-5 w-5" />
                 {inStock}+ in stock
               </span>
             )}
@@ -229,31 +259,20 @@ const shortDescription = isLong
         </div>
 
         {/* Buttons row */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <button
-            type="button"
-            onClick={onAddToCart}
-            disabled={pending || outOfStock}
-            className={`flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold shadow-sm transition ${
-              outOfStock
-                ? "cursor-not-allowed bg-gray-200 text-gray-500"
-                : "bg-green-100 text-green-700 hover:bg-green-200"
-            }`}
-          >
-            {pending ? "Working..." : `Add to Cart $${totalPrice}`}
-          </button>
-
-          <button
-            type="button"
-            onClick={onShopNow}
-            disabled={pending || outOfStock}
-            className={`rounded-2xl px-4 py-3 text-sm font-semibold text-white shadow-md transition ${
-              outOfStock ? "cursor-not-allowed bg-gray-300" : "bg-green-700 hover:opacity-95"
-            }`}
-          >
-            Shop Now
-          </button>
-        </div>
+ <div className="grid  sm:col-span-2 sm:justify-self-end">
+  <button
+    type="button"
+    onClick={onAddToCart}
+    disabled={pending || outOfStock}
+    className={`flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold shadow-sm transition ${
+      outOfStock
+        ? "cursor-not-allowed bg-gray-200 text-gray-500"
+        : "bg-green-100 text-green-700 hover:bg-green-200"
+    }`}
+  >
+    {pending ? "Working..." : `Add to Cart $${totalPrice}`}
+  </button>
+</div>
 
         {/* Delivery notice
         <div className="rounded-2xl border bg-white p-4 text-sm text-gray-600 shadow-sm">

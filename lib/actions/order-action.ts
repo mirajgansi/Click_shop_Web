@@ -46,7 +46,6 @@ export async function handleCreateOrder(payload: {
       };
     }
 
-    revalidatePath("/cart");
     revalidatePath("/orders");
     revalidatePath("/user/orders");
 

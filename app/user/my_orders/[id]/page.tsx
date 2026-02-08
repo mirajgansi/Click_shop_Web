@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { handleGetOrderById } from "@/lib/actions/order-action"; // adjust path
+import { handleGetOrderById } from "@/lib/actions/order-action";
 import CancelOrderButton from "../components/CancelButton";
 
 function money(n: any) {
@@ -14,14 +15,28 @@ function dt(v: any) {
   return d.toLocaleString();
 }
 
+function buildImageUrl(image?: string) {
+  if (!image) return "/cookie.jpg";
+  if (image.startsWith("http")) return image;
+
+  const base = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5050";
+  return `${base}/${image.replace(/^\/+/, "")}`;
+}
+
 function StatusBadge({ status }: { status?: string }) {
   const s = (status ?? "pending").toLowerCase();
-  const base = "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold";
+  const base =
+    "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold";
 
-  if (s === "delivered") return <span className={`${base} bg-green-100 text-green-700`}>Delivered</span>;
-  if (s === "cancelled") return <span className={`${base} bg-red-100 text-red-700`}>Cancelled</span>;
-  if (s === "shipped") return <span className={`${base} bg-blue-100 text-blue-700`}>Shipped</span>;
-  if (s === "processing") return <span className={`${base} bg-yellow-100 text-yellow-700`}>Processing</span>;
+  if (s === "delivered")
+    return <span className={`${base} bg-green-100 text-green-700`}>Delivered</span>;
+  if (s === "cancelled")
+    return <span className={`${base} bg-red-100 text-red-700`}>Cancelled</span>;
+  if (s === "shipped")
+    return <span className={`${base} bg-blue-100 text-blue-700`}>Shipped</span>;
+  if (s === "processing")
+    return <span className={`${base} bg-yellow-100 text-yellow-700`}>Processing</span>;
+
   return <span className={`${base} bg-gray-100 text-gray-700`}>{status ?? "Pending"}</span>;
 }
 
@@ -37,14 +52,25 @@ export default async function OrderDetailPage({
 
   const order = res.data;
 
-  // Try common shapes
   const items = order?.items ?? order?.orderItems ?? [];
-  const shippingFee = order?.shippingFee ?? order?.deliveryFee ?? order?.shipping ?? 0;
+  const shippingFee =
+    order?.shippingFee ?? order?.deliveryFee ?? order?.shipping ?? 0;
+
   const subtotal =
     order?.subtotal ??
-    items.reduce((sum: number, it: any) => sum + Number(it?.price ?? it?.product?.price ?? 0) * Number(it?.qty ?? it?.quantity ?? 1), 0);
+    items.reduce(
+      (sum: number, it: any) =>
+        sum +
+        Number(it?.price ?? it?.product?.price ?? 0) *
+          Number(it?.qty ?? it?.quantity ?? 1),
+      0,
+    );
 
-  const total = order?.total ?? order?.totalAmount ?? order?.grandTotal ?? (Number(subtotal) + Number(shippingFee));
+  const total =
+    order?.total ??
+    order?.totalAmount ??
+    order?.grandTotal ??
+    (Number(subtotal) + Number(shippingFee));
 
   const status = order?.status;
   const createdAt = order?.createdAt ?? order?.date;
@@ -54,12 +80,15 @@ export default async function OrderDetailPage({
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <Link href="/user/orders" className="text-sm text-gray-600 hover:underline">
+          <Link href="/user/my_orders" className="text-sm text-gray-600 hover:underline">
             ← Back to orders
           </Link>
           <h1 className="mt-2 text-2xl font-semibold">Order Details</h1>
           <p className="mt-1 text-sm text-gray-500">
-            Order ID: <span className="font-medium text-gray-800">{order?._id ?? order?.id ?? id}</span>
+            Order ID:{" "}
+            <span className="font-medium text-gray-800">
+              {order?._id ?? order?.id ?? id}
+            </span>
           </p>
           <p className="text-sm text-gray-500">Placed: {dt(createdAt)}</p>
         </div>
@@ -69,7 +98,6 @@ export default async function OrderDetailPage({
           <div className="mt-2">
             <StatusBadge status={status} />
           </div>
-  
         </div>
       </div>
 
@@ -88,26 +116,58 @@ export default async function OrderDetailPage({
               const price = Number(it?.price ?? it?.product?.price ?? 0);
               const lineTotal = qty * price;
 
+              const img =
+                it?.image ||
+                it?.product?.image ||
+                it?.productId?.image ||
+                "";
+
               return (
-                <div key={it?._id ?? `${name}-${idx}`} className="flex items-start justify-between gap-4 p-4">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{name}</p>
-                    <p className="mt-1 text-xs text-gray-500">
-                      Qty: <span className="font-medium text-gray-800">{qty}</span>
-                      {"  "}• Price: <span className="font-medium text-gray-800">{money(price)}</span>
-                    </p>
+                <div
+                  key={it?._id ?? `${name}-${idx}`}
+                  className="flex items-start justify-between gap-4 p-4"
+                >
+                  <div className="flex items-start gap-4">
+                    {/* ✅ Image */}
+                    <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-gray-100">
+                      <Image
+                        src={buildImageUrl(img)}
+                        alt={name}
+                        fill
+                        className="object-contain p-2"
+                        sizes="64px"
+                        unoptimized
+                      />
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-semibold text-gray-900">{name}</p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        Qty: <span className="font-medium text-gray-800">{qty}</span>
+                        {"  "}• Price:{" "}
+                        <span className="font-medium text-gray-800">{money(price)}</span>
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm font-semibold text-gray-900">{money(lineTotal)}</p>
+
+                  <p className="text-sm font-semibold text-gray-900">
+                    {money(lineTotal)}
+                  </p>
                 </div>
               );
             })}
 
             {!items.length && (
-              <div className="p-6 text-sm text-gray-500">No items found for this order.</div>
+              <div className="p-6 text-sm text-gray-500">
+                No items found for this order.
+              </div>
             )}
           </div>
- <CancelOrderButton orderId={order?._id ?? id} status={order?.status} />
 
+          {/* Cancel button */}
+          <div className="border-t p-4">
+            <CancelOrderButton orderId={order?._id ?? id} status={order?.status} />
+          </div>
         </div>
 
         {/* Summary */}
@@ -127,26 +187,28 @@ export default async function OrderDetailPage({
               <span className="font-semibold text-gray-900">{money(shippingFee)}</span>
             </div>
 
-            <div className="my-2 border-t pt-3 flex items-center justify-between">
-              <span className="text-gray-700 font-semibold">Total</span>
-              <span className="text-gray-900 font-bold">{money(total)}</span>
+            <div className="my-2 flex items-center justify-between border-t pt-3">
+              <span className="font-semibold text-gray-700">Total</span>
+              <span className="font-bold text-gray-900">{money(total)}</span>
             </div>
           </div>
 
-          {/* Shipping info (optional) */}
+          {/* Shipping info */}
           {order?.shippingAddress && (
             <div className="border-t p-4">
               <p className="text-sm font-semibold">Shipping Address</p>
               <p className="mt-2 text-sm text-gray-600">
                 {order.shippingAddress?.userName ?? ""}<br />
                 {order.shippingAddress?.phone ?? ""}<br />
-                {order.shippingAddress?.address1 ?? ""} {order.shippingAddress?.address2 ?? ""}<br />
-                {order.shippingAddress?.city ?? ""} {order.shippingAddress?.state ?? ""} {order.shippingAddress?.zip ?? ""}
+                {order.shippingAddress?.address1 ?? ""}{" "}
+                {order.shippingAddress?.address2 ?? ""}<br />
+                {order.shippingAddress?.city ?? ""}{" "}
+                {order.shippingAddress?.state ?? ""}{" "}
+                {order.shippingAddress?.zip ?? ""}
               </p>
             </div>
           )}
         </div>
-        
       </div>
     </div>
   );
