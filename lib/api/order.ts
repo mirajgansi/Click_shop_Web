@@ -102,6 +102,7 @@ export const cancelOrder = async (id: string) => {
     throw new Error(error?.response?.data?.message || "Cancel failed (400)");
   }
 };
+
 export const assignDriverToOrder = async (
   orderId: string,
   driverId: string,
@@ -128,7 +129,7 @@ export const getDrivers = async (params?: {
 }) => {
   try {
     const res = await axios.get(API.ORDER.GET_DRIVERS, {
-      params: { ...params, role: "driver" }, // ✅ important
+      params: { ...params, role: "driver" },
     });
     return res.data;
   } catch (error: any) {
@@ -136,6 +137,40 @@ export const getDrivers = async (params?: {
       error?.response?.data?.message ||
         error?.message ||
         "Failed to fetch drivers",
+    );
+  }
+};
+
+export const getMyAssignedOrders = async (params?: {
+  page?: number;
+  size?: number;
+}) => {
+  try {
+    const res = await axios.get(API.ORDER.GET_MY_ASSIGNED, { params });
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch driver orders",
+    );
+  }
+};
+
+export const driverUpdateOrderStatus = async (
+  orderId: string,
+  status: "shipped" | "delivered",
+) => {
+  try {
+    const res = await axios.patch(API.ORDER.DRIVER_UPDATE_STATUS(orderId), {
+      status,
+    });
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to update order status",
     );
   }
 };

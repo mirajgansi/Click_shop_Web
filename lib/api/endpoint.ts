@@ -45,11 +45,16 @@ export const API = {
     CREATE: "/api/orders",
     GET_MY: "/api/orders/me",
     GET_ONE: (id: string) => `/api/orders/${id}`,
+
     // admin
-    GET_ALL: "/api/orders",
+    GET_ALL: "/api/orders/",
     UPDATE_STATUS: (id: string) => `/api/orders/${id}/status`,
     CANCEL: (id: string) => `/api/orders/${id}/cancel`,
     ASSIGN_DRIVER: (id: string) => `/api/orders/${id}/assign-driver`,
+
+    // driver ✅ NEW
+    GET_MY_ASSIGNED: "/api/orders/driver/my-orders",
+    DRIVER_UPDATE_STATUS: (id: string) => `/api/orders/driver/${id}/status`,
 
     GET_DRIVERS: "/api/admin/users",
   },

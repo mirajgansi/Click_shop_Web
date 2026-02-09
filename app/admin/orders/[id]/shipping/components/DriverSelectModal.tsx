@@ -1,15 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { X, Search, Truck } from "lucide-react";
-import axios from "axios";
-import { handleGetDrivers } from "@/lib/actions/order-action";
+import { handleGetDrivers, handleAssignDriver } from "@/lib/actions/order-action";
 
 type Driver = {
   _id: string;
   username: string;
   phoneNumber?: string;
-  // optional driver fields (may not exist yet)
   vehicleType?: "bike" | "van" | "truck";
   isAvailable?: boolean;
 };
@@ -17,33 +15,31 @@ type Driver = {
 export default function DriverSelectModal({
   open,
   onClose,
+  orderId, 
 }: {
   open: boolean;
   onClose: () => void;
+  orderId: string;
 }) {
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pending, startTransition] = useTransition();
 
- useEffect(() => {
-  if (!open) return;
+  useEffect(() => {
+    if (!open) return;
 
-  (async () => {
-    try {
-      setLoading(true);
-
-      const res = await handleGetDrivers();
-
-      // your backend shape: { success, data: { users, pagination } }
-      if (res?.success) {
-        setDrivers(res.data.users);
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await handleGetDrivers();
+        if (res?.success) setDrivers(res.data.users);
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  })();
-}, [open]);
+    })();
+  }, [open]);
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -56,6 +52,21 @@ export default function DriverSelectModal({
     );
   }, [q, drivers]);
 
+  const onConfirm = () => {
+    if (!selected) return;
+
+    startTransition(async () => {
+      const res = await handleAssignDriver(orderId, selected);
+
+      if (res?.success) {
+        onClose();
+        setSelected(null);
+      } else {
+        alert(res?.message || "Failed to assign driver");
+      }
+    });
+  };
+
   if (!open) return null;
 
   return (
@@ -63,7 +74,7 @@ export default function DriverSelectModal({
       <div className="w-full max-w-xl rounded-3xl bg-white ring-1 ring-gray-200 shadow-lg">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
-            <p className="text-base font-bold text-gray-900">Create Shipping Label</p>
+            <p className="text-base font-bold text-gray-900">Assign Driver</p>
             <p className="text-sm text-gray-500">Select a driver</p>
           </div>
           <button
@@ -93,11 +104,11 @@ export default function DriverSelectModal({
               </div>
             ) : (
               filtered.map((d) => {
-                const available = d.isAvailable ?? true; // if you don’t have availability yet, treat as available
+                const available = d.isAvailable ?? true;
                 return (
                   <button
                     key={d._id}
-                    disabled={!available}
+                    disabled={!available || pending}
                     onClick={() => setSelected(d._id)}
                     className={`w-full text-left rounded-2xl p-4 ring-1 transition ${
                       selected === d._id
@@ -139,22 +150,21 @@ export default function DriverSelectModal({
           <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
             <button
               onClick={onClose}
-              className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold ring-1 ring-gray-200 hover:bg-gray-50"
+              disabled={pending}
+              className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold ring-1 ring-gray-200 hover:bg-gray-50 disabled:opacity-50"
             >
               Cancel
             </button>
 
             <button
-              onClick={() => {
-                alert(`Driver selected: ${selected}`);
-                onClose();
-              }}
-              disabled={!selected}
+              onClick={onConfirm}
+              disabled={!selected || pending}
               className="inline-flex items-center gap-2 rounded-2xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-black disabled:opacity-50"
             >
               <Truck className="h-4 w-4" />
-              Confirm Driver
+              {pending ? "Assigning..." : "Confirm Driver"}
             </button>
+            
           </div>
         </div>
       </div>

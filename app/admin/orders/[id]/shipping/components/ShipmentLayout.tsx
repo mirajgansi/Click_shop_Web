@@ -46,6 +46,7 @@ export default function ShipmentLayout({ order }: { order: any }) {
   }, [order.status]);
 
   const statusChip = getStatusChip(order.status);
+const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
@@ -140,8 +141,11 @@ export default function ShipmentLayout({ order }: { order: any }) {
       </div>
 
       {/* Driver selector modal (UI-only) */}
-      <DriverSelectModal open={open} onClose={() => setOpen(false)} />
-    </div>
+<DriverSelectModal
+  open={open}
+  onClose={() => setOpen(false)}
+  orderId={order._id}   // ✅ pass real order id
+/>    </div>
   );
 }
 

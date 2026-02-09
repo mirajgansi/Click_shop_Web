@@ -7,8 +7,9 @@ import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { handleCreateProduct } from "@/lib/actions/product-action";
-import { CATEGORIES, ProductData, ProductSchema } from "../schema";
+import {  ProductData, ProductSchema } from "../schema";
 import { Camera } from "lucide-react";
+import { CategoryModal } from "./category_modal";
 
 /** ---------------- helpers ---------------- */
 type ActionResponse =
@@ -39,99 +40,6 @@ function normalizeActionResponse(res: any): ActionResponse {
   if (!res) return { success: false, message: "No response from server" };
   if (typeof res.success === "boolean") return res as ActionResponse;
   return { success: false, message: "Unexpected server response" };
-}
-
-/** ---------------- category modal ---------------- */
-function CategoryModal({
-  open,
-  onClose,
-  onSave,
-  selected,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onSave: (value: string) => void;
-  selected?: string;
-}) {
-  const [q, setQ] = useState("");
-  const categories = useMemo(() => [...CATEGORIES], []);
-
-
-  const filtered = useMemo(() => {
-    const query = q.trim().toLowerCase();
-    if (!query) return categories;
-    return categories.filter((c) => c.toLowerCase().includes(query));
-  }, [q, categories]);
-
-  const [temp, setTemp] = useState(selected || "");
-
-  // sync when opening
-  useMemo(() => {
-    if (open) setTemp(selected || "");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3">
-      <div className="w-full max-w-xl rounded-2xl bg-white p-5 shadow-xl">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-lime-700">Select a category</h2>
-          <button type="button" onClick={onClose} className="rounded-md px-2 py-1 text-sm hover:bg-black/5">
-            ✕
-          </button>
-        </div>
-
-        <div className="mt-4">
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search category..."
-            className="h-10 w-full rounded-lg border px-3 text-sm outline-none focus:border-black/40"
-          />
-        </div>
-
-        <div className="mt-4">
-          <p className="text-sm font-medium text-gray-600">Results</p>
-
-          <div className="mt-3 max-h-60 space-y-3 overflow-auto">
-            {filtered.map((c) => (
-              <label
-                key={c}
-                className="flex cursor-pointer items-start gap-3 rounded-lg px-2 py-2 hover:bg-black/5"
-              >
-                <input
-                  type="radio"
-                  name="categoryPick"
-                  checked={temp === c}
-                  onChange={() => setTemp(c)}
-                  className="mt-1"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-blue-700">{c}</p>
-                  <p className="text-xs text-gray-500">Home&Living ▸ Bathroom ▸ {c}</p>
-                </div>
-              </label>
-            ))}
-            {!filtered.length && <p className="text-sm text-gray-500">No categories found.</p>}
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            if (!temp) return toast.error("Please select a category");
-            onSave(temp);
-            onClose();
-          }}
-          className="mt-5 h-10 w-full rounded-lg bg-blue-600 text-sm font-semibold text-white hover:opacity-90"
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  );
 }
 
 /** ---------------- main wizard ---------------- */
@@ -173,14 +81,15 @@ export default function CreateProductWizard() {
     trigger,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<WizardData>({
-    resolver: zodResolver(ProductSchema),
-    mode: "onSubmit",
-    defaultValues: {
-      inStock: 0,
-      // currency: "NPR",
-    },
-  });
+} = useForm<WizardData>({
+  resolver: zodResolver(ProductSchema),
+  shouldUnregister: false, 
+  mode: "onSubmit",
+  defaultValues: {
+    inStock: 0,
+    image: [], 
+  },
+});
 
   const selectedCurrency = watch("currency");
   const selectedCategory = watch("category");
@@ -224,49 +133,56 @@ const handleImagesChange = (
   const goBack = () => setStep((s) => (s === 3 ? 2 : 1));
 
   const onSubmit: SubmitHandler<WizardData> = async (data) => {
-    // final submit only from step 3
-    if (step !== 3) return;
+  console.log("SUBMIT CHECK:", {
+    step,
+    category: data.category,
+    imageIsArray: Array.isArray(data.image),
+    imageLen: data.image?.length,
+  });
 
-    // (optional) ensure step 3 fields valid before submit
-    const ok = await trigger(stepFields[3] as any, { shouldFocus: true });
-    if (!ok) return;
+  if (step !== 3) return;
 
-    if (pending || isSubmitting) return;
+const ok = await trigger(undefined, { shouldFocus: true });
+if (!ok) return;
 
-    startTransition(async () => {
-      try {
-        const formData = new FormData();
+console.log("schema.ts loaded (CreateProductWizard)");
 
-        formData.append("name", data.name);
-        formData.append("description", data.description);
-        formData.append("price", String(data.price));
-        formData.append("manufacturer", data.manufacturer);
-        formData.append("manufactureDate", data.manufactureDate);
-        formData.append("expireDate", data.expireDate);
-        formData.append("nutritionalInfo", data.nutritionalInfo);
-        formData.append("category", data.category);
-        
+  if (pending || isSubmitting) return;
 
-        formData.append("inStock", String(data.inStock ?? 0));
-      data.image?.forEach((file: File) => formData.append("image", file));
-        if (data.sku?.trim()) formData.append("sku", data.sku.trim());
+  startTransition(async () => {
+    try {
+      const formData = new FormData();
 
-        const raw = await handleCreateProduct(formData);
-        const response = normalizeActionResponse(raw);
+      formData.append("name", data.name);
+      formData.append("description", data.description);
+      formData.append("price", String(data.price));
+      formData.append("manufacturer", data.manufacturer);
+      formData.append("manufactureDate", data.manufactureDate);
+      formData.append("expireDate", data.expireDate);
+      formData.append("nutritionalInfo", data.nutritionalInfo);
+      formData.append("category", data.category);
+      formData.append("inStock", String(data.inStock ?? 0));
 
-        if (!response.success) throw new Error(response.message || "Create product failed");
+    data.image.forEach((file) => formData.append("image", file));
 
-        toast.success(response.message || "Product created");
-        reset();
-        setPreviewImage(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-        setCompleted({ 1: false, 2: false, 3: false });
-        setStep(1);
-      } catch (err) {
-        toast.error(getErrorMessage(err));
-      }
-    });
-  };
+      if (data.sku?.trim()) formData.append("sku", data.sku.trim());
+
+      const raw = await handleCreateProduct(formData);
+      const response = normalizeActionResponse(raw);
+
+      if (!response.success) throw new Error(response.message || "Create product failed");
+
+      toast.success(response.message || "Product created");
+      reset({ inStock: 0, image: [] }); 
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      setCompleted({ 1: false, 2: false, 3: false });
+      setStep(1);
+    } catch (err) {
+      toast.error(getErrorMessage(err));
+    }
+  });
+};
+
 
   const StepBubble = ({ n, label }: { n: 1 | 2 | 3; label: string }) => {
     const active = step === n;
@@ -481,26 +397,34 @@ const handleImagesChange = (
             </div>
 
             {/* Category modal picker */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Category</label>
+          <div className="space-y-2">
+  <label className="text-sm font-medium">Category</label>
 
-              <button
-                type="button"
-                onClick={() => setCategoryOpen(true)}
-                className="h-10 w-full rounded-md border border-black/10 px-3 text-left text-sm outline-none hover:bg-black/5"
-              >
-                {selectedCategory ? selectedCategory : "Select category"}
-              </button>
+  <input type="hidden" {...register("category")} />
 
-              {errors.category?.message && <p className="text-xs text-red-600">{errors.category.message}</p>}
+  <button
+    type="button"
+    onClick={() => setCategoryOpen(true)}
+    className="h-10 w-full rounded-md border border-black/10 px-3 text-left text-sm outline-none hover:bg-black/5"
+  >
+    {selectedCategory ? selectedCategory : "Select category"}
+  </button>
 
-              <CategoryModal
-                open={categoryOpen}
-                onClose={() => setCategoryOpen(false)}
-                selected={selectedCategory}
-          onSave={(value) => setValue("category", value as any, { shouldValidate: true })}
-              />
-            </div>
+  {errors.category?.message && (
+    <p className="text-xs text-red-600">{errors.category.message}</p>
+  )}
+
+  <CategoryModal
+    open={categoryOpen}
+    onClose={() => setCategoryOpen(false)}
+    selected={selectedCategory}
+    onSave={(value) => {
+  console.log("CATEGORY SAVED:", value);
+  setValue("category", value as any, { shouldValidate: true, shouldDirty: true, shouldTouch: true });
+}}
+  />
+</div>
+
           </motion.div>
         )}
 

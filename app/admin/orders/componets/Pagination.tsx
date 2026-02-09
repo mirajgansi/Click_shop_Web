@@ -31,11 +31,10 @@ export function Pagination({
           <button
             key={p}
             onClick={() => onPageChange(p)}
-            className={`h-9 w-9 rounded-xl text-sm ring-1 ${
-              p === page
+            className={`h-9 w-9 rounded-xl text-sm ring-1 ${p === page
                 ? "bg-gray-900 text-white ring-gray-900"
                 : "ring-gray-200 hover:bg-gray-50"
-            }`}
+              }`}
           >
             {p}
           </button>
