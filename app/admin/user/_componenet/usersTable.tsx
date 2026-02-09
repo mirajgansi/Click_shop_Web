@@ -1,12 +1,9 @@
 "use client";
-import { useRouter } from "next/navigation";
-import NextLink from "next/link";
-import { useState } from "react";
+
+import { useMemo, useRef, useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { handleDeleteUser } from "@/lib/actions/admin/user-action";
 import DeleteModal from "@/app/_componets/DeleteModal";
-import { FormSelect, SelectOption } from "@/app/_componets/dropdown";
-import { useForm } from "react-hook-form";
 
 type User = {
   _id: string;
@@ -15,16 +12,53 @@ type User = {
   role: "user" | "admin" | "driver";
   phoneNumber?: string;
   location?: string;
-  DOB?: string;
+  status?: "active" | "frozen" | "inactive";
+  avatar?: string;
+  totalOrders?: number;
 };
 
 type Pagination = {
-  page: number;
+  page: number; // server page (we won’t use it)
   size: number;
   total: number;
   totalPages: number;
 };
-type RoleFilter = "all" | "user" | "admin" | "driver";
+
+function initials(name: string) {
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase()).join("");
+}
+
+function StatusPill({ status }: { status: User["status"] }) {
+  const s = status ?? "active";
+  const map = {
+    active: "bg-green-100 text-green-700 border-green-200",
+    frozen: "bg-blue-100 text-blue-700 border-blue-200",
+    inactive: "bg-gray-100 text-gray-600 border-gray-200",
+  } as const;
+
+  const label = s === "active" ? "Active" : s === "frozen" ? "Frozen" : "Inactive";
+
+  return (
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${map[s]}`}>
+      {label}
+    </span>
+  );
+}
+
+function useOutsideClick<T extends HTMLElement>(onOutside: () => void) {
+  const ref = useRef<T | null>(null);
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const el = ref.current;
+      if (!el) return;
+      if (!el.contains(e.target as Node)) onOutside();
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [onOutside]);
+  return ref;
+}
 
 export default function UsersTable({
   users,
@@ -35,225 +69,216 @@ export default function UsersTable({
   pagination: Pagination;
   search?: string;
 }) {
-  const router = useRouter();
+  // keep initial search if you pass it
   const [searchTerm, setSearchTerm] = useState(search || "");
 
-  const pushWithParams = (next: { page?: number; search?: string }) => {
-    const params = new URLSearchParams();
-
-    const nextSearch = (next.search ?? searchTerm).trim();
-    const nextPage = next.page ?? pagination.page ?? 1;
-
-    if (nextSearch) params.set("search", nextSearch);
-    if (nextPage > 1) params.set("page", String(nextPage)); // keep url clean
-    // size is fixed (10) in server example; add if you want:
-    // params.set("size", String(pagination.size ?? 10));
-
-    router.push(`/admin/users?${params.toString()}`);
-  };
-
-  const onSearch = () => pushWithParams({ page: 1, search: searchTerm });
- 
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  
+  // dropdown
+  const [openMenuFor, setOpenMenuFor] = useState<string | null>(null);
+  const menuRef = useOutsideClick<HTMLDivElement>(() => setOpenMenuFor(null));
+
+  // ✅ ONLY role user
+  const userOnly = useMemo(() => users.filter((u) => u.role === "user"), [users]);
+
+  // ✅ CLIENT FILTER (no router.push)
+  const filtered = useMemo(() => {
+    const q = searchTerm.trim().toLowerCase();
+    if (!q) return userOnly;
+
+    return userOnly.filter((u) => {
+      return (
+        u.username?.toLowerCase().includes(q) ||
+        u.email?.toLowerCase().includes(q) ||
+        (u.phoneNumber ?? "").toLowerCase().includes(q) ||
+        (u.location ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [userOnly, searchTerm]);
+
+  // ✅ CLIENT PAGINATION
+  const pageSize = pagination?.size ?? 10;
+  const [page, setPage] = useState(1);
+
+  // when search changes, go back to page 1
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm]);
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  const pageItems = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, page, pageSize]);
+
   const onDelete = async () => {
     if (!deleteId) return;
-
     try {
       const res = await handleDeleteUser(deleteId);
       if (!res.success) throw new Error(res.message || "Failed to delete user");
-      toast.success("user deleted successfully");
-      router.refresh(); 
+      toast.success("User removed successfully");
+      // ✅ simplest: reload data from server action parent
+      // If you want instant UI removal without refresh, tell me and I’ll show local state update.
+      window.location.reload();
     } catch (err: any) {
       toast.error(err.message || "Failed to delete user");
     } finally {
       setDeleteId(null);
     }
   };
-  
-const roleOptions: SelectOption[] = [
-  { value: "all", label: "All roles" },
-  { value: "user", label: "User" },
-  { value: "driver", label: "Driver" },
-  { value: "admin", label: "Admin" },
-];
-const { control, watch } = useForm<{ role: RoleFilter }>({
-  defaultValues: { role: "all" },
-});
-
-const selectedRole = watch("role");
-
-const filteredUsers = users.filter((u) => {
-  if (selectedRole === "all") return true;
-  return u.role === selectedRole;
-});
 
   return (
     <div className="space-y-4">
-      {/* Search */}
- <div className="flex w-full items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 shadow-sm dark:border-white/15 dark:bg-background">
-  {/* Search input */}
-  <div className="flex flex-1 items-center gap-2">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4 text-gray-400"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 3.5a7.5 7.5 0 0013.15 13.15z"
-      />
-    </svg>
+      {/* Search (no navigation) */}
+      <div className="flex w-full items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1 shadow-sm dark:border-white/15 dark:bg-background">
+        <div className="flex flex-1 items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 3.5a7.5 7.5 0 0013.15 13.15z" />
+          </svg>
 
-    <input
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      placeholder="Search"
-      className="h-9 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
-      onKeyDown={(e) => {
-        if (e.key === "Enter") onSearch();
-      }}
-    />
-  </div>
+          <input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search"
+            className="h-9 w-full bg-transparent text-sm outline-none placeholder:text-gray-400"
+          />
+        </div>
 
-  {/* Search button (icon) ✅ */}
-  <button
-    type="button"
-    onClick={onSearch}
-    className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/5 dark:hover:bg-white/10"
-    aria-label="Search"
-    title="Search"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4 text-gray-600 dark:text-gray-300"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 3.5a7.5 7.5 0 0013.15 13.15z"
-      />
-    </svg>
-  </button>
+        <button
+          type="button"
+          onClick={() => setSearchTerm((s) => s.trim())}
+          className="grid h-9 w-9 place-items-center rounded-full hover:bg-black/5 dark:hover:bg-white/10"
+          aria-label="Search"
+          title="Search"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 3.5a7.5 7.5 0 0013.15 13.15z" />
+          </svg>
+        </button>
+      </div>
 
-  {/* Divider */}
-  <div className="h-6 w-px bg-gray-200 dark:bg-white/20" />
-
-  {/* Role filter */}
-  <div className="w-40">
-    <FormSelect
-      control={control}
-      name="role"
-      placeholder="Role"
-      options={roleOptions}
-      className="h-9 border-none shadow-none focus:ring-0"
-    />
-  </div>
-</div>
-
-
-
-      {/* Table */}
-      {users.length === 0 ? (
+      {pageItems.length === 0 ? (
         <p className="text-sm text-gray-600">No users found</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-100 dark:bg-gray-900">
+        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white dark:border-white/15 dark:bg-background">
+          <table className="min-w-[1000px] w-full text-sm">
+            <thead className="bg-gray-50 text-gray-600 dark:bg-white/5 dark:text-gray-300">
               <tr className="text-left">
-                <th className="px-4 py-2">Username</th>
-                <th className="px-4 py-2">Email</th>
-                <th className="px-4 py-2">Role</th>
-                <th className="px-4 py-2">Phone</th>
-                <th className="px-4 py-2">Location</th>
-                <th className="px-4 py-2">Date of Birth</th>
-                <th className="px-4 py-2 text-right">Actions</th>
+                <th className="px-4 py-3 font-medium">Name</th>
+                <th className="px-4 py-3 font-medium">Email</th>
+                <th className="px-4 py-3 font-medium">Phone</th>
+                <th className="px-4 py-3 font-medium">Address</th>
+                <th className="px-4 py-3 font-medium">Total Orders</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
             </thead>
 
             <tbody>
-{filteredUsers.map((user) => (
-                <tr key={user._id} className="border-t">
-                  <td className="px-4 py-2">{user.username}</td>
-                  <td className="px-4 py-2">{user.email}</td>
-                  <td className="px-4 py-2 capitalize">{user.role}</td>
-                  <td className="px-4 py-2">{user.phoneNumber ?? "-"}</td>
-                  <td className="px-4 py-2">{user.location ?? "-"}</td>
-                  <td className="px-4 py-2">
-                    {user.DOB ? new Date(user.DOB).toLocaleDateString() : "-"}
+              {pageItems.map((u) => (
+                <tr key={u._id} className="border-t border-gray-100 hover:bg-gray-50/60 dark:border-white/10 dark:hover:bg-white/5">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-semibold overflow-hidden">
+                        {u.avatar ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={u.avatar} alt={u.username} className="h-full w-full object-cover" />
+                        ) : (
+                          initials(u.username || "U")
+                        )}
+                      </div>
+                      <div className="font-medium text-gray-900 dark:text-white truncate">{u.username}</div>
+                    </div>
                   </td>
 
-                  <td className="px-4 py-2 text-right">
-                    <div className="inline-flex gap-2">
-                      <NextLink
-                        href={`/admin/user/${user._id}/edit`}
-                        className="inline-flex h-8 items-center rounded-md border px-3 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/30"
-                      >
-                        Edit
-                      </NextLink>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{u.email}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{u.phoneNumber ?? "-"}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300 truncate max-w-[240px]">{u.location ?? "-"}</td>
+                  <td className="px-4 py-3 text-gray-700 dark:text-gray-200">
+                    {typeof u.totalOrders === "number" ? u.totalOrders : 0}
+                  </td>
+                  <td className="px-4 py-3">
+                    <StatusPill status={u.status} />
+                  </td>
 
-                     <button
-                      type="button"
-                      className="h-8 rounded-md border border-red-500 px-3 text-sm text-red-600 cursor-pointer"
-                      onClick={() => setDeleteId(user._id)}
-                    >
-                      Delete
-                    </button>
+                  <td className="px-4 py-3 text-right">
+                    <div className="relative inline-block" ref={openMenuFor === u._id ? menuRef : undefined}>
+                      <button
+                        type="button"
+                        onClick={() => setOpenMenuFor((prev) => (prev === u._id ? null : u._id))}
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-white/10"
+                        aria-label="Actions"
+                        title="Actions"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600 dark:text-gray-300" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 14a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" />
+                        </svg>
+                      </button>
+
+                      {openMenuFor === u._id && (
+                        <div className="absolute right-0 z-20 mt-2 w-48 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/15 dark:bg-background">
+                          <button
+                            type="button"
+                            className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50/60 dark:hover:bg-red-500/10"
+                            onClick={() => {
+                              setOpenMenuFor(null);
+                              setDeleteId(u._id);
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+
+          {/* Client pagination footer */}
+          <div className="flex items-center justify-between gap-3 border-t border-gray-100 px-4 py-3 text-sm text-gray-600 dark:border-white/10 dark:text-gray-300">
+            <div className="flex items-center gap-2">
+              <span>Rows per page:</span>
+              <span className="inline-flex items-center gap-1 rounded-md border border-gray-200 px-2 py-1 text-xs dark:border-white/15">
+                {pageSize}
+              </span>
+              <span className="ml-3 text-xs">
+                Showing {(page - 1) * pageSize + 1}-{Math.min(page * pageSize, total)} of {total}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="h-8 rounded-md border px-3 text-xs disabled:opacity-50 dark:border-white/15"
+              >
+                Prev
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="h-8 rounded-md border px-3 text-xs disabled:opacity-50 dark:border-white/15"
+              >
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       )}
-       <DeleteModal
-  isOpen={!!deleteId}
-  onClose={() => setDeleteId(null)}
-  onConfirm={onDelete}
-  title="Delete Confirmation"
-  description="Are you sure you want to delete this user? This action cannot be undone."
-  
-/>
-      {/* Pagination */}
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm text-gray-600 dark:text-gray-300">
-          Page <span className="font-medium">{pagination.page}</span> of{" "}
-          <span className="font-medium">{pagination.totalPages}</span> • Total{" "}
-          <span className="font-medium">{pagination.total}</span>
-        </p>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => pushWithParams({ page: Math.max(1, pagination.page - 1) })}
-            disabled={pagination.page <= 1}
-            className="h-9 rounded-md border px-3 text-sm disabled:opacity-50"
-          >
-            Prev
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              pushWithParams({ page: Math.min(pagination.totalPages, pagination.page + 1) })
-            }
-            disabled={pagination.page >= pagination.totalPages}
-            className="h-9 rounded-md border px-3 text-sm disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
-      </div>
+      <DeleteModal
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={onDelete}
+        title="Delete Confirmation"
+        description="Are you sure you want to delete this user? This action cannot be undone."
+      />
     </div>
   );
 }
