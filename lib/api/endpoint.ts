@@ -34,6 +34,11 @@ export const API = {
       DELETEUSER: (id: string) => `/api/admin/users/${id}`,
     },
   },
+  DRIVER: {
+    GET_ALL: "/api/driver/drivers", // list drivers + profile
+    GET_STATS: "/api/driver/stats", // stats for table
+    GET_ONE_STATS: (id: string) => `/api/driver/${id}/stats`, // single driver stats
+  },
   CART: {
     GET_MY_CART: "/api/cart/",
     ADD_ITEM: "/api/cart/items",
@@ -52,7 +57,6 @@ export const API = {
     CANCEL: (id: string) => `/api/orders/${id}/cancel`,
     ASSIGN_DRIVER: (id: string) => `/api/orders/${id}/assign-driver`,
 
-    // driver ✅ NEW
     GET_MY_ASSIGNED: "/api/orders/driver/my-orders",
     DRIVER_UPDATE_STATUS: (id: string) => `/api/orders/driver/${id}/status`,
 
