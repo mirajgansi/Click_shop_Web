@@ -70,26 +70,34 @@ export async function handleCreateOrder(payload: {
     };
   }
 }
+export type OrderTab = "all" | "pending" | "unpaid" | "open" | "closed";
+
 export const handleGetAllOrders = async (params?: {
   page?: number;
   size?: number;
   search?: string;
+  tab?: OrderTab;
 }) => {
   try {
-    const response = await getAllOrders(params);
-    const data = response?.data ?? response;
-    if (response.success) {
+    const response = await getAllOrders({
+      page: params?.page ?? 1,
+      size: params?.size ?? 10,
+      search: params?.search ?? "",
+      tab: params?.tab ?? "all", // ✅ default tab
+    });
+
+    if (!response?.success) {
       return {
-        success: true,
-        message: "Orders fetched successfully",
-        orders: response.data.orders ?? response.data,
-        pagination: response.data.pagination,
+        success: false,
+        message: response?.message || "Failed to fetch orders",
       };
     }
 
     return {
-      success: false,
-      message: response.message || "Failed to fetch orders",
+      success: true,
+      message: "Orders fetched successfully",
+      orders: response.data.orders,
+      pagination: response.data.pagination,
     };
   } catch (error: any) {
     return {
@@ -98,6 +106,7 @@ export const handleGetAllOrders = async (params?: {
     };
   }
 };
+
 export async function handleGetMyOrders(): Promise<ActionResponse> {
   try {
     const res = await getMyOrders();

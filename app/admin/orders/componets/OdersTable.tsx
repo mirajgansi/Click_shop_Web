@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { OrderStatusPill } from "./OrderStatusPill";
+import { handleGetAllOrders } from "@/lib/actions/order-action";
 
 type Order = {
   _id: string;
@@ -27,7 +30,49 @@ function money(n: number) {
   }).format(n || 0);
 }
 
-export function OrdersTable({ orders }: { orders: Order[] }) {
+export function OrdersTable({ orders: initialOrders }: { orders: Order[] }) {
+  const sp = useSearchParams();
+
+  const tab = sp.get("tab") ?? "all";       // ✅ correct
+  const search = sp.get("search") ?? "";    // ✅ correct
+  const page = Number(sp.get("page") ?? "1");
+  const size = Number(sp.get("size") ?? "20");
+
+  const [orders, setOrders] = useState<Order[]>(initialOrders ?? []);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // ✅ refetch when tab/search/page/size changes
+  useEffect(() => {
+    const run = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await handleGetAllOrders({
+          page,
+          size,
+          tab:"all",
+          search,
+        });
+
+        if (!res?.success) throw new Error(res?.message || "Failed to fetch orders");
+
+        setOrders(Array.isArray(res.orders) ? res.orders : []);
+      } catch (e: any) {
+        setError(e?.message || "Failed to fetch orders");
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    run();
+  }, [tab, search, page, size]);
+
+  if (loading) return <p className="mt-4 text-sm text-gray-600">Loading orders...</p>;
+  if (error) return <p className="mt-4 text-sm text-red-600">{error}</p>;
+
   return (
     <div className="mt-4 overflow-hidden rounded-3xl bg-white ring-1 ring-gray-100">
       <div className="overflow-x-auto">
@@ -50,7 +95,7 @@ export function OrdersTable({ orders }: { orders: Order[] }) {
             {orders.map((o) => {
               const itemsCount = (o.items || []).reduce(
                 (s, it) => s + (Number(it.quantity) || 0),
-                0,
+                0
               );
 
               return (

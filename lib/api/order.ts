@@ -58,6 +58,7 @@ export const getAllOrders = async (params?: {
   page?: number;
   size?: number;
   search?: string;
+  tab?: string;
 }) => {
   try {
     const response = await axios.get(API.ORDER.GET_ALL, {

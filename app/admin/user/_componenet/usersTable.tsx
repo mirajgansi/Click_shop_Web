@@ -7,6 +7,7 @@ import DeleteModal from "@/app/_componets/DeleteModal";
 import UserAvatar from "@/app/_componets/userAvatar";
 import NextLink from "next/link";
 import { Avatar } from "radix-ui";
+import Link from "next/link";
 
 type User = {
   _id: string;
@@ -158,7 +159,13 @@ export default function UsersTable({
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 3.5a7.5 7.5 0 0013.15 13.15z" />
           </svg>
-        </button>
+        </button> 
+        <Link
+        href="/admin/user/create"
+               className="h-10 inline-flex items-center rounded-2xl bg-green-600 border-gray-200 border-2 px-4 text-sm font-semibold text-white hover:bg-green-700"
+          >
+            Create new user
+          </Link>
       </div>
 
       {pageItems.length === 0 ? (

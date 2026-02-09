@@ -26,7 +26,6 @@ export function OrdersToolbar() {
       if (!v) params.delete(k);
       else params.set(k, v);
     });
-    // reset to page 1 when changing filters/search
     params.set("page", "1");
     router.push(`?${params.toString()}`);
   };
