@@ -13,7 +13,7 @@ export default async function Page({
   if (!result.success) {
     // better than throw while debugging
     return (
-      <div className="p-4">
+      <div className="">
         <p className="text-red-600 font-medium">Whoami failed</p>
         <pre className="mt-2 text-xs whitespace-pre-wrap">
           {result.message || "No message"}
@@ -35,7 +35,7 @@ export default async function Page({
   }
 
   return (
-    <div className="p-4">
+    <div className="">
 <DriversTable pagination={{
         size: 10
       }} />

@@ -4,6 +4,9 @@ import { useMemo, useRef, useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { handleDeleteUser } from "@/lib/actions/admin/user-action";
 import DeleteModal from "@/app/_componets/DeleteModal";
+import UserAvatar from "@/app/_componets/userAvatar";
+import NextLink from "next/link";
+import { Avatar } from "radix-ui";
 
 type User = {
   _id: string;
@@ -13,8 +16,9 @@ type User = {
   phoneNumber?: string;
   location?: string;
   status?: "active" | "frozen" | "inactive";
-  avatar?: string;
   totalOrders?: number;
+    avatar?: string;
+
 };
 
 type Pagination = {
@@ -22,6 +26,7 @@ type Pagination = {
   size: number;
   total: number;
   totalPages: number;
+  
 };
 
 function initials(name: string) {
@@ -78,10 +83,8 @@ export default function UsersTable({
   const [openMenuFor, setOpenMenuFor] = useState<string | null>(null);
   const menuRef = useOutsideClick<HTMLDivElement>(() => setOpenMenuFor(null));
 
-  // ✅ ONLY role user
   const userOnly = useMemo(() => users.filter((u) => u.role === "user"), [users]);
 
-  // ✅ CLIENT FILTER (no router.push)
   const filtered = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
     if (!q) return userOnly;
@@ -181,15 +184,13 @@ export default function UsersTable({
                 <tr key={u._id} className="border-t border-gray-100 hover:bg-gray-50/60 dark:border-white/10 dark:hover:bg-white/5">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-semibold overflow-hidden">
-                        {u.avatar ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={u.avatar} alt={u.username} className="h-full w-full object-cover" />
-                        ) : (
-                          initials(u.username || "U")
-                        )}
-                      </div>
-                      <div className="font-medium text-gray-900 dark:text-white truncate">{u.username}</div>
+                        <NextLink
+                        href={`/admin/driver/${u._id}`}
+                        className="flex items-center gap-3 "
+                      >
+                        <UserAvatar username={u.username} avatar={u.avatar} />
+                        <span className="font-medium dark:text-white truncate">{u.username}</span>
+                      </NextLink>
                     </div>
                   </td>
 

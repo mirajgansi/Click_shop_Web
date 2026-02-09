@@ -1,5 +1,6 @@
 "use client";
 
+import UserAvatar from "@/app/_componets/userAvatar";
 import { handleGetDrivers } from "@/lib/actions/admin/driver-action";
 import NextLink from "next/link";
 import { useMemo, useState, useEffect } from "react";
@@ -116,18 +117,27 @@ setDrivers(Array.isArray(res.drivers) ? res.drivers : []);
           <table className="min-w-[1050px] w-full text-sm">
             <thead className="bg-gray-50 text-gray-600 dark:bg-white/5 dark:text-gray-300">
               <tr className="text-left">
+              <th className="px-4 py-3 font-medium"></th>
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Email</th>
                 <th className="px-4 py-3 font-medium">Phone</th>
                 <th className="px-4 py-3 font-medium">Assigned</th>
                 <th className="px-4 py-3 font-medium">Delivered</th>
-                <th className="px-4 py-3 font-medium text-right">Action</th>
+                <th className="px-4 py-3 font-medium ">Action</th>
               </tr>
             </thead>
 
             <tbody>
               {pageItems.map((d) => (
                 <tr key={d._id} className="border-t">
+                  <td className="px-4 py-3">
+              <NextLink
+                href={`/admin/driver/${d._id}`}
+                className="flex items-center gap-3 "
+              >
+                <UserAvatar username={d.username} avatar={d.avatar} />
+              </NextLink>
+            </td>
                   <td className="px-4 py-3">{d.username}</td>
                   <td className="px-4 py-3">{d.email}</td>
                   <td className="px-4 py-3">{d.phoneNumber ?? "-"}</td>
@@ -135,8 +145,7 @@ setDrivers(Array.isArray(res.drivers) ? res.drivers : []);
                   <td className="px-4 py-3">{d.totalAssigned ?? 0}</td>
                   <td className="px-4 py-3">{d.deliveredCount ?? 0}</td>
 
-                  <td className="px-4 py-3 text-right">
-                    {/* ⚠️ your folder is /admin/driver (singular), so use that */}
+                  <td className="px-4 py-3 ">
                     <NextLink
                       href={`/admin/driver/${d._id}`}
                       className="inline-flex h-9 items-center rounded-lg border px-3 text-sm"

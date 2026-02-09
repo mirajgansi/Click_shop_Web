@@ -37,7 +37,8 @@ export const API = {
   DRIVER: {
     GET_ALL: "/api/driver/drivers", // list drivers + profile
     GET_STATS: "/api/driver/stats", // stats for table
-    GET_ONE_STATS: (id: string) => `/api/driver/${id}/stats`, // single driver stats
+    GET_ONE_STATS: (id: string) => `/api/driver/stats/${id}`, // single driver stats
+    GET_ONE_DRIVER: (id: string) => `/api/driver/${id}/detail`,
   },
   CART: {
     GET_MY_CART: "/api/cart/",
