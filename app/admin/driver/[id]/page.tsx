@@ -2,6 +2,7 @@ import NextLink from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import UserAvatar from "@/app/_componets/userAvatar";
 import { handleOneDriver } from "@/lib/actions/admin/driver-action";
+import { OrderStatusPill } from "../../orders/componets/OrderStatusPill";
 
 export default async function DriverDetailPage({
   params,
@@ -64,10 +65,10 @@ const { driver, stats, orders, pagination } = res.data;
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-            <Row label="Phone:" value={driver?.phoneNumber ?? "-"} />
-            <Row label="Location:" value={driver?.location ?? "-"} />
-            <Row label="gender:" value={driver?.gender ?? "-"} />
-             <Row label="Date of birth:" value={driver?.DOB ?? "-"} />
+            <Row label="Phone" value={driver?.phoneNumber ?? "-"} />
+            <Row label="Location" value={driver?.location ?? "-"} />
+            <Row label="gender" value={driver?.gender ?? "-"} />
+             <Row label="Date of birth" value={driver?.DOB ?? "-"} />
           </div>
         </CardContent>
       </Card>
@@ -124,19 +125,8 @@ const { driver, stats, orders, pagination } = res.data;
                 <tr key={o._id} className="border-t">
                   <td className="px-4 py-3">{o._id}</td>
                   <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium
-                        ${
-                          o.status === "delivered"
-                            ? "bg-green-100 text-green-700"
-                            : o.status === "shipped"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-gray-100 text-gray-700"
-                        }`}
-                    >
-                      {o.status}
-                    </span>
-                  </td>
+  <OrderStatusPill type="order" value={o.status} />
+</td>
                   <td className="px-4 py-3">Rs {o.total ?? "-"}</td>
                   <td className="px-4 py-3">
                     {o.shippingAddress?.userName ?? "-"}
@@ -197,10 +187,10 @@ const { driver, stats, orders, pagination } = res.data;
 }
 
 function Row({ label, value }: { label: string; value: any }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-gray-500">{label}</span>
-      <span className="font-medium truncate">{String(value)}</span>
+ return (
+    <div className="flex items-center gap-2 rounded-lg border bg-gray-50 px-3 py-2 hover:bg-green-200 hover:border-green-700 cursor-pointer">
+      <span className="text-gray-600 whitespace-nowrap">{label}:</span>
+      <span className="font-medium text-gray-900 truncate">{String(value)}</span>
     </div>
   );
 }
@@ -221,9 +211,9 @@ function StatBox({
   };
 
   return (
-    <div className={`rounded-xl border p-4 ${colors[color]}`}>
+    <div className={`rounded-xl border p-2 ${colors[color]}`}>
       <div className="text-xs font-medium">{label}</div>
-      <div className="text-2xl font-semibold mt-1">{value}</div>
+      <div className="text-2xl font-semibold ">{value}</div>
     </div>
   );
 }

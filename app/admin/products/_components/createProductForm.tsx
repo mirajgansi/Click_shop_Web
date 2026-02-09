@@ -222,7 +222,6 @@ console.log("schema.ts loaded (CreateProductWizard)");
       </div>
 
       <AnimatePresence mode="wait">
-        {/* STEP 1 */}
         {step === 1 && (
           <motion.div
             key="step1"
@@ -232,7 +231,6 @@ console.log("schema.ts loaded (CreateProductWizard)");
             transition={{ duration: 0.25 }}
             className="space-y-4"
           >
-            {/* Product Name */}
             <div className="space-y-1">
               <label className="text-sm font-medium">Product Name</label>
               <input
@@ -244,7 +242,6 @@ console.log("schema.ts loaded (CreateProductWizard)");
               {errors.name?.message && <p className="text-xs text-red-600">{errors.name.message}</p>}
             </div>
 
-            {/* Product Images Dropzone */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Product Images</label>
 
@@ -273,7 +270,6 @@ console.log("schema.ts loaded (CreateProductWizard)");
         }}
       />
 
-      {/* Preview */}
       {value.length ? (
         <div className="space-y-3">
           <div className="flex flex-wrap gap-3">

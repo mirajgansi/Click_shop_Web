@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { MoreVertical, Search } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -69,6 +69,9 @@ export default function ProductTable({
   search?: string;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+const currentCategory = searchParams.get("category") ?? "All";
 
   const [searchTerm, setSearchTerm] = useState(search ?? "");
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -80,28 +83,43 @@ export default function ProductTable({
     return ["All", ...Array.from(set)];
   }, [products]);
 
-  const go = (next: Partial<{ page: number; size: number; search: string; category: string }>) => {
-    const sp = new URLSearchParams();
+const go = (next: Partial<{ page: number; size: number; search: string; category: string }>) => {
+  const sp = new URLSearchParams(searchParams.toString());
 
-    const page = next.page ?? pagination?.page ?? 1;
-    const size = next.size ?? pagination?.size ?? 10;
+  // page/size
+  sp.set("page", String(next.page ?? pagination?.page ?? 1));
+  sp.set("size", String(next.size ?? pagination?.size ?? 10));
 
-    sp.set("page", String(page));
-    sp.set("size", String(size));
+  // search
+  const s = (next.search ?? searchTerm ?? "").trim();
+  if (s) sp.set("search", s);
+  else sp.delete("search");
 
-    const s = (next.search ?? searchTerm ?? "").trim();
-    if (s) sp.set("search", s);
+  // category
+  const cat = (next.category ?? currentCategory ?? "All").trim();
+  if (cat && cat !== "All") sp.set("category", cat);
+  else sp.delete("category");
 
-    const category = (next.category ?? (typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("category") : "") ?? "").trim();
-    if (category && category !== "All") sp.set("category", category);
+  router.push(`/admin/products?${sp.toString()}`);
+};
 
-    router.push(`/admin/products?${sp.toString()}`);
-  };
+const filteredProducts = useMemo(() => {
+  const q = searchTerm.trim().toLowerCase();
+  const cat = currentCategory;
 
-  const currentCategory =
-    typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search).get("category") ?? "All"
-      : "All";
+  return (products ?? []).filter((p) => {
+    const matchSearch =
+      !q ||
+      p.name?.toLowerCase().includes(q) ||
+      (p.category ?? "").toLowerCase().includes(q);
+
+    const matchCategory =
+      cat === "All" || (p.category ?? "") === cat;
+
+    return matchSearch && matchCategory;
+  });
+}, [products, searchTerm, currentCategory]);
+
 
   const onDelete = async () => {
     if (!deleteId) return;
@@ -143,8 +161,8 @@ export default function ProductTable({
         <div className="flex flex-wrap items-center gap-2">
           {/* Category filter */}
           <select
-            value={currentCategory}
-            onChange={(e) => go({ page: 1, category: e.target.value })}
+           value={currentCategory}
+  onChange={(e) => go({ page: 1, category: e.target.value })}
             className="h-10 rounded-2xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400"
           >
             {categories.map((c) => (
@@ -157,7 +175,7 @@ export default function ProductTable({
           {/* Page size */}
           <select
             value={String(pagination?.size ?? 10)}
-            onChange={(e) => go({ page: 1, size: Number(e.target.value) })}
+  onChange={(e) => go({ page: 1, size: Number(e.target.value) })}
             className="h-10 rounded-2xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400"
           >
             {[10, 12, 20, 50].map((n) => (
@@ -194,7 +212,7 @@ export default function ProductTable({
           </thead>
 
           <tbody className="text-sm">
-            {products?.map((p) => {
+            {filteredProducts?.map((p) => {
               const status = getStatus(p);
               const img = buildImageUrl(p.image || p.images?.[0]);
 
@@ -279,7 +297,7 @@ export default function ProductTable({
               );
             })}
 
-            {!products?.length && (
+            {!filteredProducts?.length && (
               <tr>
                 <td colSpan={7} className="px-4 py-10 text-center text-gray-500">
                   No products found

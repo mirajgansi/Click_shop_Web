@@ -99,7 +99,6 @@ export default function UsersTable({
     });
   }, [userOnly, searchTerm]);
 
-  // ✅ CLIENT PAGINATION
   const pageSize = pagination?.size ?? 10;
   const [page, setPage] = useState(1);
 
