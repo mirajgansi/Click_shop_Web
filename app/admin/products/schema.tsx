@@ -22,7 +22,7 @@ price: z.coerce.number().positive("Price must be greater than 0"),
     }),
 
     nutritionalInfo: z.string().min(1, "Nutritional info is required"),
-  category: z.enum(CATEGORY_SLUGS, { message: "Category is required" }),
+   category: z.enum(CATEGORY_SLUGS, { message: "Category is required" }),
 
    image: z
   .array(z.instanceof(File))

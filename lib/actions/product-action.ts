@@ -5,6 +5,7 @@ import {
   getAllProduct,
   getProductById,
   getProductsByCategory,
+  updateProduct,
 } from "@/lib/api/product";
 import { revalidatePath } from "next/cache";
 
@@ -89,7 +90,6 @@ export async function handleDeleteProduct(id: string) {
     const result = await deleteProduct(id);
 
     if (result?.success) {
-      // ✅ refresh pages that show products
       revalidatePath("/admin/products");
       revalidatePath("/user/products");
 
@@ -144,3 +144,24 @@ export const handleGetProductsByCategory = async (
     };
   }
 };
+
+export async function handleUpdateProduct(
+  productId: string,
+  formData: FormData,
+) {
+  try {
+    const res = await updateProduct(productId, formData);
+
+    if (res?.success) {
+      revalidatePath("/admin/products");
+      revalidatePath(`/admin/products/edit/${productId}`);
+    }
+
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to update product",
+    };
+  }
+}

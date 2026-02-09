@@ -14,6 +14,7 @@ export function CategoryModal({
   onClose: () => void;
   onSave: (value: CategorySlug) => void;
   selected?: CategorySlug;
+  
 }) {
   const [q, setQ] = useState("");
   const [temp, setTemp] = useState<CategorySlug | "">(selected || "");

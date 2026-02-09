@@ -41,7 +41,7 @@ function money(n: number) {
   // change currency if you want
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "NPR",
     maximumFractionDigits: 0,
   }).format(n || 0);
 }

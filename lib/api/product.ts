@@ -53,9 +53,15 @@ export const getProductById = async (id: string) => {
 // UPDATE PRODUCT (JSON body)
 export const updateProduct = async (id: string, payload: any) => {
   try {
+    const isFormData = payload instanceof FormData;
+
     const response = await axios.put(API.PRODUCT.UPDATE(id), payload, {
       withCredentials: true,
+      headers: isFormData
+        ? { "Content-Type": "multipart/form-data" }
+        : undefined,
     });
+
     return response.data;
   } catch (error: any) {
     throw new Error(
