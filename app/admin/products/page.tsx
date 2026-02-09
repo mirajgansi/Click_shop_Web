@@ -23,8 +23,7 @@ export default async function Page({
 
   return (
     <div className="p-4">
-        <Link className="text-blue-500 border border-blue-500 p-2 rounded inline-block mb-10"
-             href="/admin/products/createProduct">Create Product</Link>
+    
       <ProductTable
         products={result.products ?? []}
         pagination={result.pagination}
