@@ -1,6 +1,6 @@
 import { handleGetAllOrders } from "@/lib/actions/order-action";
 import OrdersPaginationClient from "./componets/OdersPaginationClient";
-import { OrdersTable } from "./componets/OdesTable";
+import { OrdersTable } from "./componets/OdersTable";
 import { OrdersToolbar } from "./componets/OrdersToolBar";
 
 type SearchParams = {

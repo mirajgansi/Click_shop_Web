@@ -102,3 +102,40 @@ export const cancelOrder = async (id: string) => {
     throw new Error(error?.response?.data?.message || "Cancel failed (400)");
   }
 };
+export const assignDriverToOrder = async (
+  orderId: string,
+  driverId: string,
+) => {
+  try {
+    const res = await axios.patch(API.ORDER.ASSIGN_DRIVER(orderId), {
+      driverId,
+    });
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to assign driver",
+    );
+  }
+};
+
+/* ---------------- ADMIN: GET DRIVERS ONLY ---------------- */
+export const getDrivers = async (params?: {
+  search?: string;
+  page?: number;
+  size?: number;
+}) => {
+  try {
+    const res = await axios.get(API.ORDER.GET_DRIVERS, {
+      params: { ...params, role: "driver" }, // ✅ important
+    });
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch drivers",
+    );
+  }
+};

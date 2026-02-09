@@ -5,6 +5,7 @@ import {
   cancelOrder,
   createOrder,
   getAllOrders,
+  getDrivers,
   getMyOrders,
   getOrderById,
   updateOrderStatus,
@@ -183,5 +184,38 @@ export async function handleCancelMyOrder(
     };
   } catch (err: any) {
     return { success: false, message: err?.message || "Cancel failed" };
+  }
+}
+// export async function handleAssignDriver(orderId: string, driverId: string) {
+//   try {
+//     const res = await assignDriverToOrder(orderId, driverId);
+
+//     if (res?.success) {
+//       revalidatePath("/admin/orders");
+//       revalidatePath(`/admin/orders/${orderId}`);
+//     }
+
+//     return res;
+//   } catch (error: any) {
+//     return {
+//       success: false,
+//       message: error.message || "Failed to assign driver",
+//     };
+//   }
+// }
+
+/* ---------------- ADMIN: GET DRIVERS ---------------- */
+export async function handleGetDrivers(params?: {
+  page?: number;
+  size?: number;
+  search?: string;
+}) {
+  try {
+    return await getDrivers(params);
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch drivers",
+    };
   }
 }

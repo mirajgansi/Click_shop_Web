@@ -1,14 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { X, Search, Truck } from "lucide-react";
+import axios from "axios";
+import { handleGetDrivers } from "@/lib/actions/order-action";
 
-const mockDrivers = [
-  { id: "d1", name: "Suman Karki", phone: "98xxxxxxx1", vehicle: "Bike", available: true },
-  { id: "d2", name: "Aayush Shrestha", phone: "98xxxxxxx2", vehicle: "Van", available: true },
-  { id: "d3", name: "Bikash Rai", phone: "98xxxxxxx3", vehicle: "Truck", available: false },
-  { id: "d4", name: "Nisha Thapa", phone: "98xxxxxxx4", vehicle: "Bike", available: true },
-];
+type Driver = {
+  _id: string;
+  username: string;
+  phoneNumber?: string;
+  // optional driver fields (may not exist yet)
+  vehicleType?: "bike" | "van" | "truck";
+  isAvailable?: boolean;
+};
 
 export default function DriverSelectModal({
   open,
@@ -19,17 +23,38 @@ export default function DriverSelectModal({
 }) {
   const [q, setQ] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const drivers = useMemo(() => {
+ useEffect(() => {
+  if (!open) return;
+
+  (async () => {
+    try {
+      setLoading(true);
+
+      const res = await handleGetDrivers();
+
+      // your backend shape: { success, data: { users, pagination } }
+      if (res?.success) {
+        setDrivers(res.data.users);
+      }
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, [open]);
+
+  const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
-    if (!s) return mockDrivers;
-    return mockDrivers.filter(
+    if (!s) return drivers;
+    return drivers.filter(
       (d) =>
-        d.name.toLowerCase().includes(s) ||
-        d.phone.toLowerCase().includes(s) ||
-        d.vehicle.toLowerCase().includes(s),
+        d.username.toLowerCase().includes(s) ||
+        (d.phoneNumber || "").toLowerCase().includes(s) ||
+        (d.vehicleType || "").toLowerCase().includes(s),
     );
-  }, [q]);
+  }, [q, drivers]);
 
   if (!open) return null;
 
@@ -39,7 +64,7 @@ export default function DriverSelectModal({
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
             <p className="text-base font-bold text-gray-900">Create Shipping Label</p>
-            <p className="text-sm text-gray-500">Select a driver (UI only)</p>
+            <p className="text-sm text-gray-500">Select a driver</p>
           </div>
           <button
             onClick={onClose}
@@ -62,38 +87,49 @@ export default function DriverSelectModal({
           </div>
 
           <div className="mt-4 space-y-2 max-h-[320px] overflow-auto pr-1">
-            {drivers.map((d) => (
-              <button
-                key={d.id}
-                disabled={!d.available}
-                onClick={() => setSelected(d.id)}
-                className={`w-full text-left rounded-2xl p-4 ring-1 transition ${
-                  selected === d.id
-                    ? "ring-gray-900 bg-gray-50"
-                    : "ring-gray-200 hover:bg-gray-50"
-                } ${!d.available ? "opacity-50 cursor-not-allowed" : ""}`}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-semibold text-gray-900 truncate">{d.name}</p>
-                    <p className="text-sm text-gray-600">{d.phone} • {d.vehicle}</p>
-                  </div>
-
-                  <span
-                    className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
-                      d.available
-                        ? "bg-green-50 text-green-700 ring-green-200"
-                        : "bg-gray-50 text-gray-600 ring-gray-200"
-                    }`}
+            {loading ? (
+              <div className="rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 ring-1 ring-gray-100">
+                Loading drivers...
+              </div>
+            ) : (
+              filtered.map((d) => {
+                const available = d.isAvailable ?? true; // if you don’t have availability yet, treat as available
+                return (
+                  <button
+                    key={d._id}
+                    disabled={!available}
+                    onClick={() => setSelected(d._id)}
+                    className={`w-full text-left rounded-2xl p-4 ring-1 transition ${
+                      selected === d._id
+                        ? "ring-gray-900 bg-gray-50"
+                        : "ring-gray-200 hover:bg-gray-50"
+                    } ${!available ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
-                    <span className={`h-2 w-2 rounded-full ${d.available ? "bg-green-500" : "bg-gray-400"}`} />
-                    {d.available ? "Available" : "Busy"}
-                  </span>
-                </div>
-              </button>
-            ))}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-gray-900 truncate">{d.username}</p>
+                        <p className="text-sm text-gray-600">
+                          {d.phoneNumber || "No phone"} • {d.vehicleType || "No vehicle"}
+                        </p>
+                      </div>
 
-            {!drivers.length ? (
+                      <span
+                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
+                          available
+                            ? "bg-green-50 text-green-700 ring-green-200"
+                            : "bg-gray-50 text-gray-600 ring-gray-200"
+                        }`}
+                      >
+                        <span className={`h-2 w-2 rounded-full ${available ? "bg-green-500" : "bg-gray-400"}`} />
+                        {available ? "Available" : "Busy"}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })
+            )}
+
+            {!loading && !filtered.length ? (
               <div className="rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 ring-1 ring-gray-100">
                 No drivers found.
               </div>
@@ -110,8 +146,7 @@ export default function DriverSelectModal({
 
             <button
               onClick={() => {
-                // UI only: no backend
-                alert("Shipping label created (UI only).");
+                alert(`Driver selected: ${selected}`);
                 onClose();
               }}
               disabled={!selected}

@@ -49,5 +49,8 @@ export const API = {
     GET_ALL: "/api/orders",
     UPDATE_STATUS: (id: string) => `/api/orders/${id}/status`,
     CANCEL: (id: string) => `/api/orders/${id}/cancel`,
+    ASSIGN_DRIVER: (id: string) => `/api/orders/${id}/assign-driver`,
+
+    GET_DRIVERS: "/api/admin/users",
   },
 };
