@@ -42,7 +42,6 @@ export function OrdersTable({ orders: initialOrders }: { orders: Order[] }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ refetch when tab/search/page/size changes
   useEffect(() => {
     const run = async () => {
       try {
