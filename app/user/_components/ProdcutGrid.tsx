@@ -116,7 +116,7 @@ export default function ProductsGrid({
   const showSkeleton = loading && products.length === 0;
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-10">
+<section className="w-full px-6">
       {title && (
         <div className="mb-2">
           <h2 className="text-2xl font-semibold text-black">{title}</h2>
@@ -130,7 +130,7 @@ export default function ProductsGrid({
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
-      <div className="grid grid-cols-2 gap-10 md:grid-cols-4 lg:grid-cols-5">
+<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
         {showSkeleton
           ? Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} idx={i} />)
           : products.map((p) => (

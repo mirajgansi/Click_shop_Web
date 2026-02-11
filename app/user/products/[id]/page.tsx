@@ -30,10 +30,13 @@ export default async function ProductDetailPage({
 const images = product.images?.length
   ? product.images.map(buildImageUrl)
   : [buildImageUrl(product.image)];
-  return (
-    <div className="mx-auto max-w px-6 py-10 m-10">
-      <ProductDetailClient product={product} images={images} />
-      <ProductSection title={"Recently view"}/>
+ return (
+  <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <ProductDetailClient product={product} images={images} />
+    <div className="mt-10">
+      <ProductSection title="Recently viewed" kind="recent" />
     </div>
-  );
+  </div>
+);
+
 }

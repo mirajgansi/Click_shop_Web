@@ -19,28 +19,29 @@ export default function CategoryCard({
       href={href}
       className="
         group
-        flex flex-col items-center justify-center
+        flex items-center gap-4
+        px-4 py-3
+        rounded-xl
+        border border-gray-200
         bg-white
-        rounded-2xl
-        p-4
-        shadow-sm
-        hover:shadow-md
+        hover:bg-gray-50
         transition
-        hover:-translate-y-1
       "
     >
-      <div className="relative w-20 h-20 cursor-pointer">
+      {/* Icon */}
+      <div className="relative w-6 h-6 shrink-0">
         <Image
           src={image}
           alt={title}
           fill
-          className="object-contain"
+          className="object-contain group-hover:scale-105 transition"
         />
       </div>
 
-      <p className="mt-3 text-sm font-medium text-gray-800 group-hover:text-green-600 transition">
+      {/* Title */}
+      <span className="text-sm font-medium text-gray-800 group-hover:text-green-600 transition">
         {title}
-      </p>
+      </span>
     </Link>
   );
 }

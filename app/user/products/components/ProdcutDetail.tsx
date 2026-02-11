@@ -109,42 +109,52 @@ const shortDescription = isLong
   };
 
   return (
-    <div className="grid gap-10 lg:grid-cols-2">
+  <div className="grid gap-6 lg:grid-cols-2">
       {/* LEFT: Gallery */}
       <div className="space-y-6">
-        <div className="rounded-3xl bg-white p-6 shadow-sm">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-gray-50">
+ {/* IMAGE WRAPPER */}
+<div className="flex flex-col items-center">
+  <div className="relative aspect-[4/3] w-full max-w-md overflow-hidden rounded-2xl bg-gray-50">
+    <Image
+      src={activeImage}
+      alt={product.name}
+      fill
+      className="object-contain"
+      unoptimized
+      priority
+    />
+  </div>
+
+  {/* Thumbnails */}
+  <div className="mt-4 flex justify-center gap-2">
+    {safeImages.slice(0, 4).map((img, idx) => {
+      const isActive = img === activeImage;
+      return (
+        <button
+          key={`${img}-${idx}`}
+          type="button"
+          onClick={() => setActiveImage(img)}
+          className={`h-16 w-20 rounded-xl border bg-white p-2 shadow-sm transition ${
+            isActive
+              ? "border-green-500 ring-2 ring-green-200"
+              : "border-transparent hover:border-gray-200"
+          }`}
+        >
+          <div className="relative h-full w-full">
             <Image
-              src={activeImage}
-              alt={product.name}
+              src={img}
+              alt="thumb"
               fill
               className="object-contain"
               unoptimized
-              priority
             />
           </div>
-        </div>
+        </button>
+      );
+    })}
+  </div>
+</div>
 
-        {/* Thumbnails */}
-        <div className="flex items-center gap-4">
-        {safeImages.slice(0, 4).map((img, idx) => {
-  const isActive = img === activeImage;
-  return (
-    <button
-      key={`${img}-${idx}`}
-      type="button"
-      onClick={() => setActiveImage(img)}
-      className={`h-24 w-28 rounded-2xl border bg-white p-2 shadow-sm transition ${
-        isActive ? "border-green-500 ring-2 ring-green-200" : "border-transparent hover:border-gray-200"
-      }`}
-    >
-      <div className="relative h-full w-full">
-        <Image src={img} alt="thumb" fill className="object-contain" unoptimized />
-      </div>
-    </button>
-  );
-})}
-        </div>
       </div>
 
       {/* RIGHT: Details */}
@@ -152,8 +162,8 @@ const shortDescription = isLong
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs text-gray-500">{product.category ?? "Category"}</p>
-            <h1 className="mt-1 text-3xl font-semibold text-gray-900">{product.name}</h1>
-            <p className="mt-2 text-2xl font-bold text-green-600">
+           <h1 className="mt-1 text-2xl font-semibold text-gray-900">{product.name}</h1>
+<p className="mt-1.5 text-xl font-bold text-green-600">
               ${Number(product.price).toFixed(2)}
               <span className="ml-1 text-sm font-medium text-gray-500">/{product.unit ?? "per kg"}</span>
             </p>
@@ -172,10 +182,10 @@ const shortDescription = isLong
           </div>
         </div>
             
-<div className="rounded-2xl border bg-white p-4 shadow-sm">
+<div className="rounded-2xl border bg-white p-3 shadow-sm">
   <h3 className="text-sm font-semibold text-gray-900">Product details</h3>
 
-  <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">
+<div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2 text-sm">
     <div>
       <p className="text-xs font-semibold text-gray-500">Manufacturer</p>
       <p className="mt-1 font-medium text-gray-900">{product.manufacturer ?? "—"}</p>
@@ -215,7 +225,7 @@ const shortDescription = isLong
         <hr />
 
         {/* Controls row like screenshot */}
-        <div className="grid gap-2 sm:grid-cols-3">
+<div className="grid gap-3 sm:grid-cols-3 items-end">
           {/* Quantity */}
           <div>
             <p className="mb-2 text-xs font-semibold text-gray-500">Quantity</p>
@@ -223,7 +233,7 @@ const shortDescription = isLong
               <button
                 type="button"
                 onClick={() => setQuantity((q) => clamp(q - 1, 1, 999))}
-                className="rounded-full bg-gray-100 p-2 hover:bg-gray-200"
+className="rounded-full bg-gray-100 p-1.5 hover:bg-gray-200"
               >
                 <Minus className="h-4 w-4" />
               </button>
@@ -233,7 +243,7 @@ const shortDescription = isLong
               <button
                 type="button"
                 onClick={() => setQuantity((q) => clamp(q + 1, 1, 999))}
-                className="rounded-full bg-green-600 p-2 text-white hover:opacity-90"
+className="rounded-full bg-green-600 p-2 text-white hover:opacity-90"
               >
                 <Plus className="h-4 w-4" />
               </button>
@@ -245,12 +255,12 @@ const shortDescription = isLong
           {/* Stock badge */}
           <div className="flex items-end">
             {outOfStock ? (
-              <span className="inline-flex items-center gap-2 rounded-full bg-red-100 px-3 py-2 text-sm font-semibold text-red-700">
+              <span className="inline-flex items-center gap-2 rounded-full bg-red-100 px-3 py-1.5 text-xs sm:text-sm font-semibold text-red-700">
      <BadgeX className="h-5 w-5" />
                 Out of stock
               </span>
             ) : (
-              <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-2 text-sm font-semibold text-green-700">
+              <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1.5 text-xs sm:text-sm font-semibold text-green-700">
       <BadgePercent className="h-5 w-5" />
                 {inStock}+ in stock
               </span>
@@ -259,12 +269,12 @@ const shortDescription = isLong
         </div>
 
         {/* Buttons row */}
- <div className="grid  sm:col-span-2 sm:justify-self-end">
+ <div className="pt-2">
   <button
     type="button"
     onClick={onAddToCart}
     disabled={pending || outOfStock}
-    className={`flex items-center justify-center gap-2 rounded-2xl px-6 py-3 text-sm font-semibold shadow-sm transition ${
+    className={`w-full sm:w-auto sm:min-w-[220px] flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition ${
       outOfStock
         ? "cursor-not-allowed bg-gray-200 text-gray-500"
         : "bg-green-100 text-green-700 hover:bg-green-200"
@@ -273,6 +283,7 @@ const shortDescription = isLong
     {pending ? "Working..." : `Add to Cart $${totalPrice}`}
   </button>
 </div>
+
 
         {/* Delivery notice
         <div className="rounded-2xl border bg-white p-4 text-sm text-gray-600 shadow-sm">

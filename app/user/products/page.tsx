@@ -13,9 +13,6 @@ export default async function Page() {
     notFound();
   }
 
-  return (
-    <div className="flex ">
-     <AllProductsPage/>
-    </div>
-  );
+return <AllProductsPage />;
+
 }

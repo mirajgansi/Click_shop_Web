@@ -3,8 +3,11 @@ import {
   createProduct,
   deleteProduct,
   getAllProduct,
+  getPopularProducts,
   getProductById,
   getProductsByCategory,
+  getRecentProducts,
+  getTrendingProducts,
   updateProduct,
 } from "@/lib/api/product";
 import { revalidatePath } from "next/cache";
@@ -165,3 +168,51 @@ export async function handleUpdateProduct(
     };
   }
 }
+
+export async function handleGetRecentProducts(limit = 10) {
+  try {
+    const res = await getRecentProducts(limit);
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch recent product",
+    };
+  }
+}
+
+export async function handleGetTrendingProducts(limit = 10) {
+  try {
+    const res = await getTrendingProducts(limit); // 👈 CALL + PASS limit
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch trending product",
+    };
+  }
+}
+
+export async function handleGetPopularProducts(limit = 10) {
+  try {
+    const res = await getPopularProducts(limit); // 👈 CALL + PASS limit
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch popular product",
+    };
+  }
+}
+
+// export async function handleGetTopRatedProducts(limit = 10) {
+//   try {
+//     const res = await axios.get(PRODUCT_API.TOP_RATED, { params: { limit } });
+//     return res.data;
+//   } catch (error: any) {
+//     return {
+//       success: false,
+//       message: getErrorMessage(error, "Failed to fetch top rated products"),
+//     };
+//   }
+// }

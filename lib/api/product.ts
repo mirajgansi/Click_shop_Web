@@ -112,22 +112,36 @@ export const getProductsByCategory = async (category: string) => {
   }
 };
 
-export const getRecentProducts = async () => {
-  const res = await axios.get(API.PRODUCT.RECENT);
+export const getRecentProducts = async (limit = 10) => {
+  const res = await axios.get(API.PRODUCT.RECENT, {
+    params: { limit },
+  });
   return res.data;
 };
 
-export const getTrendingProducts = async () => {
-  const res = await axios.get(API.PRODUCT.TRENDING);
+export const getTrendingProducts = async (limit = 10) => {
+  const res = await axios.get(API.PRODUCT.TRENDING, {
+    params: { limit },
+  });
   return res.data;
 };
 
-export const getPopularProducts = async () => {
-  const res = await axios.get(API.PRODUCT.POPULAR);
+export const getPopularProducts = async (limit = 10) => {
+  const res = await axios.get(API.PRODUCT.POPULAR, {
+    params: { limit },
+  });
   return res.data;
 };
 
-export const getTopRatedProducts = async () => {
-  const res = await axios.get(API.PRODUCT.TOP_RATED);
-  return res.data;
+export const getTopRatedProducts = async (limit = 10) => {
+  try {
+    const res = await axios.get(API.PRODUCT.TOP_RATED);
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch top rated products",
+    );
+  }
 };
