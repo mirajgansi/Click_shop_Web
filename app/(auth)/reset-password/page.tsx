@@ -5,12 +5,11 @@ export default function Page({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const email =
-    typeof searchParams.email === "string" ? searchParams.email : "";
+
 
   return (
     <div>
-      <ResetPasswordForm initialEmail={email} />
+      <ResetPasswordForm />
     </div>
   );
 }

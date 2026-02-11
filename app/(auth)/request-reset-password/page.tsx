@@ -6,17 +6,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { requestPasswordReset } from "@/lib/api/auth";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export const RequestPasswordResetSchema = z.object({
   email: z.string().email("Invalid email"),
 });
 
-export type RequestPasswordResetDTO = z.infer<
-  typeof RequestPasswordResetSchema
->;
+export type RequestPasswordResetDTO = z.infer<typeof RequestPasswordResetSchema>;
 
 export default function Page() {
-  const router = useRouter(); 
+  const router = useRouter();
 
   const {
     register,
@@ -32,48 +31,60 @@ export default function Page() {
 
       if (response.success) {
         toast.success("Password reset code sent to your email.");
-        router.push(
-          `/reset-code-password?email=${encodeURIComponent(data.email)}`
-        );
+        router.push(`/reset-code-password?email=${encodeURIComponent(data.email)}`);
       } else {
         toast.error(response.message || "Failed to request password reset.");
       }
-    } catch (error) {
-      toast.error(
-        (error as Error).message || "Failed to request password reset."
-      );
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to request password reset.");
     }
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Request Password Reset</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="max-w-md">
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1" htmlFor="email">
-            Email Address
-          </label>
-          <input
-            type="email"
-            id="email"
-            {...register("email")}
-            className="w-full border border-gray-300 p-2 rounded"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.email.message}
-            </p>
-          )}
-        </div>
+    <div className="flex  justify-center  px-4">
+      <div className="w-full max-w-md rounded-2xl bg-white shadow p-6">
+        <h1 className="text-2xl font-semibold">Request password reset</h1>
+        <p className="text-sm text-gray-600 mt-1">
+          Enter your email to receive a 6-digit reset code.
+        </p>
 
-        <button
-          type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Sending..." : "Send Reset Code"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
+          <div>
+            <label className="text-sm font-medium" htmlFor="email">
+              Email address
+            </label>
+            <input
+              type="email"
+              id="email"
+              {...register("email")}
+              className="mt-1 w-full rounded-xl border px-3 py-2 outline-none focus:ring"
+              placeholder="you@example.com"
+              autoComplete="email"
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full rounded-xl bg-[#4CAF50] text-white py-2.5 font-medium disabled:opacity-60"
+          >
+            {isSubmitting ? "Sending..." : "Send reset code"}
+          </button>
+        </form>
+
+        <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
+          <Link className="underline" href="/login">
+            Back to login
+          </Link>
+
+          <Link className="underline" href="/reset-code-password">
+            I already have a code
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,170 +1,104 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { resetPassword } from "@/lib/api/auth";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { handleResetPassword } from "@/lib/actions/auth-actions";
 
-export const ResetPasswordSchema = z
-  .object({
-    email: z.string().email("Invalid email"),
-    code: z.string().regex(/^\d{6}$/, "Code must be 6 digits"),
-    password: z.string().min(6, "Password must be at least 6 characters long"),
-    confirmPassword: z
-      .string()
-      .min(6, "Confirm Password must be at least 6 characters long"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-export type ResetPasswordDTO = z.infer<typeof ResetPasswordSchema>;
-
-export default function ResetPasswordForm({
-  initialEmail = "",
-}: {
-  initialEmail?: string;
-}) {
+export default function ResetPasswordPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<ResetPasswordDTO>({
-    resolver: zodResolver(ResetPasswordSchema),
-    defaultValues: {
-      email: initialEmail,
-    },
-  });
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (data: ResetPasswordDTO) => {
+  useEffect(() => {
+    const e = searchParams.get("email") || "";
+    const c = searchParams.get("code") || "";
+    setEmail(e);
+    setCode(c);
+  }, [searchParams]);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!email.trim()) return toast.error("Email is required");
+    if (!/^\d{6}$/.test(code.trim())) return toast.error("Valid 6-digit code is required");
+    if (newPassword.length < 8) return toast.error("Password must be at least 8 characters");
+    if (newPassword !== confirm) return toast.error("Passwords do not match");
+
     try {
-      const response = await handleResetPassword(
-        data.email,
-        data.code,
-        data.password
-      );
-
-      if (response.success) {
-        toast.success(response.message || "Password reset successfully");
-        router.replace("/login");
-      } else {
-        toast.error(response.message || "Failed to reset password");
-      }
-    } catch (error: any) {
-      toast.error(error?.message || "An unexpected error occurred");
+      setLoading(true);
+      const res = await resetPassword(email.trim(), code.trim(), newPassword);
+      toast.success(res?.message || "Password reset successful");
+      router.push("/login");
+    } catch (err: any) {
+      toast.error(err?.message || "Reset password failed");
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   return (
-    <div>
-      <form className="max-w-md" onSubmit={handleSubmit(onSubmit)}>
-        {/* Email */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1" htmlFor="email">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            {...register("email")}
-            className="w-full border border-gray-300 p-2 rounded"
-          />
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-          )}
-        </div>
+    <div className=" flex justify-center  px-4">
+      <div className="w-full max-w-md rounded-2xl bg-white shadow p-6">
+        <h1 className="text-2xl font-semibold">Set new password</h1>
+        <p className="text-sm text-gray-600 mt-1">
+          Create a new password for <span className="font-medium">{email || "your account"}</span>
+        </p>
 
-        {/* Code */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1" htmlFor="code">
-            Reset Code
-          </label>
-          <input
-            type="text"
-            inputMode="numeric"
-            id="code"
-            {...register("code")}
-            className="w-full border border-gray-300 p-2 rounded tracking-widest text-center"
-            placeholder="123456"
-            onChange={(e) => {
-              // keep only digits & max 6
-              e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6);
-              register("code").onChange(e);
-            }}
-          />
-          {errors.code && (
-            <p className="text-red-500 text-sm mt-1">{errors.code.message}</p>
-          )}
-        </div>
+        <form onSubmit={onSubmit} className="mt-6 space-y-4">
+          <div>
+            <label className="text-sm font-medium">New password</label>
+            <div className="mt-1 flex items-center gap-2">
+              <input
+                className="w-full rounded-xl border px-3 py-2 outline-none focus:ring"
+                type={showPass ? "text" : "password"}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass((s) => !s)}
+                className="rounded-xl border px-3 py-2 text-sm"
+              >
+                {showPass ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
 
-        {/* Password */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1" htmlFor="password">
-            New Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            {...register("password")}
-            className="w-full border border-gray-300 p-2 rounded"
-          />
-          {errors.password && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
+          <div>
+            <label className="text-sm font-medium">Confirm password</label>
+            <input
+              className="mt-1 w-full rounded-xl border px-3 py-2 outline-none focus:ring"
+              type={showPass ? "text" : "password"}
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              autoComplete="new-password"
+            />
+          </div>
 
-        {/* Confirm password */}
-        <div className="mb-4">
-          <label
-            className="block text-sm font-medium mb-1"
-            htmlFor="confirmPassword"
+          <button
+            disabled={loading}
+            className="w-full rounded-xl bg-[#4CAF50] text-white py-2.5 font-medium disabled:opacity-60"
+            type="submit"
           >
-            Confirm New Password
-          </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            {...register("confirmPassword")}
-            className="w-full border border-gray-300 p-2 rounded"
-          />
-          {errors.confirmPassword && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.confirmPassword.message}
-            </p>
-          )}
-        </div>
+            {loading ? "Resetting..." : "Reset password"}
+          </button>
+        </form>
 
-        <div className="mb-4">
-          <Link
-            href="/login"
-            className="text-sm text-black hover:underline mb-4 inline-block"
-          >
-            Back to Login
-          </Link>
-          <Link
-            href="/request-password-reset"
-            className="text-sm text-black hover:underline mb-4 inline-block ml-4"
-          >
-            Request another reset email
-          </Link>
+        <div className="mt-4 text-sm text-gray-600">
+          Want to re-enter code?{" "}
+          <a className="underline" href={`/reset-code-password?email=${encodeURIComponent(email)}`}>
+            Back
+          </a>
         </div>
-
-        <button
-          type="submit"
-          className="h-10 w-full rounded-md bg-[#4CAF50] text-white font-semibold disabled:opacity-60"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Resetting..." : "Reset Password"}
-        </button>
-      </form>
+      </div>
     </div>
   );
 }
