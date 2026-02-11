@@ -35,17 +35,16 @@ const HomePage = () => {
 
       {/* FILTER BAR */}
       <section className="max-w-7xl mx-auto px-6 -mt-10 relative z-10">
- <ProductFilterBar
-      onSearch={(query) => {
-        router.push(`/user/products?search=${encodeURIComponent(query)}`);
-      }}
-      onCategoryChange={(category) => {
-        router.push(`/category/${category}`);
-      }}
-      onFind={() => {
-        router.push("/user/products");
-      }}
-    />
+<ProductFilterBar
+  onSubmit={({ search, category }) => {
+    const sp = new URLSearchParams();
+
+    if (search.trim()) sp.set("search", search.trim());
+    if (category && category !== "all") sp.set("category", category);
+
+    router.push(`/user/products?${sp.toString()}`);
+  }}
+/>
       </section>
 
       {/* CATEGORY */}

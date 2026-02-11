@@ -121,28 +121,32 @@ export const handleRequestPasswordReset = async (email: string) => {
 };
 
 export const handleResetPassword = async (
-  token: string,
+  email: string,
+  code: string,
   newPassword: string,
 ) => {
   try {
-    const response = await resetPassword(token, newPassword);
+    const response = await resetPassword(email, code, newPassword);
+
     if (response.success) {
       return {
         success: true,
-        message: "Password has been reset successfully",
+        message: response.message || "Password has been reset successfully",
       };
     }
+
     return {
       success: false,
       message: response.message || "Reset password failed",
     };
-  } catch (error: Error | any) {
+  } catch (error: any) {
     return {
       success: false,
       message: error.message || "Reset password action failed",
     };
   }
 };
+
 export async function handleDeleteMe(password: string) {
   try {
     const result = await deleteMe(password);

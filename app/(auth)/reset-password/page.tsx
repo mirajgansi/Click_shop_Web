@@ -1,15 +1,16 @@
 import ResetPasswordForm from "../_componets/resetPasswordForm";
 
-export default async function Page({
-    searchParams
+export default function Page({
+  searchParams,
 }: {
-    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
-    const query = await searchParams;
-    const token = query.token ? (query.token as string) : '';
-    return (
-        <div>
-            <ResetPasswordForm token={token} />
-        </div>
-    );
+  const email =
+    typeof searchParams.email === "string" ? searchParams.email : "";
+
+  return (
+    <div>
+      <ResetPasswordForm initialEmail={email} />
+    </div>
+  );
 }
