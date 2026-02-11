@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { handleGetOrderById } from "@/lib/actions/order-action";
 import CancelOrderButton from "../components/CancelButton";
+import { OrderStatusPill } from "@/app/_componets/OrderStatusPill";
 
 function money(n: any) {
   const num = Number(n ?? 0);
@@ -23,22 +24,6 @@ function buildImageUrl(image?: string) {
   return `${base}/${image.replace(/^\/+/, "")}`;
 }
 
-function StatusBadge({ status }: { status?: string }) {
-  const s = (status ?? "pending").toLowerCase();
-  const base =
-    "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold";
-
-  if (s === "delivered")
-    return <span className={`${base} bg-green-100 text-green-700`}>Delivered</span>;
-  if (s === "cancelled")
-    return <span className={`${base} bg-red-100 text-red-700`}>Cancelled</span>;
-  if (s === "shipped")
-    return <span className={`${base} bg-blue-100 text-blue-700`}>Shipped</span>;
-  if (s === "processing")
-    return <span className={`${base} bg-yellow-100 text-yellow-700`}>Processing</span>;
-
-  return <span className={`${base} bg-gray-100 text-gray-700`}>{status ?? "Pending"}</span>;
-}
 
 export default async function OrderDetailPage({
   params,
@@ -96,7 +81,8 @@ export default async function OrderDetailPage({
         <div className="rounded-2xl border bg-white p-4">
           <p className="text-xs font-semibold text-gray-500">STATUS</p>
           <div className="mt-2">
-            <StatusBadge status={status} />
+           <OrderStatusPill type="order" value={order.status} />
+
           </div>
         </div>
       </div>

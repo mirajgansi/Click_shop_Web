@@ -2,6 +2,12 @@ import { notFound } from "next/navigation";
 import { handleGetProductsByCategory } from "@/lib/actions/product-action";
 import CategoryProductsClient from "../component/page";
 
+function formatSlug(slug: string) {
+  return slug
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export default async function CategoryPage({
   params,
 }: {
@@ -13,16 +19,33 @@ export default async function CategoryPage({
   if (!res?.success) return notFound();
 
   const products = res.products ?? [];
+  const formattedName = formatSlug(slug);
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold capitalize">{slug}</h1>
+    <div className="w-full">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-8">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">
+            {formattedName}
+          </h1>
 
-      {products.length ? (
-        <CategoryProductsClient products={products} />
-      ) : (
-        <p className="mt-6 text-gray-500">No products found in this category.</p>
-      )}
+          <p className="mt-2 text-sm text-gray-500">
+            Browse our collection of {formattedName.toLowerCase()} products.
+          </p>
+        </div>
+
+        {/* Products */}
+        {products.length ? (
+          <CategoryProductsClient products={products} />
+        ) : (
+          <div className="mt-10 rounded-2xl border bg-white p-8 text-center">
+            <p className="text-gray-500">
+              No products available in {formattedName} at the moment.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

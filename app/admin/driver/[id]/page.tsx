@@ -2,7 +2,7 @@ import NextLink from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import UserAvatar from "@/app/_componets/userAvatar";
 import { handleOneDriver } from "@/lib/actions/admin/driver-action";
-import { OrderStatusPill } from "../../orders/componets/OrderStatusPill";
+import { OrderStatusPill } from "../../../_componets/OrderStatusPill";
 
 export default async function DriverDetailPage({
   params,

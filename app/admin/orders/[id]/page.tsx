@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { handleGetOrderById } from "@/lib/actions/order-action";
-import { OrderStatusPill } from "../componets/OrderStatusPill"; // adjust path
+import { OrderStatusPill } from "../../../_componets/OrderStatusPill"; // adjust path
 import OrderProgress from "./componenets/OrderProgress";
 import UpdateOrderStatusPanel from "./componenets/UpdateOrderStatusPanel";
 

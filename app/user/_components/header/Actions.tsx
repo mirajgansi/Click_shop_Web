@@ -130,7 +130,6 @@ export default function Actions() {
         </DropdownMenu>
       </div>
 
-      {/* ✅ Drawer lives outside the toolbar */}
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );

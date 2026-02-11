@@ -1,5 +1,6 @@
 "use client";
 
+import { OrderStatusPill } from "@/app/_componets/OrderStatusPill";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -14,16 +15,6 @@ function formatDate(d: any) {
   return dt.toLocaleString();
 }
 
-function StatusBadge({ status }: { status?: string }) {
-  const s = (status ?? "pending").toLowerCase();
-
-  const base = "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold";
-  if (s === "delivered") return <span className={`${base} bg-green-100 text-green-700`}>Delivered</span>;
-  if (s === "cancelled") return <span className={`${base} bg-red-100 text-red-700`}>Cancelled</span>;
-  if (s === "shipped") return <span className={`${base} bg-blue-100 text-blue-700`}>Shipped</span>;
-  if (s === "processing") return <span className={`${base} bg-yellow-100 text-yellow-700`}>pending</span>;
-  return <span className={`${base} bg-gray-100 text-gray-700`}>{status ?? "Pending"}</span>;
-}
 
 export default function OrdersList({ orders }: { orders: any[] }) {
   const [q, setQ] = useState("");
@@ -106,7 +97,7 @@ export default function OrdersList({ orders }: { orders: any[] }) {
                 <div className="col-span-3 text-sm text-gray-700">{formatDate(createdAt)}</div>
                 <div className="col-span-2 text-sm font-semibold text-gray-900">{formatMoney(total)}</div>
                 <div className="col-span-2">
-                  <StatusBadge status={status} />
+  <OrderStatusPill type="order" value={o.status} />
                 </div>
               </Link>
             );

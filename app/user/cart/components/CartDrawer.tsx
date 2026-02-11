@@ -23,6 +23,7 @@ type Product = {
 };
 
 type CartItem = {
+    _id: string;           
   productId: string | Product;
   quantity: number;
 };
@@ -99,35 +100,38 @@ const [mounted, setMounted] = useState(false);
     }, 0);
   }, [cart.items]);
 
-  const changeQty = async (productId: string, nextQty: number) => {
-    if (nextQty < 1) return;
-    try {
-      await updateCartItemQuantity(productId, nextQty);
-      await fetchCart();
-    } catch (e: any) {
-      toast.error(e.message || "Failed to update quantity");
-    }
-  };
+ 
+   const changeQty = async (productId: string, nextQty: number) => {
+      if (nextQty < 1) return;
+  
+      try {
+        await updateCartItemQuantity(productId, nextQty);
+        await fetchCart();
+      } catch (e: any) {
+        toast.error(e.message || "Failed to update quantity");
+      }
+    };
+  
+    const removeItem = async (productId: string) => {
+      try {
+        await removeCartItem(productId);
+        toast.success("Item removed");
+        await fetchCart();
+      } catch (e: any) {
+        toast.error(e.message || "Failed to remove item");
+      }
+    };
+  
+    const onClearCart = async () => {
+      try {
+        await clearCart();
+        toast.success("Cart cleared");
+        await fetchCart();
+      } catch (e: any) {
+        toast.error(e.message || "Failed to clear cart");
+      }
+    };
 
-  const removeItem = async (productId: string) => {
-    try {
-      await removeCartItem(productId);
-      toast.success("Item removed");
-      await fetchCart();
-    } catch (e: any) {
-      toast.error(e.message || "Failed to remove item");
-    }
-  };
-
-  const onClearCart = async () => {
-    try {
-      await clearCart();
-      toast.success("Cart cleared");
-      await fetchCart();
-    } catch (e: any) {
-      toast.error(e.message || "Failed to clear cart");
-    }
-  };
 
   const loadUserShippingData = async () => {
     try {
@@ -287,12 +291,12 @@ if (!mounted) return null;
                     );
                   }
 
-                  const id = product._id;
+const pid = typeof item.productId === "string" ? item.productId : item.productId._id;
                   const lineTotal = product.price * item.quantity;
 
                   return (
                     <div
-                      key={id}
+                      key={pid}
                       className="flex gap-3 rounded-2xl border bg-white p-3"
                     >
                       <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-gray-100">
@@ -318,7 +322,7 @@ if (!mounted) return null;
 
                           <button
                             type="button"
-                            onClick={() => removeItem(id)}
+                            onClick={() => removeItem(pid)}
                             className="rounded-full p-1.5 text-gray-500 hover:bg-black/5 hover:text-red-600"
                             aria-label="Remove item"
                           >
@@ -329,27 +333,29 @@ if (!mounted) return null;
                         <div className="mt-2 flex items-center justify-between">
                           <div className="inline-flex items-center rounded-full border">
                             <button
-                              type="button"
-                              onClick={() => changeQty(id, item.quantity - 1)}
-                              className="p-1.5 hover:bg-black/5"
-                              aria-label="Decrease quantity"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </button>
+                        type="button"
+                        onClick={() => changeQty(item._id, item.quantity - 1)
+}
+                        className="p-2 hover:bg-black/5"
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </button>
 
-                            <span className="w-9 text-center text-sm font-medium">
-                              {item.quantity}
-                            </span>
+                      <span className="w-10 text-center text-sm font-medium">
+                        {item.quantity}
+                      </span>
 
-                            <button
-                              type="button"
-                              onClick={() => changeQty(id, item.quantity + 1)}
-                              className="p-1.5 hover:bg-black/5"
-                              aria-label="Increase quantity"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </button>
-                          </div>
+                      <button
+                        type="button"
+                        onClick={() => changeQty(item._id, item.quantity + 1)
+}
+                        className="p-2 hover:bg-black/5"
+                        aria-label="Increase quantity"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    </div>
 
                           <p className="text-sm font-semibold">
                             Rs {lineTotal.toFixed(2)}

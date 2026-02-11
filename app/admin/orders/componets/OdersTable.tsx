@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { OrderStatusPill } from "./OrderStatusPill";
+import { OrderStatusPill } from "../../../_componets/OrderStatusPill";
 import { handleGetAllOrders } from "@/lib/actions/order-action";
 
 type Order = {

@@ -8,11 +8,12 @@ export default function AllProductsPage() {
   const router = useRouter();
 
   return (
-    <div className="w-full px-6 py-8">
-      
-      {/* FILTER BAR */}
-      <div className="w-full">
-        <ProductFilterBar
+   <div className="w-full">
+      {/* Top container */}
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6">
+        {/* FILTER BAR */}
+        <div className="sticky top-0 z-20  ">
+          <ProductFilterBar
           onSubmit={({ search, category }) => {
             const sp = new URLSearchParams();
 
@@ -23,14 +24,11 @@ export default function AllProductsPage() {
           }}
         />
       </div>
-
-        <ProductsGrid
-          title=""
-          pageSize={20}
-          refreshMs={10000}
-
-        />
+  <div className="mt-6">
+          <ProductsGrid title="" pageSize={20} refreshMs={10000} />
+        </div>
       </div>
+</div>
 
   );
 }
