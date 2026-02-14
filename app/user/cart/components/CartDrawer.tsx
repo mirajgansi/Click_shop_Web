@@ -334,7 +334,7 @@ const pid = typeof item.productId === "string" ? item.productId : item.productId
                           <div className="inline-flex items-center rounded-full border">
                             <button
                         type="button"
-                        onClick={() => changeQty(item._id, item.quantity - 1)
+                        onClick={() => changeQty(pid, item.quantity - 1)
 }
                         className="p-2 hover:bg-black/5"
                         aria-label="Decrease quantity"
@@ -348,7 +348,7 @@ const pid = typeof item.productId === "string" ? item.productId : item.productId
 
                       <button
                         type="button"
-                        onClick={() => changeQty(item._id, item.quantity + 1)
+                        onClick={() => changeQty(pid, item.quantity + 1)
 }
                         className="p-2 hover:bg-black/5"
                         aria-label="Increase quantity"

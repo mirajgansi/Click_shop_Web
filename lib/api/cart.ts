@@ -33,7 +33,7 @@ export const updateCartItemQuantity = async (
   quantity: number,
 ) => {
   try {
-    const res = await axios.patch(API.CART.UPDATE_ITEM_QTY(productId), {
+    const res = await axios.put(API.CART.UPDATE_ITEM_QTY(productId), {
       quantity,
     });
     return res.data;
