@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, useState } from "react";
 import {
   LineChart,
   Line,
@@ -16,52 +16,45 @@ import {
 type KPI = {
   title: string;
   value: string;
-  delta: string;
+  // delta: string;
   positive?: boolean;
 };
 
-const kpis: KPI[] = [
-  { title: "Total Revenue", value: "203k", delta: "12.8%", positive: true },
-  { title: "Avg. Transaction Value", value: "3.4k", delta: "1.5%", positive: true },
-  { title: "Avg. Footfall", value: "683", delta: "0.5%", positive: true },
-  { title: "Avg. Units Per Customer", value: "12", delta: "3.4%", positive: true },
-];
+type Props = {
+  initial: any;
+  user: any; 
+};
+function Sparkline({ dataKey = "value", data }: { dataKey?: string; data: any[] }) {
+  return (
+    <div className="mt-3 h-10 w-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data}>
+          <Line
+            type="monotone"
+            dataKey={dataKey}
+            strokeWidth={2}
+            dot={false}
+            stroke="#94A3B8" 
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 
-const earnings = [
-  { day: "Mon", value: 22000 },
-  { day: "Tue", value: 65000 },
-  { day: "Wed", value: 18000 },
-  { day: "Thu", value: 98000 },
-  { day: "Fri", value: 21000 },
-  { day: "Sat", value: 45000 },
-  { day: "Sun", value: 88000 },
-];
-
-const categories = [
-  { name: "Snacks", value: 45.37 },
-  { name: "Beverages", value: 28.19 },
-  { name: "Pulse", value: 13.69 },
-  { name: "Cooking oil & ghee", value: 13.69 },
-  { name: "Meat and fish", value: 13.69 },
-];
-
-// Donut colors (feel free to change)
+function getGreeting(now = new Date()) {
+  const h = now.getHours();
+  if (h < 12) return "Good Morning 👋";
+  if (h < 18) return "Good Afternoon 👋";
+  return "Good Evening 👋";
+}
 const pieColors = ["#F59E0B", "#60A5FA", "#A855F7", "#22C55E", "#FB7185"];
 
-const stores = [
-  { name: "Koramangala", tag: "Best Performing", sales: "$ 896.3", change: "23%", up: true },
-  { name: "Indira Nagar", tag: "", sales: "$ 683.3", change: "3.8%", up: false },
-  { name: "Whitefield", tag: "Low Performing", sales: "$ 569.3", change: "8.2%", up: false },
-];
-
-const skus = [
-  { name: "Wai wai", pcs: "481 Pcs", share: "16%", up: true },
-  { name: "Real juice", pcs: "351 Pcs", share: "34%", up: true },
-  { name: "Coffee", pcs: "281 Pcs", share: "7.3%", up: false },
-  { name: "Rice", pcs: "267 Pcs", share: "14.7%", up: true },
-];
-
-function TrendPill({ positive = true, value }: { positive?: boolean; value: string }) {
+function TrendPill({ positive = true, 
+  // value
+ }: { positive?: boolean;
+  //  value: string
+   }) {
   return (
     <span
       className={[
@@ -70,7 +63,7 @@ function TrendPill({ positive = true, value }: { positive?: boolean; value: stri
       ].join(" ")}
     >
       <span className={positive ? "text-green-600" : "text-red-600"}>{positive ? "↗" : "↘"}</span>
-      {value}
+      {/* {value} */}
     </span>
   );
 }
@@ -97,29 +90,148 @@ function Card({
   );
 }
 
-export default function DashboardPage() {
+function formatMoney(n: number) {
+  if (!Number.isFinite(n)) return "0";
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
+  return `${Math.round(n)}`;
+}
+
+function labelFromEarningsId(id: any) {
+  if (!id) return "";
+  if (id.day) return `${id.month}/${id.day}`;
+  if (id.week) return `W${id.week}`;
+  if (id.month) return `${id.month}/${String(id.year).slice(-2)}`;
+  return "";
+}
+
+export default function DashboardClient({ initial, user }: Props) {
+  const [rangeMode, setRangeMode] = useState<"Daily" | "Weekly" | "Monthly">("Daily");
+
+    const greeting = getGreeting(new Date());
+
+  const name =
+    user?.username ||
+    user?.name ||
+    user?.fullName ||
+    user?.email?.split?.("@")?.[0] ||
+    "Admin";
+
+  const ok = initial?.success;
+
+  const kpiData = initial?.kpis ?? { revenue: 0, orders: 0, avgOrderValue: 0, customers: 0 };
+  const earningsRaw = Array.isArray(initial?.earnings) ? initial.earnings : [];
+  const categories = Array.isArray(initial?.categories) ? initial.categories : [];
+  const topProducts = Array.isArray(initial?.topProducts) ? initial.topProducts : [];
+  const drivers = Array.isArray(initial?.drivers) ? initial.drivers : [];
+
+  // chart: convert backend format -> { day: string, value: number }
+  const earnings = useMemo(() => {
+    return earningsRaw.map((r: any) => ({
+      day: labelFromEarningsId(r?._id),
+      value: Number(r?.value) || 0,
+    }));
+  }, [earningsRaw]);
+
+  // KPI cards from real data (you can change titles)
+  const kpis: KPI[] = useMemo(() => {
+    return [
+      {
+        title: "Total Revenue",
+        value: `₹.${formatMoney(Number(kpiData.revenue) || 0)}`,
+        delta: "—",
+        positive: true,
+      },
+      {
+        title: "Avg. Transaction Value",
+        value: `₹.${formatMoney(Number(kpiData.avgOrderValue) || 0)}`,
+        delta: "—",
+        positive: true,
+      },
+      {
+        title: "Total Orders",
+        value: String(Number(kpiData.orders) || 0),
+        delta: "—",
+        positive: true,
+      },
+      {
+        title: "Customers",
+        value: String(Number(kpiData.customers) || 0),
+        delta: "—",
+        positive: true,
+      },
+    ];
+  }, [kpiData]);
+
+
+const revenueSpark = useMemo(() => earnings, [earnings]);
+
+const avgOrderSpark = useMemo(() => {
+  // approximate: avg per point (avoid divide by 0)
+  const values = earnings.map((e: any) => Number(e.value) || 0);
+  const max = Math.max(1, ...values);
+  // normalize so line exists even for small numbers
+  return values.map((v:any, i:any) => ({ day: earnings[i]?.day, value: (v / max) * 100 }));
+}, [earnings]);
+
+const countSpark = useMemo(() => {
+  // create a small line using index (works even if you don't have per-day counts yet)
+  return earnings.map((e: any, i: number) => ({ day: e.day, value: i + 1 }));
+}, [earnings]);
+
+  // Drivers card UI expects: {name, tag, sales, change, up}
+  const driverCards = useMemo(() => {
+    // sort by delivered desc
+    const sorted = [...drivers].sort((a: any, b: any) => (b.delivered || 0) - (a.delivered || 0));
+    const topId = sorted[0]?.driverId;
+
+    return sorted.slice(0, 6).map((d: any) => ({
+      name: d?.name || d?.email || "Driver",
+      tag: d?.driverId === topId ? "Top Driver" : "",
+      sales: `Delivered: ${d?.delivered ?? 0} / Assigned: ${d?.assigned ?? 0}`,
+      change: `${Number(d?.deliveryRate ?? 0).toFixed(1)}%`,
+      up: Number(d?.deliveryRate ?? 0) >= 70,
+    }));
+  }, [drivers]);
+
+  // Top products card UI expects: {name, pcs, share, up}
+  const productCards = useMemo(() => {
+    return topProducts.slice(0, 6).map((p: any) => ({
+      name: p?.name || "Product",
+      pcs: `${p?.qty ?? 0} Sold`,
+      share: `${Number(p?.share ?? 0).toFixed(1)}%`,
+      up: true,
+    }));
+  }, [topProducts]);
+
+  const earningsTotal = useMemo(() => {
+    return earnings.reduce((s: number, x: any) => s + (Number(x.value) || 0), 0);
+  }, [earnings]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="mx-auto max-w-7xl px-4 py-6">
+        {!ok ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {initial?.message || "Failed to load dashboard analytics"}
+          </div>
+        ) : null}
+
         {/* Top row */}
         <div className="grid gap-4 md:grid-cols-12">
           {/* Welcome card */}
           <div className="md:col-span-3">
             <div className="relative h-full rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-              <div className="text-sm text-gray-500">Good Afternoon 👋</div>
-              <div className="mt-1 text-lg font-bold text-gray-900">Adam</div>
+              <div className="text-sm text-gray-500">{greeting}</div>
+              <div className="mt-1 text-lg font-bold text-gray-900">{name}</div>
+
               <p className="mt-2 text-sm text-gray-500">
                 Here is your weekly <br /> overview report
               </p>
 
-              <button className="mt-4 inline-flex items-center rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
-                View report
-              </button>
 
-              <div className="pointer-events-none absolute right-3 top-3 text-4xl opacity-10">📊</div>
             </div>
           </div>
-
           {/* KPI cards */}
           <div className="md:col-span-9">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -128,11 +240,17 @@ export default function DashboardPage() {
                   <div className="text-xs font-medium text-gray-500">{k.title}</div>
                   <div className="mt-2 flex items-end justify-between gap-3">
                     <div className="text-2xl font-bold text-gray-900">{k.value}</div>
-                    <TrendPill positive={k.positive} value={k.delta} />
+                    <TrendPill positive={k.positive}
+                    //  value={k.delta}
+                     />
                   </div>
-
-                  {/* tiny sparkline-ish bar */}
-                  <div className="mt-3 h-8 w-full rounded-lg bg-gray-50" />
+                  {(() => {
+                    if (k.title === "Total Revenue") return <Sparkline data={revenueSpark} />;
+                    if (k.title === "Avg. Transaction Value") return <Sparkline data={avgOrderSpark} />;
+                    if (k.title === "Total Orders") return <Sparkline data={countSpark} />;
+                    if (k.title === "Customers") return <Sparkline data={countSpark} />;
+                    return <div className="mt-3 h-10 w-full rounded-lg bg-gray-50" />;
+                  })()}
                 </div>
               ))}
             </div>
@@ -141,18 +259,25 @@ export default function DashboardPage() {
 
         {/* Middle row */}
         <div className="mt-4 grid gap-4 md:grid-cols-12">
-          {/* Overall Earnings line chart */}
           <div className="md:col-span-8">
             <Card
               title={
                 <div className="flex items-center gap-2">
                   <span>Overall Earnings</span>
-                  <span className="text-xs font-medium text-gray-400">- This Week</span>
-                  <span className="ml-1 text-sm font-bold text-green-600">$48.9k</span>
+                  <span className="text-xs font-medium text-gray-400">
+                    - {rangeMode === "Daily" ? "This Week" : rangeMode}
+                  </span>
+                  <span className="ml-1 text-sm font-bold text-green-600">
+                    Rs{formatMoney(earningsTotal)}
+                  </span>
                 </div>
               }
               right={
-                <select className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700">
+                <select
+                  value={rangeMode}
+                  onChange={(e) => setRangeMode(e.target.value as any)}
+                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
+                >
                   <option>Daily</option>
                   <option>Weekly</option>
                   <option>Monthly</option>
@@ -169,15 +294,7 @@ export default function DashboardPage() {
                       contentStyle={{ borderRadius: 12, border: "1px solid #eee" }}
                       labelStyle={{ fontWeight: 700 }}
                     />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      strokeWidth={3}
-                      dot={false}
-                      // don’t set explicit colors if you want to keep it neutral;
-                      // but line needs a stroke to show: using a safe default
-                      stroke="#F97316"
-                    />
+                    <Line type="monotone" dataKey="value" strokeWidth={3} dot={false} stroke="#F97316" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -186,7 +303,11 @@ export default function DashboardPage() {
 
           {/* Donut category chart */}
           <div className="md:col-span-4">
-            <Card title="Merchandise Category" right={<span className="text-xs text-gray-400">in last 30 days</span>} className="p-5">
+            <Card
+              title="Merchandise Category"
+              right={<span className="text-xs text-gray-400">in selected range</span>}
+              className="p-5"
+            >
               <div className="flex items-center justify-center">
                 <div className="h-56 w-56">
                   <ResponsiveContainer width="100%" height="100%">
@@ -199,7 +320,7 @@ export default function DashboardPage() {
                         outerRadius={95}
                         paddingAngle={2}
                       >
-                        {categories.map((_, idx) => (
+                        {categories.map((_: any, idx: number) => (
                           <Cell key={idx} fill={pieColors[idx % pieColors.length]} />
                         ))}
                       </Pie>
@@ -209,7 +330,7 @@ export default function DashboardPage() {
               </div>
 
               <div className="mt-2 space-y-2">
-                {categories.map((c, idx) => (
+                {categories.map((c: any, idx: number) => (
                   <div key={c.name} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
                       <span
@@ -219,7 +340,7 @@ export default function DashboardPage() {
                       <span className="text-gray-700">{c.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-gray-800">{c.value.toFixed(2)}%</span>
+                      <span className="font-semibold text-gray-800">{Number(c.value).toFixed(2)}%</span>
                       <span className="text-green-600">↗</span>
                     </div>
                   </div>
@@ -231,11 +352,11 @@ export default function DashboardPage() {
 
         {/* Bottom row */}
         <div className="mt-4 grid gap-4 md:grid-cols-12">
-          {/* Stores Analytics */}
+          {/* Drivers Analytics (replaces Stores) */}
           <div className="md:col-span-5">
-            <Card title="Stores Analytics" right={<span className="text-xs text-gray-400">in last 7 days</span>} className="p-5">
+            <Card title="Drivers Analytics" right={<span className="text-xs text-gray-400">in selected range</span>} className="p-5">
               <div className="space-y-3">
-                {stores.map((s) => (
+                {driverCards.map((s) => (
                   <div
                     key={s.name}
                     className="flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3"
@@ -247,7 +368,7 @@ export default function DashboardPage() {
                           <span
                             className={[
                               "rounded-full px-2 py-1 text-xs font-semibold",
-                              s.tag.includes("Best") ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700",
+                              s.tag.includes("Top") ? "bg-green-50 text-green-700" : "bg-gray-100 text-gray-700",
                             ].join(" ")}
                           >
                             {s.tag}
@@ -263,15 +384,20 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 ))}
+
+                {!driverCards.length ? (
+                  <div className="rounded-xl border border-gray-100 bg-white p-3 text-sm text-gray-500">
+                    No driver assignments found in this date range.
+                  </div>
+                ) : null}
               </div>
             </Card>
           </div>
 
-          {/* Top Performing SKUs */}
           <div className="md:col-span-4">
-            <Card title="Top Performing SKUs" right={<span className="text-xs text-gray-400">in last 7 days</span>} className="p-5">
+            <Card title="Top Selling Products" right={<span className="text-xs text-gray-400">in selected range</span>} className="p-5">
               <div className="space-y-3">
-                {skus.map((p) => (
+                {productCards.map((p:any) => (
                   <div key={p.name} className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white px-3 py-3">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 text-sm font-bold text-gray-600">
@@ -288,16 +414,16 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 ))}
+
+                {!productCards.length ? (
+                  <div className="rounded-xl border border-gray-100 bg-white p-3 text-sm text-gray-500">
+                    No sales data found in this date range.
+                  </div>
+                ) : null}
               </div>
             </Card>
           </div>
-
-          {/* (Optional) Extra card area like screenshot spacing */}
-          <div className="md:col-span-3">
-            <div className="h-full rounded-2xl border border-dashed border-gray-200 bg-white p-5 text-sm text-gray-400">
-              You can place another widget here (recent orders, drivers, low stock, etc.)
-            </div>
-          </div>
+       
         </div>
       </div>
     </div>

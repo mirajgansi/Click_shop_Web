@@ -33,6 +33,13 @@ export const API = {
       GETALLUSER: "/api/admin/users/",
       DELETEUSER: (id: string) => `/api/admin/users/${id}`,
     },
+    ANALYTICS: {
+      KPIS: "/api/admin/analytics/kpis",
+      EARNINGS: "/api/admin/analytics/earnings", // ?from=&to=&group=daily|weekly|monthly
+      CATEGORY_SHARE: "/api/admin/analytics/category-share", // ?from=&to=
+      TOP_PRODUCTS: "/api/admin/analytics/top-products", // ?from=&to=&limit=10
+      DRIVERS: "/api/admin/analytics/drivers", // ?from=&to=&limit=10
+    },
   },
   DRIVER: {
     GET_ALL: "/api/driver/drivers", // list drivers + profile

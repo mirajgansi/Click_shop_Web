@@ -23,7 +23,6 @@ export default function ResetCodePasswordPage() {
     if (!email.trim()) return toast.error("Email is required");
     if (!/^\d{6}$/.test(code)) return toast.error("Code must be 6 digits");
 
-    // ✅ Move to password page, keep email+code in query
     router.push(
       `/reset-password?email=${encodeURIComponent(email.trim())}&code=${encodeURIComponent(code)}`
     );
