@@ -2,99 +2,150 @@
 
 import { resetPassword } from "@/lib/api/auth";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useTransition } from "react";
 import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import AnimatedTextField from "./AnimatedTextFeild"; // adjust path
+
+const resetSchema = z
+  .object({
+    email: z.string().min(1, "Email is required").email("Enter a valid email"),
+    code: z.string().regex(/^\d{6}$/, "Valid 6-digit code is required"),
+    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+    confirm: z.string().min(1, "Confirm your password"),
+  })
+  .refine((data) => data.newPassword === data.confirm, {
+    path: ["confirm"],
+    message: "Passwords do not match",
+  });
+
+type ResetData = z.infer<typeof resetSchema>;
 
 export default function ResetPasswordPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [pending, startTransition] = useTransition();
 
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    setError,
+    formState: { errors },
+  } = useForm<ResetData>({
+    resolver: zodResolver(resetSchema),
+    mode: "onSubmit",
+    defaultValues: {
+      email: "",
+      code: "",
+      newPassword: "",
+      confirm: "",
+    },
+  });
 
   useEffect(() => {
     const e = searchParams.get("email") || "";
     const c = searchParams.get("code") || "";
-    setEmail(e);
-    setCode(c);
-  }, [searchParams]);
+    setValue("email", e);
+    setValue("code", c);
+  }, [searchParams, setValue]);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  const submit = (values: ResetData) => {
+    startTransition(async () => {
+      try {
+        const res = await resetPassword(values.email.trim(), values.code.trim(), values.newPassword);
 
-    if (!email.trim()) return toast.error("Email is required");
-    if (!/^\d{6}$/.test(code.trim())) return toast.error("Valid 6-digit code is required");
-    if (newPassword.length < 8) return toast.error("Password must be at least 8 characters");
-    if (newPassword !== confirm) return toast.error("Passwords do not match");
+        toast.success(res?.message || "Password reset successful");
+        router.push("/login");
+      } catch (err: any) {
+        // ✅ make it shake on server error too
+        setError("code", {
+          type: "manual",
+          message: err?.message || "Reset password failed",
+        });
 
-    try {
-      setLoading(true);
-      const res = await resetPassword(email.trim(), code.trim(), newPassword);
-      toast.success(res?.message || "Password reset successful");
-      router.push("/login");
-    } catch (err: any) {
-      toast.error(err?.message || "Reset password failed");
-    } finally {
-      setLoading(false);
-    }
-  }
+        toast.error(err?.message || "Reset password failed");
+      }
+    });
+  };
+
+  const onInvalid = () => {
+    toast.error("Please fix the validation errors");
+  };
 
   return (
-    <div className=" flex justify-center  px-4">
+    <div className="flex justify-center px-4">
       <div className="w-full max-w-md rounded-2xl bg-white shadow p-6">
         <h1 className="text-2xl font-semibold">Set new password</h1>
-        <p className="text-sm text-gray-600 mt-1">
-          Create a new password for <span className="font-medium">{email || "your account"}</span>
-        </p>
 
-        <form onSubmit={onSubmit} className="mt-6 space-y-4">
-          <div>
-            <label className="text-sm font-medium">New password</label>
-            <div className="mt-1 flex items-center gap-2">
-              <input
-                className="w-full rounded-xl border px-3 py-2 outline-none focus:ring"
-                type={showPass ? "text" : "password"}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                autoComplete="new-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPass((s) => !s)}
-                className="rounded-xl border px-3 py-2 text-sm"
-              >
-                {showPass ? "Hide" : "Show"}
-              </button>
-            </div>
+        <form onSubmit={handleSubmit(submit, onInvalid)} className="mt-6 space-y-4">
+          {/* Email (hidden or readonly if you want) */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium">Email</label>
+            <AnimatedTextField
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              register={register("email")}
+              error={errors.email}
+              inputClassName="bg-gray-50"
+            />
           </div>
 
-          <div>
+          {/* Code */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium">6-digit code</label>
+            <AnimatedTextField
+              id="code"
+              type="text"
+              placeholder="123456"
+              register={register("code")}
+              error={errors.code}
+            />
+          </div>
+
+          {/* New password */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium">New password</label>
+            <AnimatedTextField
+              id="newPassword"
+              type="password"
+              placeholder="••••••••"
+              register={register("newPassword")}
+              error={errors.newPassword}
+              showToggle
+            />
+          </div>
+
+          {/* Confirm */}
+          <div className="space-y-1">
             <label className="text-sm font-medium">Confirm password</label>
-            <input
-              className="mt-1 w-full rounded-xl border px-3 py-2 outline-none focus:ring"
-              type={showPass ? "text" : "password"}
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              autoComplete="new-password"
+            <AnimatedTextField
+              id="confirm"
+              type="password"
+              placeholder="••••••••"
+              register={register("confirm")}
+              error={errors.confirm}
+              showToggle
             />
           </div>
 
           <button
-            disabled={loading}
             className="w-full rounded-xl bg-[#4CAF50] text-white py-2.5 font-medium disabled:opacity-60"
             type="submit"
           >
-            {loading ? "Resetting..." : "Reset password"}
+          Reset password
           </button>
         </form>
 
         <div className="mt-4 text-sm text-gray-600">
           Want to re-enter code?{" "}
-          <a className="underline" href={`/reset-code-password?email=${encodeURIComponent(email)}`}>
+          <a
+            className="underline"
+            href={`/reset-code-password?email=${encodeURIComponent(searchParams.get("email") || "")}`}
+          >
             Back
           </a>
         </div>

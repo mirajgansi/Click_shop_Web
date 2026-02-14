@@ -1,15 +1,17 @@
-"use client";
-
-import { ShoppingCart } from "lucide-react";
+import Image from "next/image";
 
 export default function FullScreenLoader() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-grey-600">
       <div className="flex flex-col items-center gap-4">
-        <div className="relative">
-          <ShoppingCart className="h-14 w-14 text-green-600 animate-bounce" />
-          <div className="absolute inset-0 -z-10 h-14 w-14 animate-spin rounded-full border-4 border-green-200 border-t-green-600" />
-        </div>
+        
+        <Image
+          src="/loader.gif"
+          alt="Loading"
+          width={100}
+          height={100}
+          unoptimized
+        />
 
         <p className="text-sm text-gray-600 animate-pulse">
           Loading your groceries...

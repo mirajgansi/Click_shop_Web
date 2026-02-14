@@ -32,7 +32,10 @@ export default function AnimatedTextField({
     showToggle && isPassword ? (showPassword ? "text" : "password") : type;
 
   useEffect(() => {
-    if (!error) return;
+    if (!error?.message) return;
+
+    // ✅ reset first so animation always replays
+    controls.set({ x: 0, y: 0, rotate: 0 });
 
     controls.start({
       x: [0, -18, 18, -16, 16, -14, 14, -10, 10, -6, 6, 0],
@@ -40,7 +43,7 @@ export default function AnimatedTextField({
       rotate: [0, -2, 2, -2, 2, -1, 1, 0],
       transition: { duration: 0.55, ease: "easeInOut" },
     });
-  }, [error, controls]);
+  }, [error?.message, controls]);
 
   return (
     <div className="w-full">

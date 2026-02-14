@@ -13,46 +13,56 @@ import AnimatedTextField from "./AnimatedTextFeild";
 
 export default function LoginForm() {
   const router = useRouter();
+const {
+  register,
+  handleSubmit,
+  setError,
+  formState: { errors, isSubmitting },
+} = useForm<LoginData>({
+  resolver: zodResolver(loginSchema),
+  mode: "onSubmit",
+});
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginData>({
-    resolver: zodResolver(loginSchema),
-    mode: "onSubmit",
-  });
 
   const [pending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
 
  
 const submit = async (values: LoginData) => {
-
   startTransition(async () => {
     try {
       const response = await handleLogin(values);
 
-      if (response?.success !== true) {
-        toast.error(response?.message || "Invalid credentials");
-        return;
-      }
+    if (response?.success !== true) {
+  setError("email", {
+    type: "manual",
+    message: " ",
+  });
+
+  setError("password", {
+    type: "manual",
+    message: response?.message || "Invalid email or password",
+  });
+
+  toast.error(response?.message || "Invalid credentials");
+  return;
+}
 
       toast.success("Login successful");
 
-      if (response.data?.role === "admin") {
-        router.replace("/admin");
-      } else if (response.data?.role === "user") {
-        router.replace("/user/dashboard");
-      } else {
-        router.replace("/");
-      }
-
+      if (response.data?.role === "admin") router.replace("/admin");
+      else if (response.data?.role === "user") router.replace("/user/dashboard");
+      else router.replace("/");
     } catch (err: any) {
+      setError("password", {
+        type: "manual",
+        message: err.message || "Login failed",
+      });
       toast.error(err.message || "Something went wrong");
     }
   });
 };
+
 
 const onInvalid = () => {
   toast.error("Please fix the validation errors");
@@ -74,22 +84,22 @@ const onInvalid = () => {
   />
 </div>
 
-      {/* Password */}
-      {/* Password */}
 <div className="space-y-1">
   <label className="text-sm font-medium" htmlFor="password">
     Password
   </label>
+<div className="space-y-1">
+  <AnimatedTextField
+    id="password"
+    type="password"
+    placeholder="••••••"
+    register={register("password")}
+    error={errors.password}
+    showToggle
+  />
+</div>
 
   <div className="relative">
-   <AnimatedTextField
-  id="password"
-  type="password"
-  placeholder="••••••"
-  register={register("password")}
-  error={errors.password}
-  showToggle 
-/>
 
     <button
       type="button"
@@ -106,7 +116,7 @@ const onInvalid = () => {
         disabled={isSubmitting || pending}
         className="h-10 w-full rounded-md bg-[#4CAF50] text-white font-semibold disabled:opacity-60"
       >
-        {isSubmitting || pending ? "Logging in..." : "Log in"}
+ Log in
       </button>
       <div className="text-right text-sm">
          <Link href="/request-reset-password" className="font-medium hover:underline ">

@@ -14,39 +14,41 @@ import AnimatedTextField from "./AnimatedTextFeild";
 export default function RegisterForm() {
   const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterData>({
-    resolver: zodResolver(registerSchema),
-    mode: "onSubmit",
-  });
-
+const {
+  register,
+  handleSubmit,
+  setError,
+  formState: { errors, isSubmitting },
+} = useForm<RegisterData>({
+  resolver: zodResolver(registerSchema),
+  mode: "onSubmit",
+});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [pending, startTransition] = useTransition();
-  const [error, setError] = useState("");
 
   const onSubmit = async (data: RegisterData) => {
-    setError("");
+  try {
+    const result = await handleRegister(data);
 
-    try {
-      const result = await handleRegister(data);
-
-      if (!result.success) {
-        setError(result.message || "Registration failed");
-        return;
-      }
-
-      startTransition(() => {
-        router.push("/login");
+    if (!result.success) {
+      setError("email", {
+        type: "manual",
+        message: result.message || "Registration failed",
       });
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Something went wrong";
-      setError(message);
+      return;
     }
-  };
+
+    startTransition(() => {
+      router.push("/login");
+    });
+  } catch (e: any) {
+    setError("email", {
+      type: "manual",
+      message: e?.message || "Something went wrong",
+    });
+  }
+};
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
