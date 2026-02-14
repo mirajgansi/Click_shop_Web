@@ -2,7 +2,7 @@
 
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -10,6 +10,7 @@ import { handleCreateProduct } from "@/lib/actions/product-action";
 import {  ProductData, ProductSchema } from "../schema";
 import { Camera } from "lucide-react";
 import { CategoryModal } from "./category_modal";
+import CreateProductStep1Skeleton from "./skeleton_add_prdocut";
 
 /** ---------------- helpers ---------------- */
 type ActionResponse =
@@ -90,6 +91,7 @@ export default function CreateProductWizard() {
     image: [], 
   },
 });
+const [pageLoading, setPageLoading] = useState(true);
 
   const selectedCurrency = watch("currency");
   const selectedCategory = watch("category");
@@ -211,7 +213,12 @@ console.log("schema.ts loaded (CreateProductWizard)");
       </button>
     );
   };
+useEffect(() => {
+  const t = setTimeout(() => setPageLoading(false), 700);
+  return () => clearTimeout(t);
+}, []);
 
+if (pageLoading) return <CreateProductStep1Skeleton />;
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {/* Stepper top (only 1..3) */}
