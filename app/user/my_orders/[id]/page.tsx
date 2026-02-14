@@ -114,8 +114,7 @@ export default async function OrderDetailPage({
                   className="flex items-start justify-between gap-4 p-4"
                 >
                   <div className="flex items-start gap-4">
-                    {/* ✅ Image */}
-                    <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-gray-100">
+              <div className="relative h-16 w-16 overflow-hidden rounded-xl bg-gray-100">
                       <Image
                         src={buildImageUrl(img)}
                         alt={name}

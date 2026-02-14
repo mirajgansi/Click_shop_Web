@@ -1,5 +1,5 @@
-"user server"
-export default function NotFound() {
+
+export default function notfound() {
     return (
         <div>
             ERROR 404

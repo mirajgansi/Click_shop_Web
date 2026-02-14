@@ -47,7 +47,6 @@ export default function ProductsGrid({
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ When search/category changes, reset to page 1
   useEffect(() => {
     setPage(1);
   }, [search, category]);
@@ -61,7 +60,6 @@ export default function ProductsGrid({
       setLoading(true);
       setError(null);
 
-      // ✅ pass filters to backend
       const res = await getAllProduct({
         page,
         size: pageSize,
@@ -130,7 +128,7 @@ export default function ProductsGrid({
 
       {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
-<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {showSkeleton
           ? Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} idx={i} />)
           : products.map((p) => (
