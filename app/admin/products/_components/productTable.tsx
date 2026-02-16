@@ -8,7 +8,9 @@ import { MoreVertical, Search } from "lucide-react";
 import { toast } from "react-toastify";
 
 import DeleteModal from "@/app/_componets/DeleteModal";
-import { handleDeleteProduct } from "@/lib/actions/product-action";
+import { handleDeleteProduct ,handleRestockProduct } from "@/lib/actions/product-action";
+import RestockModal from "./RestockModal";
+import ActionMenu from "./ActionMenu";
 
 type Product = {
   _id: string;
@@ -75,7 +77,9 @@ const currentCategory = searchParams.get("category") ?? "All";
 
   const [searchTerm, setSearchTerm] = useState(search ?? "");
   const [deleteId, setDeleteId] = useState<string | null>(null);
-
+const [restockId, setRestockId] = useState<string | null>(null);
+//restock
+const [restockLoading, setRestockLoading] = useState(false);
   // filters via URL (so refresh keeps state)
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -102,6 +106,7 @@ const go = (next: Partial<{ page: number; size: number; search: string; category
 
   router.push(`/admin/products?${sp.toString()}`);
 };
+
 
 const filteredProducts = useMemo(() => {
   const q = searchTerm.trim().toLowerCase();
@@ -134,6 +139,9 @@ const filteredProducts = useMemo(() => {
       setDeleteId(null);
     }
   };
+
+
+  
 
   return (
     <div className="rounded-3xl bg-white ring-1 ring-gray-100 shadow-sm">
@@ -205,8 +213,8 @@ const filteredProducts = useMemo(() => {
               <th>Stock</th>
               <th>Total Revenue</th>
            <th>Total Sold</th>
-
               <th>Status</th>
+
               <th className="text-right">Action</th>
             </tr>
           </thead>
@@ -267,32 +275,14 @@ const filteredProducts = useMemo(() => {
                     </span>
                   </td>
 
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end gap-2">
-                      <Link
-                        href={`/admin/products/edit/${p._id}`}
-                        className="rounded-xl px-3 py-2 text-xs font-semibold ring-1 ring-gray-200 hover:bg-white"
-                      >
-                        Edit
-                      </Link>
-
-                      <button
-                        onClick={() => setDeleteId(p._id)}
-                        className="rounded-xl px-3 py-2 text-xs font-semibold text-red-600 ring-1 ring-red-200 hover:bg-red-50"
-                      >
-                        Delete
-                      </button>
-
-                      {/* optional: menu icon like reference */}
-                      <button
-                        type="button"
-                        className="h-9 w-9 grid place-items-center rounded-xl ring-1 ring-gray-200 hover:bg-white"
-                        aria-label="More"
-                      >
-                        <MoreVertical className="h-4 w-4 text-gray-600" />
-                      </button>
-                    </div>
-                  </td>
+                 <td className="px-4 py-3">
+  <ActionMenu
+    id={p._id}
+    editHref={`/admin/products/edit/${p._id}`}
+    onRestock={(id) => setRestockId(id)}
+    onDelete={(id) => setDeleteId(id)}
+  />
+</td>
                 </tr>
               );
             })}
@@ -343,6 +333,32 @@ const filteredProducts = useMemo(() => {
         title="Delete Confirmation"
         description="Are you sure you want to delete this product? This action cannot be undone."
       />
+
+
+  <RestockModal
+  isOpen={!!restockId}
+  loading={restockLoading}
+  onClose={() => setRestockId(null)}
+  onConfirm={async ({ quantity, mode }) => {
+    if (!restockId) return;
+
+    const res = await handleRestockProduct(restockId, {
+      quantity,
+      mode,
+    });
+
+    if (!res?.success) {
+      toast.error(res?.message || "Restock failed");
+      return;
+    }
+
+    toast.success("Stock updated successfully");
+    router.refresh();
+    setRestockId(null);
+  }}
+/>
     </div>
+    
   );
+  
 }
