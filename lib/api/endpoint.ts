@@ -25,6 +25,9 @@ export const API = {
     TRENDING: "/api/products/trending",
     POPULAR: "/api/products/popular",
     TOP_RATED: "/api/products/top-rated",
+    OUT_OF_STOCK: "/api/products/out-of-stock",
+    RESTOCK: (id: string) => `/api/products/${id}/restock`,
+    INCREMENT_VIEW: (id: string) => `/api/products/${id}/view`,
   },
 
   ADMIN: {

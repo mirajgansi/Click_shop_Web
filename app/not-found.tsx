@@ -5,7 +5,6 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100 px-6 text-center">
 
-      {/* Sad Image */}
       <div className="relative w-40 h-40 sm:w-100 sm:h-100 md:w-200 md:h-100">
         <Image
           src="/404.png" 
@@ -16,7 +15,6 @@ export default function NotFound() {
         />
       </div>
 
-      {/* 404 Text */}
       <h1 className="mt-6 text-4xl sm:text-5xl font-bold text-gray-900">
         404 - Page Not Found
       </h1>

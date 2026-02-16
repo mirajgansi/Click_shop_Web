@@ -70,7 +70,7 @@ export const resetPassword = async (
   try {
     const response = await axios.post(API.AUTH.RESET_PASSWORD, {
       email,
-      code: code.trim(), // ✅ ensure string
+      code: code.trim(),
       newPassword,
     });
     return response.data;

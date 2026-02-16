@@ -56,7 +56,6 @@ const stepFields: Record<number, (keyof WizardData)[]> = {
     "manufactureDate",
     "expireDate",
     "nutritionalInfo",
-    "sku",
   ],
 };
 
@@ -167,14 +166,12 @@ console.log("schema.ts loaded (CreateProductWizard)");
 
     data.image.forEach((file) => formData.append("image", file));
 
-      if (data.sku?.trim()) formData.append("sku", data.sku.trim());
 
       const raw = await handleCreateProduct(formData);
       const response = normalizeActionResponse(raw);
 
       if (!response.success) throw new Error(response.message || "Create product failed");
 
-      toast.success(response.message || "Product created");
       reset({ inStock: 0, image: [] }); 
       if (fileInputRef.current) fileInputRef.current.value = "";
       setCompleted({ 1: false, 2: false, 3: false });
@@ -317,6 +314,7 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
             </div>
             <p className="text-sm text-gray-600">Browse or Drag & Drop</p>
             <p className="text-xs text-gray-400">Select up to 3 images</p>
+            <p className="text-xs text-red-700">Use png  image if possible</p>
           </div>
         </button>
       )}
@@ -494,16 +492,7 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
               )}
             </div>
 
-            {/* SKU */}
-            <div className="space-y-1">
-              <label className="text-sm font-medium">SKU (optional)</label>
-              <input
-                type="text"
-                className="h-10 w-full rounded-md border border-black/10 px-3 text-sm outline-none focus:border-black/40"
-                {...register("sku")}
-              />
-              {errors.sku?.message && <p className="text-xs text-red-600">{errors.sku.message}</p>}
-            </div>
+            
           </motion.div>
         )}
       </AnimatePresence>

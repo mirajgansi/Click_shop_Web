@@ -53,7 +53,6 @@ export default function EditProductForm({ product }: { product?: any }) {
       manufactureDate: product?.manufactureDate ?? "",
       expireDate: product?.expireDate ?? "",
       nutritionalInfo: product?.nutritionalInfo ?? "",
-      sku: product?.sku ?? "",
       image: [],
     },
   });
@@ -72,7 +71,6 @@ export default function EditProductForm({ product }: { product?: any }) {
       manufactureDate: product?.manufactureDate ?? "",
       expireDate: product?.expireDate ?? "",
       nutritionalInfo: product?.nutritionalInfo ?? "",
-      sku: product?.sku ?? "",
       image: [],
     });
 
@@ -124,7 +122,6 @@ export default function EditProductForm({ product }: { product?: any }) {
         fd.append("manufactureDate", data.manufactureDate ?? "");
         fd.append("expireDate", data.expireDate ?? "");
         fd.append("nutritionalInfo", data.nutritionalInfo ?? "");
-        fd.append("sku", data.sku ?? "");
 
         // keep existing images list
         fd.append("existingImages", JSON.stringify(existingImages));

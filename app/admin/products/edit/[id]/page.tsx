@@ -1,5 +1,7 @@
 import { handleGetProductById } from "@/lib/actions/product-action";
 import EditProductForm from "../components/EditProductForm";
+import { Toast } from "radix-ui";
+import ToastProvider from "@/app/_componets/ToastProvider";
 
 export default async function Page({
   params,
@@ -21,6 +23,7 @@ export default async function Page({
 
   return (
     <div className="p-6">
+      <ToastProvider />
       <EditProductForm product={product} />
     </div>
   );

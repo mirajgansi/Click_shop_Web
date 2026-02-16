@@ -37,7 +37,6 @@ price: z.coerce.number().positive("Price must be greater than 0"),
 
 inStock: z.coerce.number().int("Stock must be an integer").min(0).default(0),
 
-    sku: z.string().optional(),
 
     // server stats (should be set by backend usually)
     totalSold: z.number().int().min(0).default(0),
