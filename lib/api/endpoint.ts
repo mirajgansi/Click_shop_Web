@@ -41,7 +41,8 @@ export const API = {
       EARNINGS: "/api/admin/analytics/earnings", // ?from=&to=&group=daily|weekly|monthly
       CATEGORY_SHARE: "/api/admin/analytics/category-share", // ?from=&to=
       TOP_PRODUCTS: "/api/admin/analytics/top-products", // ?from=&to=&limit=10
-      DRIVERS: "/api/admin/analytics/drivers", // ?from=&to=&limit=10
+      DRIVERS: "/api/admin/analytics/drivers",
+      TOP_VIEWED_PRODUCTS: "/api/admin/analytics/topView",
     },
   },
   DRIVER: {

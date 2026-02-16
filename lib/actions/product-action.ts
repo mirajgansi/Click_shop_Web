@@ -3,11 +3,14 @@ import {
   createProduct,
   deleteProduct,
   getAllProduct,
+  getOutOfStockProducts,
   getPopularProducts,
   getProductById,
   getProductsByCategory,
   getRecentProducts,
   getTrendingProducts,
+  incrementProductView,
+  restockProduct,
   updateProduct,
 } from "@/lib/api/product";
 import { revalidatePath } from "next/cache";
@@ -195,7 +198,7 @@ export async function handleGetTrendingProducts(limit = 10) {
 
 export async function handleGetPopularProducts(limit = 10) {
   try {
-    const res = await getPopularProducts(limit); // 👈 CALL + PASS limit
+    const res = await getPopularProducts(limit);
     return res;
   } catch (error: any) {
     return {
@@ -216,3 +219,51 @@ export async function handleGetPopularProducts(limit = 10) {
 //     };
 //   }
 // }
+export async function handleRestockProduct(
+  productId: string,
+  payload: { quantity: number; mode?: "set" | "add" },
+) {
+  try {
+    const res = await restockProduct(productId, payload);
+
+    if (res?.success) {
+      revalidatePath("/admin/products");
+      revalidatePath(`/admin/products/edit/${productId}`);
+      revalidatePath(`/products/${productId}`);
+      revalidatePath("/products");
+    }
+
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to restock product",
+    };
+  }
+}
+
+export async function handleIncrementProductView(productId: string) {
+  try {
+    await incrementProductView(productId);
+    return { success: true };
+  } catch {
+    return { success: true };
+  }
+}
+
+export async function handleGetOutOfStockProducts(params?: {
+  page?: number;
+  size?: number | "all";
+  search?: string;
+  category?: string;
+}) {
+  try {
+    const res = await getOutOfStockProducts(params);
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch out of stock products",
+    };
+  }
+}

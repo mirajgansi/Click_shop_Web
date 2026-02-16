@@ -145,3 +145,48 @@ export const getTopRatedProducts = async (limit = 10) => {
     );
   }
 };
+export const restockProduct = async (
+  id: string,
+  payload: { quantity: number; mode?: "set" | "add" },
+) => {
+  if (!id) throw new Error("Product id is required");
+
+  try {
+    const response = await axios.put(API.PRODUCT.RESTOCK(id), payload, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || error.message || "Restock failed",
+    );
+  }
+};
+
+export const incrementProductView = async (id: string) => {
+  if (!id) throw new Error("Product id is required");
+  try {
+    const response = await axios.patch(API.PRODUCT.INCREMENT_VIEW(id));
+    return response.data;
+  } catch (error: any) {
+    return null;
+  }
+};
+
+export const getOutOfStockProducts = async (params?: {
+  page?: number;
+  size?: number | "all";
+  search?: string;
+  category?: string;
+}) => {
+  try {
+    const response = await axios.get(API.PRODUCT.OUT_OF_STOCK, { params });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch out of stock products",
+    );
+  }
+};

@@ -6,6 +6,7 @@ import {
   getAdminCategoryShare,
   getAdminTopProducts,
   getAdminDriversAnalytics,
+  getAdminTopViewedProducts,
 } from "@/lib/api/admin/analytics";
 
 type DateRange = {
@@ -196,25 +197,29 @@ export async function handleGetAdminDashboard(
   },
 ) {
   try {
-    const [kpisRes, earnRes, catRes, topRes, drvRes] = await Promise.all([
-      getAdminKpis({ from: params?.from, to: params?.to }),
-      getAdminEarnings({
-        from: params?.from,
-        to: params?.to,
-        group: params?.group || "daily",
-      }),
-      getAdminCategoryShare({ from: params?.from, to: params?.to }),
-      getAdminTopProducts({
-        from: params?.from,
-        to: params?.to,
-        limit: params?.topLimit ?? 10,
-      }),
-      getAdminDriversAnalytics({
-        from: params?.from,
-        to: params?.to,
-        limit: params?.driverLimit ?? 10,
-      }),
-    ]);
+    const [kpisRes, earnRes, catRes, topRes, drvRes, viewRes] =
+      await Promise.all([
+        getAdminKpis({ from: params?.from, to: params?.to }),
+        getAdminEarnings({
+          from: params?.from,
+          to: params?.to,
+          group: params?.group || "daily",
+        }),
+        getAdminCategoryShare({ from: params?.from, to: params?.to }),
+        getAdminTopProducts({
+          from: params?.from,
+          to: params?.to,
+          limit: params?.topLimit ?? 10,
+        }),
+        getAdminDriversAnalytics({
+          from: params?.from,
+          to: params?.to,
+          limit: params?.driverLimit ?? 10,
+        }),
+        getAdminTopViewedProducts({
+          limit: params?.topLimit ?? 10,
+        }),
+      ]);
 
     if (!kpisRes?.success)
       return {
@@ -241,6 +246,11 @@ export async function handleGetAdminDashboard(
         success: false,
         message: drvRes?.message || "Failed to fetch driver analytics",
       };
+    if (!viewRes?.success)
+      return {
+        success: false,
+        message: viewRes?.message || "Failed to fetch top viewed products",
+      };
 
     const products = Array.isArray(topRes.data) ? topRes.data : [];
     const totalRevenue =
@@ -262,11 +272,38 @@ export async function handleGetAdminDashboard(
       categories: Array.isArray(catRes.data) ? catRes.data : [],
       topProducts,
       drivers: Array.isArray(drvRes.data) ? drvRes.data : [],
+      topViewed: Array.isArray(viewRes.data) ? viewRes.data : [],
     };
   } catch (error: any) {
     return {
       success: false,
       message: error?.message || "Failed to fetch admin dashboard",
+    };
+  }
+}
+export async function handleGetAdminTopViewedProducts(params?: {
+  limit?: number;
+}) {
+  try {
+    const res = await getAdminTopViewedProducts(params);
+
+    if (!res?.success) {
+      return {
+        success: false,
+        message: res?.message || "Failed to fetch top viewed products",
+      };
+    }
+
+    const rows = Array.isArray(res.data) ? res.data : [];
+
+    return {
+      success: true,
+      topViewed: rows,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error?.message || "Failed to fetch top viewed products",
     };
   }
 }

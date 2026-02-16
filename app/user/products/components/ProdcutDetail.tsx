@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { Heart, Share2, Minus, Plus, BadgePercent, BadgeX } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { handleAddCartItem } from "@/lib/actions/cart-action";
 import { handleCreateOrder } from "@/lib/actions/order-action";
+import { handleIncrementProductView } from "@/lib/actions/product-action";
 
 type Product = {
   _id: string;
@@ -17,21 +18,20 @@ type Product = {
   category?: string;
   inStock?: number;
   unit?: string;
-
+   viewCount?: number; 
   manufacturer?: string;
   manufactureDate?: string;
   expireDate?: string;
 };
 
-export default function ProductDetailClient({
-  product,
-  images,
-}: {
-  product: Product;
-  images: string[];
-}) {
+export default function ProductDetailClient({ product, images }: { product: Product; images: string[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+
+  useEffect(() => {
+    if (!product?._id) return;
+    handleIncrementProductView(product._id);
+  }, [product?._id]);
 
   const inStock = product.inStock ?? 0;
   const outOfStock = inStock <= 0;
@@ -44,10 +44,12 @@ export default function ProductDetailClient({
 
     const [expanded, setExpanded] = useState(false);
 
-    const DESCRIPTION_LIMIT = 160; // characters
+    const DESCRIPTION_LIMIT = 160; 
     const fullDescription = product.description || "No description available.";
     const isLong = fullDescription.length > DESCRIPTION_LIMIT;
 
+
+    
 const shortDescription = isLong
   ? fullDescription.slice(0, DESCRIPTION_LIMIT) + "..."
   : fullDescription;
@@ -114,7 +116,7 @@ const shortDescription = isLong
       <div className="space-y-6">
  {/* IMAGE WRAPPER */}
 <div className="flex flex-col items-center">
-  <div className="relative aspect-[4/3] w-full max-w-md overflow-hidden rounded-2xl bg-gray-50">
+  <div className="relative aspect-4/3 w-full max-w-md overflow-hidden rounded-2xl bg-gray-50">
     <Image
       src={activeImage}
       alt={product.name}
@@ -274,7 +276,7 @@ className="rounded-full bg-green-600 p-2 text-white hover:opacity-90"
     type="button"
     onClick={onAddToCart}
     disabled={pending || outOfStock}
-    className={`w-full sm:w-auto sm:min-w-[220px] flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition ${
+    className={`w-full sm:w-auto sm:min-w-55 flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition ${
       outOfStock
         ? "cursor-not-allowed bg-gray-200 text-gray-500"
         : "bg-green-100 text-green-700 hover:bg-green-200"

@@ -175,13 +175,10 @@ const avgOrderSpark = useMemo(() => {
 }, [earnings]);
 
 const countSpark = useMemo(() => {
-  // create a small line using index (works even if you don't have per-day counts yet)
   return earnings.map((e: any, i: number) => ({ day: e.day, value: i + 1 }));
 }, [earnings]);
 
-  // Drivers card UI expects: {name, tag, sales, change, up}
   const driverCards = useMemo(() => {
-    // sort by delivered desc
     const sorted = [...drivers].sort((a: any, b: any) => (b.delivered || 0) - (a.delivered || 0));
     const topId = sorted[0]?.driverId;
 
@@ -194,7 +191,6 @@ const countSpark = useMemo(() => {
     }));
   }, [drivers]);
 
-  // Top products card UI expects: {name, pcs, share, up}
   const productCards = useMemo(() => {
     return topProducts.slice(0, 6).map((p: any) => ({
       name: p?.name || "Product",
@@ -207,6 +203,19 @@ const countSpark = useMemo(() => {
   const earningsTotal = useMemo(() => {
     return earnings.reduce((s: number, x: any) => s + (Number(x.value) || 0), 0);
   }, [earnings]);
+
+const topViewedRaw = Array.isArray(initial?.topViewed)
+  ? initial.topViewed
+  : [...topProducts].sort((a: any, b: any) => (b.viewCount || 0) - (a.viewCount || 0));
+
+const viewedCards = useMemo(() => {
+  return topViewedRaw.slice(0, 6).map((p: any) => ({
+    name: p?.name || "Product",
+    views: `${p?.viewCount ?? 0} Views`,
+    share: `${Number(p?.share ?? 0).toFixed(1)}%`,
+    up: true,
+  }));
+}, [topViewedRaw]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -423,6 +432,46 @@ const countSpark = useMemo(() => {
               </div>
             </Card>
           </div>
+          <div className="md:col-span-3">
+  <Card
+    title="Top Viewed Products"
+    right={<span className="text-xs text-gray-400">in selected range</span>}
+    className="p-5"
+  >
+    <div className="space-y-3">
+      {viewedCards.map((p: any) => (
+        <div
+          key={p.name}
+          className="flex items-center justify-between rounded-2xl border border-gray-100 bg-white px-3 py-3"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 text-sm font-bold text-gray-600">
+              {p.name.slice(0, 1)}
+            </div>
+            <div>
+              <div className="font-semibold text-gray-900">{p.name}</div>
+              <div className="text-xs text-gray-500">{p.views}</div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="text-sm font-semibold text-gray-800">{p.share}</div>
+            <div className={p.up ? "text-green-600" : "text-red-600"}>
+              {p.up ? "↗" : "↘"}
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {!viewedCards.length ? (
+        <div className="rounded-xl border border-gray-100 bg-white p-3 text-sm text-gray-500">
+          No view data found in this date range.
+        </div>
+      ) : null}
+    </div>
+  </Card>
+</div>
+
        
         </div>
       </div>

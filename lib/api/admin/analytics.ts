@@ -83,3 +83,20 @@ export const getAdminDriversAnalytics = async (
     );
   }
 };
+export const getAdminTopViewedProducts = async (params?: {
+  limit?: number;
+}) => {
+  try {
+    const res = await axios.get(API.ADMIN.ANALYTICS.TOP_VIEWED_PRODUCTS, {
+      params,
+    });
+
+    return res.data;
+  } catch (error: any) {
+    throw new Error(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to fetch top viewed products",
+    );
+  }
+};

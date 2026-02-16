@@ -22,7 +22,7 @@ export default async function ProductDetailPage({
 
   if (!res?.success) notFound();
 
-  const product = res.product; // adjust if your action returns res.data
+  const product = res.product; 
   if (!product?._id) notFound();
 
 const images = product.images?.length
