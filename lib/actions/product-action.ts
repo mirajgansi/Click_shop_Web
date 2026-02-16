@@ -172,9 +172,9 @@ export async function handleUpdateProduct(
   }
 }
 
-export async function handleGetRecentProducts(limit = 10) {
+export async function handleGetRecentProducts(page = 1, size = 10) {
   try {
-    const res = await getRecentProducts(limit);
+    const res = await getRecentProducts(page, size);
     return res;
   } catch (error: any) {
     return {
@@ -184,9 +184,9 @@ export async function handleGetRecentProducts(limit = 10) {
   }
 }
 
-export async function handleGetTrendingProducts(limit = 10) {
+export async function handleGetTrendingProducts(page = 1, size = 10) {
   try {
-    const res = await getTrendingProducts(limit);
+    const res = await getTrendingProducts(page, size);
     return res;
   } catch (error: any) {
     return {
@@ -196,9 +196,9 @@ export async function handleGetTrendingProducts(limit = 10) {
   }
 }
 
-export async function handleGetPopularProducts(limit = 10) {
+export async function handleGetPopularProducts(page = 1, size = 10) {
   try {
-    const res = await getPopularProducts(limit);
+    const res = await getPopularProducts(page, size);
     return res;
   } catch (error: any) {
     return {

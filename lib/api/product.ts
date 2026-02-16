@@ -112,39 +112,34 @@ export const getProductsByCategory = async (category: string) => {
   }
 };
 
-export const getRecentProducts = async (limit = 10) => {
+export const getRecentProducts = async (page = 1, size = 10) => {
   const res = await axios.get(API.PRODUCT.RECENT, {
-    params: { limit },
+    params: { page, size },
   });
   return res.data;
 };
 
-export const getTrendingProducts = async (limit = 10) => {
+export const getTrendingProducts = async (page = 1, size = 10) => {
   const res = await axios.get(API.PRODUCT.TRENDING, {
-    params: { limit },
+    params: { page, size },
   });
   return res.data;
 };
 
-export const getPopularProducts = async (limit = 10) => {
+export const getPopularProducts = async (page = 1, size = 10) => {
   const res = await axios.get(API.PRODUCT.POPULAR, {
-    params: { limit },
+    params: { page, size },
   });
   return res.data;
 };
 
-export const getTopRatedProducts = async (limit = 10) => {
-  try {
-    const res = await axios.get(API.PRODUCT.TOP_RATED);
-    return res.data;
-  } catch (error: any) {
-    throw new Error(
-      error.response?.data?.message ||
-        error.message ||
-        "Failed to fetch top rated products",
-    );
-  }
+export const getTopRatedProducts = async (page = 1, size = 10) => {
+  const res = await axios.get(API.PRODUCT.TOP_RATED, {
+    params: { page, size },
+  });
+  return res.data;
 };
+
 export const restockProduct = async (
   id: string,
   payload: { quantity: number; mode?: "set" | "add" },

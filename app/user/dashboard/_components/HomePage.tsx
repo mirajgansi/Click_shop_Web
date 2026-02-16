@@ -64,7 +64,7 @@ const HomePage = () => {
             <ProductSection title="Trending items" kind="trending" />
             <ProductSection title="Recently Added" kind="recent" />
             <ProductSection title="Best Seller" kind="bestSeller" />
-            <ProductSection title="Seasonal Favorites" kind="seasonal" />
+            <ProductSection title="Favorites" kind="popular" />
           </div>
         </div>
       </div>
