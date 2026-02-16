@@ -186,7 +186,7 @@ export async function handleGetRecentProducts(limit = 10) {
 
 export async function handleGetTrendingProducts(limit = 10) {
   try {
-    const res = await getTrendingProducts(limit); // 👈 CALL + PASS limit
+    const res = await getTrendingProducts(limit);
     return res;
   } catch (error: any) {
     return {

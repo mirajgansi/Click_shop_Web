@@ -215,7 +215,7 @@ const filteredProducts = useMemo(() => {
            <th>Total Sold</th>
               <th>Status</th>
 
-              <th className="text-right">Action</th>
+              <th >Action</th>
             </tr>
           </thead>
 
@@ -267,7 +267,7 @@ const filteredProducts = useMemo(() => {
                     {p.totalSold ?? 0}
                   </td>
 
-                  <td className="px-4 py-3">
+                  <td className=" py-3">
                     <span
                       className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ${status.cls}`}
                     >

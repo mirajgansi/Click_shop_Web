@@ -68,7 +68,6 @@ export function OrderStatusPill({
     <span
       className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${ui.cls}`}
     >
-      <span className={`h-2 w-2 rounded-full ${ui.dot}`} />
       <Icon className="h-3.5 w-3.5" />
       {ui.label}
     </span>
