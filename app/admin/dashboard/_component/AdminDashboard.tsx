@@ -175,6 +175,7 @@ const avgOrderSpark = useMemo(() => {
 }, [earnings]);
 
 const countSpark = useMemo(() => {
+  // create a small line using index (works even if you don't have per-day counts yet)
   return earnings.map((e: any, i: number) => ({ day: e.day, value: i + 1 }));
 }, [earnings]);
 

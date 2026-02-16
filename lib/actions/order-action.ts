@@ -70,13 +70,12 @@ export async function handleCreateOrder(payload: {
     };
   }
 }
-export type OrderTab = "all" | "pending" | "unpaid" | "open" | "closed";
 
 export const handleGetAllOrders = async (params?: {
   page?: number;
   size?: number;
   search?: string;
-  tab?: OrderTab;
+  tab?: string;
 }) => {
   try {
     const response = await getAllOrders({

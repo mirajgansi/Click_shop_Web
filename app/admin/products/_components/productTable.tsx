@@ -77,6 +77,8 @@ const currentCategory = searchParams.get("category") ?? "All";
 
   const [searchTerm, setSearchTerm] = useState(search ?? "");
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const stockFilter = searchParams.get("stock") ?? "all";
+
 const [restockId, setRestockId] = useState<string | null>(null);
 //restock
 const [restockLoading, setRestockLoading] = useState(false);

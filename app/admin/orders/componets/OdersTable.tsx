@@ -42,32 +42,33 @@ export function OrdersTable({ orders: initialOrders }: { orders: Order[] }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const run = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+useEffect(() => {
+  const run = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const res = await handleGetAllOrders({
-          page,
-          size,
-          tab:"all",
-          search,
-        });
+      const res = await handleGetAllOrders({
+        page,
+        size,
+        tab,
+        search,
+      });
 
-        if (!res?.success) throw new Error(res?.message || "Failed to fetch orders");
+      if (!res?.success) throw new Error(res?.message || "Failed to fetch orders");
 
-        setOrders(Array.isArray(res.orders) ? res.orders : []);
-      } catch (e: any) {
-        setError(e?.message || "Failed to fetch orders");
-        setOrders([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+      setOrders(Array.isArray(res.orders) ? res.orders : []);
+    } catch (e: any) {
+      setError(e?.message || "Failed to fetch orders");
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    run();
-  }, [tab, search, page, size]);
+  run();
+}, [tab, search, page, size]);
+
 
   if (loading) return <p className="mt-4 text-sm text-gray-600">Loading orders...</p>;
   if (error) return <p className="mt-4 text-sm text-red-600">{error}</p>;

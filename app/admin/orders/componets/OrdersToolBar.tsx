@@ -6,10 +6,12 @@ import { useMemo, useState } from "react";
 
 const tabs = [
   { key: "all", label: "All" },
-  { key: "pending", label: "Unfulfilled" },
-  { key: "unpaid", label: "Unpaid" },
-  { key: "open", label: "Open" },
-  { key: "closed", label: "Closed" },
+  { key: "pending", label: "Pending" },
+  { key: "paid", label: "Paid" },
+  { key: "shipped", label: "Shipped" },
+  { key: "delivered", label: "Delivered" },
+  { key: "cancelled", label: "Cancelled" },
+  { key: "unpaid", label: "Unpaid " },
 ] as const;
 
 export function OrdersToolbar() {
