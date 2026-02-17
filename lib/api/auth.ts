@@ -5,24 +5,28 @@ import { API } from "./endpoint";
 export const register = async (registrationData: any) => {
   try {
     const response = await axios.post(API.AUTH.REGISTER, registrationData);
-    return response.data;
-  } catch (err: Error | any) {
-    //4xx - 5xx falls in catch
-    err.response?.data?.message || // message from backend
-      err.message || //general exception message
-      "Regisration Failed"; //fallback message
+    return response.data; // expected: { success, message, data?, field? }
+  } catch (err: any) {
+    return {
+      success: false,
+      // if backend sends field, keep it (optional)
+      field: err?.response?.data?.field,
+      message:
+        err?.response?.data?.message || err?.message || "Registration Failed",
+    };
   }
 };
 
-export const login = async (loginData: any) => {
+export const login = async (data: any) => {
   try {
-    const response = await axios.post(API.AUTH.LOGIN, loginData);
-    return response.data;
-  } catch (err: Error | any) {
-    //4xx - 5xx falls in catch
-    err.response?.data?.message || // message from backend
-      err.message || //general exception message
-      "Login Failed"; //fallback message
+    const res = await axios.post(API.AUTH.LOGIN, data);
+    return res.data;
+  } catch (err: any) {
+    return {
+      success: false,
+      field: err?.response?.data?.field,
+      message: err?.response?.data?.message || "Invalid email or password",
+    };
   }
 };
 

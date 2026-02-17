@@ -38,15 +38,15 @@ export const API = {
     },
     ANALYTICS: {
       KPIS: "/api/admin/analytics/kpis",
-      EARNINGS: "/api/admin/analytics/earnings", // ?from=&to=&group=daily|weekly|monthly
+      EARNINGS: "/api/admin/analytics/earnings",
       CATEGORY_SHARE: "/api/admin/analytics/category-share", // ?from=&to=
-      TOP_PRODUCTS: "/api/admin/analytics/top-products", // ?from=&to=&limit=10
+      TOP_PRODUCTS: "/api/admin/analytics/top-products",
       DRIVERS: "/api/admin/analytics/drivers",
       TOP_VIEWED_PRODUCTS: "/api/admin/analytics/topView",
     },
   },
   DRIVER: {
-    GET_ALL: "/api/driver/drivers", // list drivers + profile
+    GET_ALL: "/api/driver/drivers",
     GET_STATS: "/api/driver/stats", // stats for table
     GET_ONE_STATS: (id: string) => `/api/driver/stats/${id}`, // single driver stats
     GET_ONE_DRIVER: (id: string) => `/api/driver/${id}/detail`,

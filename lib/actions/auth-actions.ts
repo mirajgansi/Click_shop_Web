@@ -16,19 +16,32 @@ import { revalidatePath } from "next/cache";
 
 export async function handleRegister(formData: any) {
   try {
-    //how to ake data from componenets
     const result = await register(formData);
-    // how to send data to componenet
-    if (result.success) {
+
+    // ✅ guard
+    if (!result) {
+      return { success: false, message: "No response from server" };
+    }
+
+    // If backend already returns success boolean
+    if (result.success === false) {
       return {
-        success: true,
-        message: "message successfull",
-        data: result.data,
+        success: false,
+        field: result.field,
+        message: result.message || "Registration failed",
       };
     }
-    return { success: false, message: "Registration failed" };
-  } catch (err: Error | any) {
-    return { success: false, message: err.message };
+
+    return {
+      success: true,
+      message: result.message || "Registered successfully",
+      data: result.data ?? result,
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err?.message || "Network error",
+    };
   }
 }
 
@@ -36,7 +49,6 @@ export async function handleLogin(formData: any) {
   try {
     const result = await login(formData);
 
-    // ✅ success
     if (result?.success === true) {
       await setUserData(result.data);
       await setAuthToken(result.token);
@@ -50,7 +62,7 @@ export async function handleLogin(formData: any) {
 
     return {
       success: false,
-      field: result?.field, // "email" | "password" (optional)
+      field: result?.field,
       message: result?.message || "Invalid email or password",
     };
   } catch (err: any) {

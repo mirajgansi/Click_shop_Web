@@ -31,30 +31,28 @@ const onSubmit = async (data: RegisterData) => {
   try {
     const result = await handleRegister(data);
 
-    if (!result.success) {
-      if (result.message?.toLowerCase().includes("username")) {
-        setError("username", {
-          type: "manual",
-          message: "Username is already taken",
-        });
-        return;
-      }
-
-      // 👇 If backend says email already used
-      if (result.message?.toLowerCase().includes("email")) {
-        setError("email", {
-          type: "manual",
-          message: "Email is already registered",
-        });
-        return;
-      }
-
-      // fallback error
+    if (!result) {
       setError("root", {
         type: "manual",
-        message: result.message || "Registration failed",
+        message: "No response from server. Please try again.",
       });
+      return;
+    }
 
+    if (!result.success) {
+      const msg = (result.message || "").toLowerCase();
+
+      if (msg.includes("username")) {
+        setError("username", { type: "manual", message: result.message });
+        return;
+      }
+
+      if (msg.includes("email")) {
+        setError("email", { type: "manual", message: result.message });
+        return;
+      }
+
+      setError("root", { type: "manual", message: result.message || "Registration failed" });
       return;
     }
 
@@ -68,6 +66,7 @@ const onSubmit = async (data: RegisterData) => {
 };
 
 
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* Full name */}
@@ -76,13 +75,19 @@ const onSubmit = async (data: RegisterData) => {
           Full name
         </label>
 
-        <AnimatedTextField
-          id="name"
-          type="text"
-          placeholder="Jane Doe"
-          register={register("username")}
-          error={errors.username}
-        />
+       
+      <AnimatedTextField
+        id="username"
+        type="text"
+        placeholder="Jane Doe"
+        register={register("username")}
+        error={errors.username}
+      />
+    {errors.root?.message && (
+  <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+    {errors.root.message}
+  </div>
+)}
       </div>
 
       {/* Email */}

@@ -33,20 +33,25 @@ const submit = async (values: LoginData) => {
     try {
       const response = await handleLogin(values);
 
-    if (response?.success !== true) {
-  setError("email", {
-    type: "manual",
-    message: " ",
-  });
+      if (!response || response.success !== true) {
+        const field = response?.field as keyof LoginData | undefined;
+        const message = response?.message || "Invalid email or password";
 
-  setError("password", {
-    type: "manual",
-    message: response?.message || "Invalid email or password",
-  });
+        if (field) {
+          setError(field, { type: "manual", message });
+        } else {
+          const msg = message.toLowerCase();
+          if (msg.includes("email")) {
+            setError("email", { type: "manual", message });
+          } else if (msg.includes("password")) {
+            setError("password", { type: "manual", message });
+          } else {
+            setError("password", { type: "manual", message });
+          }
+        }
 
-  toast.error(response?.message || "Invalid credentials");
-  return;
-}
+        return;
+      }
 
       toast.success("Login successful");
 
@@ -54,22 +59,17 @@ const submit = async (values: LoginData) => {
       else if (response.data?.role === "user") router.replace("/user/dashboard");
       else router.replace("/");
     } catch (err: any) {
-      setError("password", {
-        type: "manual",
-        message: err.message || "Login failed",
-      });
-      toast.error(err.message || "Something went wrong");
+      const msg = err?.message || "Something went wrong";
+      setError("root", { type: "manual", message: msg });
+      toast.error(msg);
     }
   });
 };
 
 
-const onInvalid = () => {
-  toast.error("Please fix the validation errors");
-};
   return (
     <form
-      onSubmit={handleSubmit(submit, onInvalid)}
+      onSubmit={handleSubmit(submit, )}
       className="space-y-4"
     >
       {/* Email */}
@@ -82,6 +82,7 @@ const onInvalid = () => {
     register={register("email")}
     error={errors.email}
   />
+
 </div>
 
 <div className="space-y-1">
@@ -97,6 +98,7 @@ const onInvalid = () => {
     error={errors.password}
     showToggle
   />
+
 </div>
 
   <div className="relative">

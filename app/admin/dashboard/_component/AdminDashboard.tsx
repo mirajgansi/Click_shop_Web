@@ -175,7 +175,6 @@ const avgOrderSpark = useMemo(() => {
 }, [earnings]);
 
 const countSpark = useMemo(() => {
-  // create a small line using index (works even if you don't have per-day counts yet)
   return earnings.map((e: any, i: number) => ({ day: e.day, value: i + 1 }));
 }, [earnings]);
 
@@ -230,16 +229,21 @@ const viewedCards = useMemo(() => {
         {/* Top row */}
         <div className="grid gap-4 md:grid-cols-12">
           {/* Welcome card */}
-          <div className="md:col-span-3">
-            <div className="relative h-full rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
-              <div className="text-sm text-gray-500">{greeting}</div>
-              <div className="mt-1 text-lg font-bold text-gray-900">{name}</div>
+         <div className="md:col-span-3">
+          <div className="relative h-full rounded-2xl border border-gray-100 bg-white p-4 shadow-sm overflow-hidden">
+            
+            <div className="text-sm text-gray-500">{greeting}</div>
+            <div className="mt-1 text-lg font-bold text-gray-900">{name}</div>
 
-              <p className="mt-2 text-sm text-gray-500">
-                Here is your weekly <br /> overview report
-              </p>
+            <p className="mt-2 text-sm text-gray-500">
+              Here is your weekly <br /> overview report
+            </p>
 
-
+            <img
+              src="/Greetings.png"  
+              alt="Greeting"
+              className="absolute bottom-3 right-3 w-30 opacity-90 pointer-events-none"
+            />
             </div>
           </div>
           {/* KPI cards */}
