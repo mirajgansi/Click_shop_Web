@@ -112,7 +112,6 @@ export default function ProductSection({
       const list: Product[] = res?.data ?? [];
       const tp = res?.pagination?.totalPages ?? 1;
 
-      // ✅ REPLACE (not append)
       setProducts(list);
       setTotalPages(tp);
       setPage(nextPage);
@@ -185,7 +184,6 @@ export default function ProductSection({
       {error && <p className="mb-3 text-xs text-red-600">{error}</p>}
 
       <div className="relative">
-        {/* LEFT */}
         <button
           onClick={goLeft}
           disabled={!canLeft || loading}
@@ -197,7 +195,6 @@ export default function ProductSection({
           <ChevronLeft size={18} />
         </button>
 
-        {/* RIGHT */}
         <button
           onClick={goRight}
           disabled={!canRight || loading}

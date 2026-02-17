@@ -229,28 +229,48 @@ const shortDescription = isLong
         {/* Controls row like screenshot */}
 <div className="grid gap-3 sm:grid-cols-3 items-end">
           {/* Quantity */}
-          <div>
-            <p className="mb-2 text-xs font-semibold text-gray-500">Quantity</p>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => clamp(q - 1, 1, 999))}
-className="rounded-full bg-gray-100 p-1.5 hover:bg-gray-200"
-              >
-                <Minus className="h-4 w-4" />
-              </button>
+<div className="flex items-center gap-2">
+  {/* Minus */}
+  <button
+    type="button"
+    onClick={() => setQuantity((q) => clamp(q - 1, 1, 999))}
+    className="rounded-full bg-gray-100 p-2 hover:bg-gray-200"
+  >
+    <Minus className="h-4 w-4" />
+  </button>
 
-              <div className="min-w-10 text-center font-semibold">{quantity}</div>
+  {/* Input without browser arrows */}
+  <input
+    type="number"
+    min={1}
+    max={999}
+    value={quantity}
+    onChange={(e) => {
+      const value = e.target.value;
+      if (value === "") {
+        setQuantity(1);
+        return;
+      }
 
-              <button
-                type="button"
-                onClick={() => setQuantity((q) => clamp(q + 1, 1, 999))}
-className="rounded-full bg-green-600 p-2 text-white hover:opacity-90"
-              >
-                <Plus className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+      const num = Number(value);
+      if (!Number.isFinite(num)) return;
+
+      setQuantity(clamp(Math.floor(num), 1, 999));
+    }}
+    className="no-spinner w-20 rounded-xl border border-gray-200 bg-white px-2 py-2 text-center text-sm font-semibold shadow-sm focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-100"
+  />
+
+  {/* Plus */}
+  <button
+    type="button"
+    onClick={() => setQuantity((q) => clamp(q + 1, 1, 999))}
+    className="rounded-full bg-green-600 p-2 text-white hover:opacity-90"
+  >
+    <Plus className="h-4 w-4" />
+  </button>
+</div>
+
+
 
         
 

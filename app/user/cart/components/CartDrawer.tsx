@@ -342,9 +342,19 @@ const pid = typeof item.productId === "string" ? item.productId : item.productId
                         <Minus className="h-4 w-4" />
                       </button>
 
-                      <span className="w-10 text-center text-sm font-medium">
-                        {item.quantity}
-                      </span>
+                     <input
+  type="number"
+  min={1}
+  value={item.quantity}
+  onChange={(e) => {
+    const value = Number(e.target.value);
+    if (!Number.isFinite(value)) return;
+
+    changeQty(pid, Math.max(1, value));
+  }}
+  className="w-12 bg-transparent text-center text-sm font-medium outline-none"
+  aria-label="Quantity"
+/>
 
                       <button
                         type="button"

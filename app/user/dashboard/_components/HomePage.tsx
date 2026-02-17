@@ -12,7 +12,7 @@ const HomePage = () => {
   return (
     <div className="flex-1 min-h-screen bg-gray-50">
       {/* HERO */}
-      <section className="relative h-[55vh] w-full">
+      <section className="relative h-[48vh] sm:h-[52vh] md:h-[55vh] w-full">
         <Image
           src="/hero-store.jpg"
           fill
@@ -45,11 +45,37 @@ const HomePage = () => {
       </section>
 
       {/* CATEGORY + PRODUCTS */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-<div className="flex flex-col lg:flex-row gap-6">
-          {/* LEFT SIDEBAR */}
-          <div className="w-60 bg-white rounded-2xl border border-gray-200 p-4 space-y-2 h-fit">
-            <h3 className="text-base font-semibold mb-2">Categories</h3>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* MOBILE: horizontal categories row */}
+          <div className="lg:hidden">
+            <h3 className="text-base font-semibold mb-3">Categories</h3>
+
+            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+              <div className="flex-none w-[210px]">
+                <CategoryCard title="Meat & Fish" image="/categories/meat.png" href="/user/category/meat" />
+              </div>
+              <div className="flex-none w-[210px]">
+                <CategoryCard title="Cooking Oil & Ghee" image="/categories/oil.png" href="/user/category/oil" />
+              </div>
+              <div className="flex-none w-[210px]">
+                <CategoryCard title="Pulses" image="/categories/pluse.png" href="/user/category/pulses" />
+              </div>
+              <div className="flex-none w-[210px]">
+                <CategoryCard title="Bakery" image="/categories/bakery.png" href="/user/category/bakery" />
+              </div>
+              <div className="flex-none w-[210px]">
+                <CategoryCard title="Snacks" image="/categories/snacks.png" href="/user/category/snacks" />
+              </div>
+              <div className="flex-none w-[210px]">
+                <CategoryCard title="Beverages" image="/categories/beverages.png" href="/user/category/beverages" />
+              </div>
+            </div>
+          </div>
+
+          {/* DESKTOP: left sidebar */}
+          <div className="hidden lg:block w-75 bg-white rounded-2xl border border-gray-200 p-5 space-y-3 h-fit">
+            <h3 className="text-lg font-semibold mb-1">Categories</h3>
 
             <CategoryCard title="Meat & Fish" image="/categories/meat.png" href="/user/category/meat" />
             <CategoryCard title="Cooking Oil & Ghee" image="/categories/oil.png" href="/user/category/oil" />
@@ -60,7 +86,7 @@ const HomePage = () => {
           </div>
 
           {/* RIGHT CONTENT */}
-          <div className="flex-1 space-y-10">
+          <div className="flex-1 w-100 space-y-6">
             <ProductSection title="Trending items" kind="trending" />
             <ProductSection title="Recently Added" kind="recent" />
             <ProductSection title="Best Seller" kind="bestSeller" />

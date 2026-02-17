@@ -10,6 +10,7 @@ import { handleDeleteMe, handleUpdateProfile } from "@/lib/actions/auth-actions"
 import { Camera, Pencil, User, X } from "lucide-react";
 import DeleteAccountModal from "@/app/_componets/DeleteAccountModal";
 import { useAuth } from "@/context/AuthContext";
+import { FormSelect } from "@/app/_componets/dropdown";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
@@ -31,7 +32,11 @@ export const updateUserSchema = z.object({
   DOB: z.string().optional(),
   gender: z.string().optional(),
 });
-
+const genderOptions = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "other", label: "Other" },
+];
 export type UpdateUserData = z.infer<typeof updateUserSchema>;
 
 export default function UpdateUserForm({ user }: { user: any }) {
@@ -91,42 +96,48 @@ export default function UpdateUserForm({ user }: { user: any }) {
   };
 
   const onSubmit = async (data: UpdateUserData) => {
-    try {
-      const formData = new FormData();
-      formData.append("email", data.email);
-      formData.append("username", data.username);
-      formData.append("phoneNumber", data.phoneNumber || "");
-      formData.append("location", data.location || "");
-      formData.append("DOB", data.DOB || "");
-      formData.append("gender", data.gender || "");
-      if (data.image) formData.append("image", data.image);
+  try {
+    const formData = new FormData();
 
-      const response = await handleUpdateProfile(formData);
+    // required
+    formData.append("email", data.email);
+    formData.append("username", data.username);
 
-      if (!response?.success) {
-        toast.error(response?.message || "Update profile failed");
-        return;
-      }
+    // optional (only append if not empty)
+    if (data.phoneNumber?.trim()) formData.append("phoneNumber", data.phoneNumber.trim());
+    if (data.location?.trim()) formData.append("location", data.location.trim());
+    if (data.DOB) formData.append("DOB", data.DOB);
+    if (data.gender?.trim()) formData.append("gender", data.gender.trim());
 
-      toast.success("Profile updated successfully");
-      setEditing(false);
-      clearImage();
-      // optional: reset dirty state after save
-      reset(
-        {
-          email: data.email,
-          username: data.username,
-          phoneNumber: data.phoneNumber || "",
-          location: data.location || "",
-          DOB: data.DOB || "",
-          gender: data.gender || "",
-        },
-        { keepDirty: false }
-      );
-    } catch (err: any) {
-      toast.error(err?.message || "Profile update failed");
+    if (data.image) formData.append("image", data.image);
+
+    const response = await handleUpdateProfile(formData);
+
+    if (!response?.success) {
+      toast.error(response?.message || "Update profile failed");
+      return;
     }
-  };
+
+    toast.success("Profile updated successfully");
+    setEditing(false);
+    clearImage();
+
+    reset(
+      {
+        email: data.email,
+        username: data.username,
+        phoneNumber: data.phoneNumber || "",
+        location: data.location || "",
+        DOB: data.DOB || "",
+        gender: data.gender || "",
+      },
+      { keepDirty: false }
+    );
+  } catch (err: any) {
+    toast.error(err?.message || "Profile update failed");
+  }
+};
+
 const [deletePassword, setDeletePassword] = useState("");
 const [deleting, setDeleting] = useState(false);
 const [deleteOpen, setDeleteOpen] = useState(false);
@@ -184,14 +195,6 @@ const onDeleteAccount = async () => {
                 Edit Information
               </button>
 
-              <button
-                type="submit"
-                form="profile-form"
-                disabled={!editing || isSubmitting}
-                className="h-11 rounded-full bg-[#35C759] px-6 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? "Saving..." : "Save"}
-              </button>
             </div>
           </div>
 
@@ -232,7 +235,6 @@ const onDeleteAccount = async () => {
                             )}
                         </div>
 
-                        {/* ❌ REMOVE BUTTON — ONLY FOR NEW UPLOAD */}
                         {previewImage && (
                             <button
                             type="button"
@@ -244,7 +246,6 @@ const onDeleteAccount = async () => {
                             </button>
                         )}
 
-                        {/* 📷 CHANGE BUTTON — ALWAYS AVAILABLE (or gate with editing) */}
                         <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
@@ -255,7 +256,6 @@ const onDeleteAccount = async () => {
                         </button>
                         </div>
 
-                        {/* Hidden file input */}
                         <input
                         ref={fileInputRef}
                         type="file"
@@ -297,20 +297,19 @@ const onDeleteAccount = async () => {
               </div>
 
               {/* Gender -> Like "Last Name" */}
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-black/80">
-                  Gender
-                </label>
-                <input
-                  {...register("gender")}
-                  disabled={!editing}
-                  className={inputBase}
-                  placeholder="male / female / other"
-                />
-                {errors.gender?.message && (
-                  <p className="text-xs text-red-600">{errors.gender.message}</p>
-                )}
-              </div>
+             <div className="space-y-2">
+            <label className="text-sm font-medium text-black/80">Gender</label>
+
+            <FormSelect<UpdateUserData>
+              control={control}
+              name="gender"
+              placeholder="Select gender"
+              options={genderOptions}
+              disabled={!editing}
+              error={errors.gender?.message}
+              className={inputBase + " h-11 rounded-xl"} // match your input style
+            />
+          </div>
 
               {/* Location -> Like "Shipping Address" (full width) */}
               <div className="space-y-2 md:col-span-2">

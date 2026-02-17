@@ -27,28 +27,46 @@ const {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [pending, startTransition] = useTransition();
 
-  const onSubmit = async (data: RegisterData) => {
+const onSubmit = async (data: RegisterData) => {
   try {
     const result = await handleRegister(data);
 
     if (!result.success) {
-      setError("email", {
+      if (result.message?.toLowerCase().includes("username")) {
+        setError("username", {
+          type: "manual",
+          message: "Username is already taken",
+        });
+        return;
+      }
+
+      // 👇 If backend says email already used
+      if (result.message?.toLowerCase().includes("email")) {
+        setError("email", {
+          type: "manual",
+          message: "Email is already registered",
+        });
+        return;
+      }
+
+      // fallback error
+      setError("root", {
         type: "manual",
         message: result.message || "Registration failed",
       });
+
       return;
     }
 
-    startTransition(() => {
-      router.push("/login");
-    });
+    router.push("/login");
   } catch (e: any) {
-    setError("email", {
+    setError("root", {
       type: "manual",
       message: e?.message || "Something went wrong",
     });
   }
 };
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

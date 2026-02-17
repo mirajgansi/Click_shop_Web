@@ -32,7 +32,7 @@ const images = product.images?.length
   <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
     <ProductDetailClient product={product} images={images} />
     <div className="mt-10">
-      <ProductSection title="Recently viewed" kind="recent" />
+      <ProductSection title="Popular" kind="popular" />
     </div>
   </div>
 );

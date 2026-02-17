@@ -19,8 +19,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getMyCart } from "@/lib/api/cart";
 
-// ✅ import your drawer
 import CartDrawer from "@/app/user/cart/components/CartDrawer"; // adjust path
+import { CART_UPDATED_EVENT } from "@/lib/cart-event";
 
 type CartItem = { quantity: number };
 type CartResponse = {
@@ -35,31 +35,35 @@ export default function Actions() {
   const [cartOpen, setCartOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
 
-  const fetchCartCount = async () => {
-    try {
-      const res: CartResponse = await getMyCart();
-      const items: CartItem[] =
-        res?.data?.items || res?.items || res?.data?.data?.items || [];
+const fetchCartCount = async () => {
+  try {
+    const res: CartResponse = await getMyCart();
 
-      const totalQty = items.reduce(
-        (sum, it) => sum + (Number(it.quantity) || 0),
-        0,
-      );
-      setCartCount(totalQty);
-    } catch {
-      setCartCount(0);
-    }
+    const items: CartItem[] =
+      res?.data?.items || res?.items || res?.data?.data?.items || [];
+
+    setCartCount(items.length);
+  } catch {
+    setCartCount(0);
+  }
+};
+
+useEffect(() => {
+  if (loading) return;
+
+  // initial load
+  fetchCartCount();
+
+  // listen for cart updates
+  const handler = () => fetchCartCount();
+
+  window.addEventListener(CART_UPDATED_EVENT, handler);
+
+  return () => {
+    window.removeEventListener(CART_UPDATED_EVENT, handler);
   };
+}, [loading]);
 
-  useEffect(() => {
-    if (loading) return;
-
-    fetchCartCount();
-    const interval = setInterval(fetchCartCount, 15000);
-    return () => clearInterval(interval);
-  }, [loading]);
-
-  if (loading) return null;
 
   return (
     <>
