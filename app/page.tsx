@@ -16,24 +16,27 @@ export default function Home() {
     if (isAuthenticated && user) {
       if (user.role === "admin") {
         router.replace("/admin");
-      } else {
+      }else if(user.role === "driver") {
+        router.replace("/driver");
+      } 
+      else {
         router.replace("/user/dashboard");
       }
     }
+    
   }, [isAuthenticated, user, loading, router]);
 
   // While checking auth → render nothing (or spinner)
   if (loading) return null;
 
   // Not logged in → show onboarding
-  if (!isAuthenticated) {
-    return (
-      <div className="flex min-h-screen items-center justify-center ">
-        <OnBoarding />
-      </div>
-    );
-  }
-
+ if (!loading && !isAuthenticated) {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <OnBoarding />
+    </div>
+  );
+}
   // Logged in but redirecting
   return null;
 }

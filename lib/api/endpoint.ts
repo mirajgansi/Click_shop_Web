@@ -46,10 +46,15 @@ export const API = {
     },
   },
   DRIVER: {
-    GET_ALL: "/api/driver/drivers",
-    GET_STATS: "/api/driver/stats", // stats for table
-    GET_ONE_STATS: (id: string) => `/api/driver/stats/${id}`, // single driver stats
+    GET_ALL: "/api/driver/stats",
+
+    GET_STATS: "/api/driver/stats", // same thing (you can keep only one)
+    GET_ONE_STATS: (id: string) => `/api/driver/stats/${id}`,
     GET_ONE_DRIVER: (id: string) => `/api/driver/${id}/detail`,
+
+    // extra (since backend has these)
+    UPDATE_AVAILABILITY: (id: string) => `/api/driver/${id}/status`,
+    UPDATE_ORDER_STATUS: (id: string) => `/api/driver/orders/${id}/status`,
   },
   CART: {
     GET_MY_CART: "/api/cart/",

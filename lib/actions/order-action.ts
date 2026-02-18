@@ -82,7 +82,7 @@ export const handleGetAllOrders = async (params?: {
       page: params?.page ?? 1,
       size: params?.size ?? 10,
       search: params?.search ?? "",
-      tab: params?.tab ?? "all", // ✅ default tab
+      tab: params?.tab ?? "all",
     });
 
     if (!response?.success) {

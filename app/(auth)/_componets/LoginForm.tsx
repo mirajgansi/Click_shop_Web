@@ -57,7 +57,7 @@ const submit = async (values: LoginData) => {
 
       if (response.data?.role === "admin") router.replace("/admin");
       else if (response.data?.role === "user") router.replace("/user/dashboard");
-      else router.replace("/");
+      else if (response.data?.role === "driver") router.replace("/driver");
     } catch (err: any) {
       const msg = err?.message || "Something went wrong";
       setError("root", { type: "manual", message: msg });
