@@ -4,9 +4,9 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
 
 import AvatarMenu from "@/app/_componets/AvatarMenu";
+import NotificationBell from "@/app/_componets/Notification";
 
 function formatTime(d: Date) {
   return new Intl.DateTimeFormat("en-US", {
@@ -25,30 +25,19 @@ function formatDate(d: Date) {
 }
 
 export default function Header() {
-  const { logout, user } = useAuth();
+  const { user, loading } = useAuth();
 
   const [now, setNow] = React.useState(() => new Date());
-  const [menuValue, setMenuValue] = React.useState<string>("");
 
   React.useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
-const router = useRouter();
-
-const onMenuChange = (val: string) => {
-  setMenuValue(val);
-
-  if (val === "logout") logout();
-
-  if (val === "profile") {
-    router.push("/admin/profile");
-  }
-
-  setTimeout(() => setMenuValue(""), 50);
-};
 
   const displayName = user?.userName || user?.name || user?.email || "Admin";
+
+  // ✅ show nothing while loading / not logged in
+  if (loading || !user?._id) return null;
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-white/80 backdrop-blur supports-backdrop-filter:bg-white/70">
@@ -56,12 +45,15 @@ const onMenuChange = (val: string) => {
         <div className="flex h-14 sm:h-16 md:h-18 items-center justify-between">
           {/* LEFT */}
           <Link href="/admin" className="flex items-center gap-3 sm:gap-4">
-            {/* Logo */}
             <div className="relative h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 overflow-hidden rounded-full ring-1 ring-black/10">
-              <Image src="/cookie.jpg" alt="Logo" fill className="object-cover" />
+              <Image
+                src="/cookie.jpg"
+                alt="Logo"
+                fill
+                className="object-cover"
+              />
             </div>
 
-            {/* Title + Time */}
             <div className="leading-tight">
               <div className="text-base sm:text-lg md:text-xl font-bold text-black">
                 Click Shop
@@ -74,16 +66,24 @@ const onMenuChange = (val: string) => {
 
           {/* RIGHT */}
           <div className="flex items-center gap-3 sm:gap-4">
-            {/* User info */}
             <div className="hidden md:block text-right leading-tight">
               <div className="text-sm font-semibold text-gray-900">
                 {displayName}
               </div>
-              <div className="text-xs text-gray-500">Admin</div>
+              <div className="text-xs text-gray-500">
+                {user.role?.toUpperCase?.() ?? "ADMIN"}
+              </div>
             </div>
 
-          <AvatarMenu displayName={displayName} profileHref="/admin/profile" roleLabel="Admin" />
+            <div className="flex justify-center xl:justify-end">
+              <NotificationBell userId={user._id} role={user.role} />
+            </div>
 
+            <AvatarMenu
+              displayName={displayName}
+              profileHref="/admin/profile"
+              roleLabel="Admin"
+            />
           </div>
         </div>
       </nav>

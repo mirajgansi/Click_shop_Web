@@ -17,7 +17,7 @@ export default function Nav() {
       </Link>
 
       <Link
-        href="/user/my_orders"
+        href="/user/orders"
         className="text-sm font-medium text-gray-700 hover:text-green-600 transition"
       >
         My orders

@@ -22,6 +22,7 @@ import { getMyCart } from "@/lib/api/cart";
 import CartDrawer from "@/app/user/cart/components/CartDrawer"; // adjust path
 import { CART_UPDATED_EVENT } from "@/lib/cart-event";
 import AvatarMenu from "@/app/_componets/AvatarMenu";
+import NotificationBell from "@/app/_componets/Notification";
 
 type CartItem = { quantity: number };
 type CartResponse = {
@@ -78,13 +79,9 @@ useEffect(() => {
         </button>
 
         {/* Wishlist */}
-        <button
-          type="button"
-          className="relative text-gray-600 hover:text-red-500 transition"
-          aria-label="Wishlist"
-        >
-          <Heart size={20} />
-        </button>
+      <div className="flex justify-center xl:justify-end ">
+              {user?._id &&<NotificationBell userId={user._id} role={user.role} />}
+            </div>
 
         {/* Cart (opens drawer) */}
         <button

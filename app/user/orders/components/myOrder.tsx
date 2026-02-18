@@ -84,7 +84,7 @@ export default function OrdersList({ orders }: { orders: any[] }) {
             return (
               <Link
                 key={String(id)}
-                href={id ? `/user/my_orders/${id}` : "#"}
+                href={id ? `/user/orders/${id}` : "#"}
                 className="grid grid-cols-12 gap-2 px-4 py-4 hover:bg-black/5"
               >
                 <div className="col-span-5">

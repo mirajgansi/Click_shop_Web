@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { clearAuthCookies, getAuthToken, getUserData } from "@/lib/cookie";
 import { useRouter } from "next/navigation";
+import { socket } from "@/lib/socket";
 
 interface AuthContextProps {
     isAuthenticated: boolean;
@@ -63,3 +64,18 @@ export const useAuth = () => {
     }
     return context;
 };
+
+export function SocketBridge({ userId }: { userId: string }) {
+  useEffect(() => {
+    if (!userId) return;
+
+    socket.connect();
+    socket.emit("join", userId);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [userId]);
+
+  return null;
+}

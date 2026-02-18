@@ -65,7 +65,7 @@ export default async function OrderDetailPage({
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <Link href="/user/my_orders" className="text-sm text-gray-600 hover:underline">
+          <Link href="/user/orders" className="text-sm text-gray-600 hover:underline">
             ← Back to orders
           </Link>
           <h1 className="mt-2 text-2xl font-semibold">Order Details</h1>

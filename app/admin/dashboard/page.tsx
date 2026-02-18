@@ -3,6 +3,7 @@ import { handleWhoami } from "@/lib/actions/auth-actions";
 import DashboardClient from "./_component/AdminDashboard";
 
 export default async function DashboardPage() {
+  
   const to = new Date();
   const from = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const fmt = (d: Date) => d.toISOString().slice(0, 10);

@@ -10,6 +10,7 @@ export default async function Page() {
     if(!result.data){
             notFound();
             }
+            
       return <Dashboard />;
 
 }

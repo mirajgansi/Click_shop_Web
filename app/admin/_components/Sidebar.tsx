@@ -10,6 +10,7 @@ import {
   Truck,
 } from "lucide-react";
 
+
 const ADMIN_LINKS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/user", label: "Users", icon: Users },
@@ -34,6 +35,7 @@ export default function Sidebar() {
         flex flex-col
       "
     >
+     
       <nav className="flex flex-col gap-1 p-2">
         {ADMIN_LINKS.map((link) => {
           const Icon = link.icon;
@@ -50,21 +52,22 @@ export default function Sidebar() {
                 transition-all
                 ${
                   active
-                ? "bg-green-600 text-white shadow-sm"
-                : "text-gray-800 hover:bg-green-50"
+                    ? "bg-green-600 text-white shadow-sm"
+                    : "text-gray-800 hover:bg-green-50"
                 }
               `}
             >
-              {/* Icon */}
               <Icon
                 size={20}
                 className={`
                   shrink-0
-                  ${active ? "text-current" : "text-gray-500 group-hover:text-gray-900 dark:group-hover:text-white"}
+                  ${
+                    active
+                      ? "text-current"
+                      : "text-gray-500 group-hover:text-gray-900"
+                  }
                 `}
               />
-
-              {/* Label (hidden on compact mode) */}
               <span className="hidden xl:inline">{link.label}</span>
             </Link>
           );

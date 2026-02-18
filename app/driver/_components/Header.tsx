@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 
 
 import AvatarMenu from "@/app/_componets/AvatarMenu";
+import NotificationBell from "@/app/_componets/Notification";
 
 function formatTime(d: Date) {
   return new Intl.DateTimeFormat("en-US", {
@@ -73,7 +74,9 @@ const router = useRouter();
     </div>
     <div className="text-xs text-gray-500">Driver</div>
   </div>
-
+ <div className="flex justify-center xl:justify-end ">
+        {user?._id && <NotificationBell userId={user._id} role={user.role} />}
+      </div>
   
 <AvatarMenu displayName={displayName} roleLabel="Driver"  image={user?.image} />
 

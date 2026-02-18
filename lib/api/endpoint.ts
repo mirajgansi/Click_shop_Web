@@ -79,4 +79,13 @@ export const API = {
 
     GET_DRIVERS: "/api/admin/users",
   },
+  NOTIFICATION: {
+    GET_MY: "/api/notifications/me",
+    UNREAD_COUNT: "/api/notifications/me/unread-count",
+    READ_ALL: "/api/notifications/me/read-all",
+    MARK_READ: (id: string) => `/api/notifications/${id}/read`,
+
+    // admin only (optional)
+    CREATE: "/api/notifications",
+  },
 };
