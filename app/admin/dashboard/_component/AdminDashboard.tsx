@@ -206,17 +206,14 @@ const countSpark = useMemo(() => {
   if (!earnings.length) return 0;
 
   if (rangeMode === "Daily") {
-    // last day value
     return Number(earnings[earnings.length - 1]?.value) || 0;
   }
 
   if (rangeMode === "Weekly") {
-    // sum current week (assuming backend grouped by week)
     return earnings.reduce((s: number, x: any) => s + (Number(x.value) || 0), 0);
   }
 
   if (rangeMode === "Monthly") {
-    // sum current month (assuming backend grouped by month)
     return earnings.reduce((s: number, x: any) => s + (Number(x.value) || 0), 0);
   }
 
