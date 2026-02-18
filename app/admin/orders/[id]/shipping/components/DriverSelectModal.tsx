@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { X, Search, Truck } from "lucide-react";
 import { handleGetDrivers, handleAssignDriver } from "@/lib/actions/order-action";
+import { toast } from "react-toastify";
 
 type Driver = {
   _id: string;
@@ -62,7 +63,7 @@ const [openDriver, setOpenDriver] = useState(false);
         onClose();
         setSelected(null);
       } else {
-        alert(res?.message || "Failed to assign driver");
+toast.error(res?.message || "Failed to assign driver");
       }
     });
   };
@@ -97,7 +98,7 @@ const [openDriver, setOpenDriver] = useState(false);
             />
           </div>
 
-          <div className="mt-4 space-y-2 max-h-[320px] overflow-auto pr-1">
+          <div className="m-2 space-y-2 max-h-[320px] overflow-auto p-1">
             {loading ? (
               <div className="rounded-2xl bg-gray-50 p-4 text-sm text-gray-600 ring-1 ring-gray-100">
                 Loading drivers...
@@ -151,7 +152,8 @@ const [openDriver, setOpenDriver] = useState(false);
             <button
               onClick={onClose}
               disabled={pending}
-              className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold ring-1 ring-gray-200 hover:bg-gray-50 disabled:opacity-50"
+              className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold ring-1 ring-gray-200 hover:bg-gray-50 disabled:opacity-50
+              cursor-pointer"
             >
               Cancel
             </button>
@@ -159,7 +161,7 @@ const [openDriver, setOpenDriver] = useState(false);
             <button
               onClick={onConfirm}
               disabled={!selected || pending}
-              className="inline-flex items-center gap-2 rounded-2xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-black disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-2xl bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800 cursor-pointer disabled:opacity-50"
             >
               <Truck className="h-4 w-4" />
               {pending ? "Assigning..." : "Confirm Driver"}

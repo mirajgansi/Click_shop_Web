@@ -132,15 +132,6 @@ export default function DriverOrderDetailPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
-                      <button
-              onClick={markAsDone}
-              disabled={loading || saving || !order || order.status === "delivered" || order.status === "cancelled"}
-              className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black disabled:opacity-50"
-            >
-              {order?.status === "delivered" ? "Delivered" : saving ? "Updating..." : "Mark as Done"}
-            </button>
-          </div>
         </div>
 
         {err ? (
@@ -247,7 +238,8 @@ export default function DriverOrderDetailPage() {
                 <button
                   onClick={markAsDone}
                   disabled={saving || order.status === "delivered" || order.status === "cancelled"}
-                  className="mt-3 w-full rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-black disabled:opacity-50"
+                  className="mt-3 w-full rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-black hover:bg-green-700 
+                   disabled:opacity-50  cursor-pointer"
                 >
                   {order.status === "delivered" ? "Already Delivered" : saving ? "Updating..." : "Mark as Done"}
                 </button>

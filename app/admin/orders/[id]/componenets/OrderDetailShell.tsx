@@ -10,7 +10,6 @@ type PaymentStatus = "unpaid" | "paid";
 
 function formatAddress(a: any) {
   if (!a) return "N/A";
-  // based on your backend shape
   const parts = [a.address1, a.address2, a.city, a.state, a.zip, a.country].filter(Boolean);
   return parts.length ? parts.join(", ") : "N/A";
 }
@@ -98,7 +97,7 @@ export default function OrderDetailShell({
                     <div className="mt-4 flex justify-end">
                     <Link
                         href={shippingHref}
-                        className="rounded-2xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+                        className="rounded-2xl bg-green-600 ring-green-900 ring-1 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
                     >
                         Create Shipping Label →
                     </Link>

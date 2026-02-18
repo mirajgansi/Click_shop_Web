@@ -42,14 +42,14 @@ export default function OrderButton({
           type="button"
           onClick={() => setOpen(true)}
           disabled={isDisabled}
-          className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold ring-1 ring-gray-200 hover:bg-gray-50 disabled:opacity-60"
+          className="rounded-2xl bg-white px-4 py-2 text-sm font-semibold ring-1 ring-gray-300 hover:bg-gray-50 disabled:opacity-60"
         >
           {pending ? "Cancelling..." : "Cancel Order"}
         </button>
 
         <button
           type="button"
-          className="rounded-2xl bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+          className="rounded-2xl bg-lime-900 px-4 py-2 text-sm font-semibold text-white hover:bg-lime-600 cursor-pointer"
         >
           Notify Customer
         </button>

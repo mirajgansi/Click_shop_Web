@@ -1,13 +1,14 @@
 import OrderDetailShell from "../componenets/OrderDetailShell";
 import { handleGetOrderById } from "@/lib/actions/order-action";
 import ShippingStatusSection from "./components/ShipmentLayout";
+import ToastProvider from "@/app/_componets/ToastProvider";
 
 export default async function ShippingPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params; // ✅ REQUIRED in your Next.js version
+  const { id } = await params; 
 
   const res = await handleGetOrderById(id);
 
@@ -29,6 +30,7 @@ export default async function ShippingPage({
       showProgress={false} 
     >
       <ShippingStatusSection order={order} />
+      <ToastProvider />
     </OrderDetailShell>
   );
 }

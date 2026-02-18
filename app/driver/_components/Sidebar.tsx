@@ -36,7 +36,7 @@ export default function Sidebar() {
           const Icon = link.icon;
           const active = isActive(link.href);
 
-          return (
+           return (
             <Link
               key={link.href}
               href={link.href}
@@ -47,8 +47,8 @@ export default function Sidebar() {
                 transition-all
                 ${
                   active
-                    ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                ? "bg-green-600 text-white shadow-sm"
+                : "text-gray-800 hover:bg-green-50"
                 }
               `}
             >

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Package, Truck, MapPin } from "lucide-react";
 import OrderProgress from "../../componenets/OrderProgress";
-import DriverSelectModal from "./DriverSelectModal"; // ✅ adjust path if needed
+import DriverSelectModal from "./DriverSelectModal";
 
 type OrderStatus = "pending" | "paid" | "shipped" | "delivered" | "cancelled";
 
@@ -19,7 +19,7 @@ function fmt(ts?: string) {
 }
 
 export default function ShippingStatusSection({ order }: { order: any }) {
-  const [openDriver, setOpenDriver] = useState(false); // ✅ modal state
+  const [openDriver, setOpenDriver] = useState(false); 
 
   const events = useMemo(() => {
     const placed = {
@@ -76,7 +76,7 @@ export default function ShippingStatusSection({ order }: { order: any }) {
           <button
             type="button"
             onClick={() => setOpenDriver(true)}
-            className="rounded-2xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-black"
+            className="rounded-2xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
           >
             Choose Driver
           </button>
@@ -99,7 +99,7 @@ export default function ShippingStatusSection({ order }: { order: any }) {
                 <div
                   className={`mt-0.5 grid h-9 w-9 place-items-center rounded-2xl ring-1 ${
                     e.done
-                      ? "bg-gray-900 text-white ring-gray-900"
+                      ? "bg-green-700 text-white ring-gren-900"
                       : "bg-white text-gray-400 ring-gray-200"
                   }`}
                 >
@@ -125,7 +125,6 @@ export default function ShippingStatusSection({ order }: { order: any }) {
         </div>
       </div>
 
-      {/* ✅ Modal */}
       <DriverSelectModal
         open={openDriver}
         onClose={() => setOpenDriver(false)}

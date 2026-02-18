@@ -33,8 +33,8 @@ function money(n: number) {
 export function OrdersTable({ orders: initialOrders }: { orders: Order[] }) {
   const sp = useSearchParams();
 
-  const tab = sp.get("tab") ?? "all";       // ✅ correct
-  const search = sp.get("search") ?? "";    // ✅ correct
+  const tab = sp.get("tab") ?? "all";       
+  const search = sp.get("search") ?? "";    
   const page = Number(sp.get("page") ?? "1");
   const size = Number(sp.get("size") ?? "20");
 

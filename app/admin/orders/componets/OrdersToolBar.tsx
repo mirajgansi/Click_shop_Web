@@ -39,9 +39,9 @@ export function OrdersToolbar() {
           <button
             key={t.key}
             onClick={() => push({ tab: t.key })}
-            className={`rounded-full px-4 py-2 text-sm ring-1 ${
+            className={`rounded-full px-4 py-2 text-sm ring-1 cursor-pointer ${
               active === t.key
-                ? "bg-gray-900 text-white ring-gray-900"
+                ? "bg-green-700 text-white ring-green-900 "
                 : "bg-white text-gray-700 ring-gray-200 hover:bg-gray-50"
             }`}
           >
