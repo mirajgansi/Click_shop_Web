@@ -4,14 +4,10 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
+import AvatarMenu from "@/app/_componets/AvatarMenu";
 
 function formatTime(d: Date) {
   return new Intl.DateTimeFormat("en-US", {
@@ -39,12 +35,9 @@ export default function Header() {
     const id = setInterval(() => setNow(new Date()), 30_000);
     return () => clearInterval(id);
   }, []);
+const router = useRouter();
 
-  const onMenuChange = (val: string) => {
-    setMenuValue(val);
-    if (val === "logout") logout();
-    setTimeout(() => setMenuValue(""), 50);
-  };
+
 
   const displayName = user?.userName || user?.name || user?.email || "Driver";
 
@@ -71,33 +64,24 @@ export default function Header() {
           </Link>
 
           {/* RIGHT */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            {/* User info */}
-            <div className="hidden md:block text-right leading-tight">
-              <div className="text-sm font-semibold text-gray-900">
-                {displayName}
-              </div>
-              <div className="text-xs text-gray-500">Driver</div>
-            </div>
+        {/* RIGHT */}
+<div className="flex items-center gap-3 sm:gap-4">
+  {/* User info */}
+  <div className="hidden md:block text-right leading-tight">
+    <div className="text-sm font-semibold text-gray-900">
+      {displayName}
+    </div>
+    <div className="text-xs text-gray-500">Driver</div>
+  </div>
 
-            <Select value={menuValue} onValueChange={onMenuChange}>
-              <SelectTrigger className="h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 rounded-full border border-black/10 p-0">
-                <SelectValue
-                  placeholder={
-                    <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-900 text-xs sm:text-sm font-bold text-white">
-                      {String(displayName).slice(0, 2).toUpperCase()}
-                    </div>
-                  }
-                />
-              </SelectTrigger>
+  
+<AvatarMenu displayName={displayName} roleLabel="Driver"  image={user?.image} />
 
-              <SelectContent align="end" className="w-44">
-                <SelectItem value="profile">Profile</SelectItem>
-                <SelectItem value="logout">Logout</SelectItem>
-              </SelectContent>
-            </Select>
+
+
           </div>
-        </div>
+                  </div>
+
       </nav>
     </header>
   );

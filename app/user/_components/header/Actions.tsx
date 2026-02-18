@@ -21,6 +21,7 @@ import { getMyCart } from "@/lib/api/cart";
 
 import CartDrawer from "@/app/user/cart/components/CartDrawer"; // adjust path
 import { CART_UPDATED_EVENT } from "@/lib/cart-event";
+import AvatarMenu from "@/app/_componets/AvatarMenu";
 
 type CartItem = { quantity: number };
 type CartResponse = {
@@ -29,11 +30,10 @@ type CartResponse = {
 };
 
 export default function Actions() {
-  const router = useRouter();
-  const { logout, loading } = useAuth();
-
+const { user, loading } = useAuth(); 
   const [cartOpen, setCartOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const displayName = user?.userName || user?.name || user?.email || "User"; 
 
 const fetchCartCount = async () => {
   try {
@@ -103,35 +103,8 @@ useEffect(() => {
         </button>
 
         {/* User menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="text-gray-600 hover:text-black transition outline-none cursor-pointer"
-              aria-label="User menu"
-            >
-              <User size={20} />
-            </button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem
-              onClick={() => router.push("/user/profile")}
-              className="cursor-pointer"
-            >
-              <UserCircle className="mr-2 h-4 w-4" />
-              Profile
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              onClick={logout}
-              className="cursor-pointer text-red-600 focus:text-red-600"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <AvatarMenu displayName={displayName} roleLabel=""  image={user?.image}  profileHref="/user/profile" />
+        
       </div>
 
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
