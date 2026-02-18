@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getDriverDetail } from "@/lib/api/driver";
 import { handleGetMyAssignedOrders } from "@/lib/actions/order-action";
 import StatCard from "./StatsCard";
+import { Clock, Truck } from "lucide-react";
 
 export default function DriverDashboardPage({ user }: { user: any }) {
   const driverId = user?._id;
@@ -86,23 +87,32 @@ export default function DriverDashboardPage({ user }: { user: any }) {
         <p className="mt-1 text-sm text-gray-600">{lastActivityLabel}</p>
 
         {err ? (
+          
           <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
             {err}
           </div>
         ) : null}
+
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <StatCard
             title="Total Orders Assigned"
             value={loading ? "—" : assigned}
             sub="All orders assigned to you"
+              color="yellow"
+          Icon={Clock}
+
           />
           <StatCard
             title="Total Delivered"
             value={loading ? "—" : delivered}
             sub="Orders you have completed"
+              color="green"
+                Icon={Truck}
+
           />
 
-        </div>
+        </div>    
+
 
       <div className="mt-6 rounded-2xl border bg-white p-5 shadow-sm">
   <p className="text-sm font-semibold text-gray-800">My Last Activity</p>
