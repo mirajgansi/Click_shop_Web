@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MoreVertical, Search } from "lucide-react";
 import { toast } from "react-toastify";
@@ -11,6 +11,8 @@ import DeleteModal from "@/app/_componets/DeleteModal";
 import { handleDeleteProduct ,handleRestockProduct } from "@/lib/actions/product-action";
 import RestockModal from "./RestockModal";
 import ActionMenu from "./ActionMenu";
+import { FormSelect } from "@/app/_componets/dropdown";
+import { useForm } from "react-hook-form";
 
 type Product = {
   _id: string;
@@ -31,7 +33,10 @@ type Pagination = {
   total: number;
   totalPages: number;
 };
-
+type FilterForm = {
+  category: string;
+  size: string; 
+};
 function buildImageUrl(img?: string) {
   if (!img) return "/cookie.jpg";
   if (img.startsWith("http")) return img;
@@ -109,7 +114,31 @@ const go = (next: Partial<{ page: number; size: number; search: string; category
   router.push(`/admin/products?${sp.toString()}`);
 };
 
+const { control, watch, setValue } = useForm<FilterForm>({
+  defaultValues: {
+    category: currentCategory ?? "All",
+    size: String(pagination?.size ?? 10),
+  },
+});
 
+// keep RHF synced if URL/pagination changes from outside
+useEffect(() => {
+  setValue("category", currentCategory ?? "All", { shouldDirty: false });
+  setValue("size", String(pagination?.size ?? 10), { shouldDirty: false });
+}, [currentCategory, pagination?.size, setValue]);
+
+const cat = watch("category");
+const size = watch("size");
+
+// when category OR size changes -> update URL
+useEffect(() => {
+  const nextSize = Number(size || 10);
+
+  // prevent useless push loop
+  if (cat === (currentCategory ?? "All") && nextSize === (pagination?.size ?? 10)) return;
+
+  go({ page: 1, category: cat, size: nextSize });
+}, [cat, size, currentCategory, pagination?.size]);
 const filteredProducts = useMemo(() => {
   const q = searchTerm.trim().toLowerCase();
   const cat = currentCategory;
@@ -162,7 +191,7 @@ const filteredProducts = useMemo(() => {
 
           <button
             onClick={() => go({ page: 1, search: searchTerm })}
-            className="h-10 rounded-2xl bg-gray-900 px-4 text-sm font-semibold text-white hover:bg-black"
+            className="h-10 rounded-2xl bg-green-600 px-4 text-sm font-semibold text-white hover:bg-green-700 cursor-pointer"
           >
             Search
           </button>
@@ -170,31 +199,26 @@ const filteredProducts = useMemo(() => {
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Category filter */}
-          <select
-           value={currentCategory}
-  onChange={(e) => go({ page: 1, category: e.target.value })}
-            className="h-10 rounded-2xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400"
-          >
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+        <FormSelect
+  control={control}
+  name="category"
+  placeholder="All categories"
+  options={categories.map((c) => ({ value: c, label: c }))}
+  className="h-10 rounded-2xl border border-gray-200 bg-white px-3 text-sm cursor-pointer"
+/>
 
           {/* Page size */}
-          <select
-            value={String(pagination?.size ?? 10)}
-  onChange={(e) => go({ page: 1, size: Number(e.target.value) })}
-            className="h-10 rounded-2xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400"
-          >
-            {[10, 12, 20, 50].map((n) => (
-              <option key={n} value={n}>
-                Show {n}
-              </option>
-            ))}
-          </select>
-
+     
+<FormSelect<FilterForm>
+  control={control}
+  name="size"
+  placeholder="Show"
+  options={[10, 12, 20, 50].map((n) => ({
+    value: String(n),
+    label: `Show ${n}`,
+  }))}
+  className="h-10 rounded-2xl border border-gray-200 bg-white px-3 text-sm outline-none focus:border-gray-400 cursor-pointer"
+/>
           <Link
               href="/admin/products/createProduct"
                className="h-10 inline-flex items-center rounded-2xl bg-green-600 px-4 text-sm font-semibold text-white hover:bg-green-700"
@@ -216,7 +240,6 @@ const filteredProducts = useMemo(() => {
               <th>Total Revenue</th>
            <th>Total Sold</th>
               <th>Status</th>
-
               <th >Action</th>
             </tr>
           </thead>
@@ -278,13 +301,13 @@ const filteredProducts = useMemo(() => {
                   </td>
 
                  <td className="px-4 py-3">
-  <ActionMenu
-    id={p._id}
-    editHref={`/admin/products/edit/${p._id}`}
-    onRestock={(id) => setRestockId(id)}
-    onDelete={(id) => setDeleteId(id)}
-  />
-</td>
+              <ActionMenu
+                id={p._id}
+                editHref={`/admin/products/edit/${p._id}`}
+                onRestock={(id) => setRestockId(id)}
+                onDelete={(id) => setDeleteId(id)}
+              />
+            </td>
                 </tr>
               );
             })}
@@ -304,8 +327,7 @@ const filteredProducts = useMemo(() => {
       <div className="flex flex-col gap-3 border-t border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
         <p className="text-sm text-gray-500">
           Page <span className="font-semibold text-gray-900">{pagination.page}</span> of{" "}
-          <span className="font-semibold text-gray-900">{pagination.totalPages}</span> •{" "}
-          Total <span className="font-semibold text-gray-900">{pagination.total}</span>
+          <span className="font-semibold text-gray-900">{pagination.totalPages}</span> {" "}
         </p>
 
         <div className="flex items-center gap-2">

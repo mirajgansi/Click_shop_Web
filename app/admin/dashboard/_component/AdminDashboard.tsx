@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import { Moon, Sun, Sunrise, TrendingDown, TrendingUp } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   LineChart,
   Line,
@@ -12,6 +13,11 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import Card from "./Card";
+import TrendPill from "./TrendPill";
+import { useForm } from "react-hook-form";
+import { FormSelect } from "@/app/_componets/dropdown";
+import { handleGetAdminEarnings } from "@/lib/actions/admin/analytics-action";
 
 type KPI = {
   title: string;
@@ -44,51 +50,29 @@ function Sparkline({ dataKey = "value", data }: { dataKey?: string; data: any[] 
 
 function getGreeting(now = new Date()) {
   const h = now.getHours();
-  if (h < 12) return "Good Morning 👋";
-  if (h < 18) return "Good Afternoon 👋";
-  return "Good Evening 👋";
+
+  if (h < 12) {
+    return {
+      text: "Good Morning",
+      icon: <Sunrise className="h-5 w-5 text-amber-500" />,
+    };
+  }
+
+  if (h < 18) {
+    return {
+      text: "Good Afternoon",
+      icon: <Sun className="h-5 w-5 text-yellow-500" />,
+    };
+  }
+
+  return {
+    text: "Good Evening",
+    icon: <Moon className="h-5 w-5 text-indigo-500" />,
+  };
 }
+
 const pieColors = ["#F59E0B", "#60A5FA", "#A855F7", "#22C55E", "#FB7185"];
 
-function TrendPill({ positive = true, 
-  // value
- }: { positive?: boolean;
-  //  value: string
-   }) {
-  return (
-    <span
-      className={[
-        "inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold",
-        positive ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700",
-      ].join(" ")}
-    >
-      <span className={positive ? "text-green-600" : "text-red-600"}>{positive ? "↗" : "↘"}</span>
-      {/* {value} */}
-    </span>
-  );
-}
-
-function Card({
-  title,
-  right,
-  children,
-  className = "",
-}: {
-  title: React.ReactNode;
-  right?: React.ReactNode;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={"rounded-2xl border border-gray-100 bg-white p-4 shadow-sm " + className}>
-      <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm font-semibold text-gray-800">{title}</div>
-        {right ? <div>{right}</div> : null}
-      </div>
-      {children}
-    </div>
-  );
-}
 
 function formatMoney(n: number) {
   if (!Number.isFinite(n)) return "0";
@@ -106,7 +90,13 @@ function labelFromEarningsId(id: any) {
 }
 
 export default function DashboardClient({ initial, user }: Props) {
-  const [rangeMode, setRangeMode] = useState<"Daily" | "Weekly" | "Monthly">("Daily");
+type RangeMode = "Daily" | "Weekly" | "Monthly";
+
+const { control, watch } = useForm<{ rangeMode: RangeMode }>({
+  defaultValues: { rangeMode: "Daily" },
+});
+
+const rangeMode = watch("rangeMode") ?? "Daily";
 
     const greeting = getGreeting(new Date());
 
@@ -120,19 +110,31 @@ export default function DashboardClient({ initial, user }: Props) {
   const ok = initial?.success;
 
   const kpiData = initial?.kpis ?? { revenue: 0, orders: 0, avgOrderValue: 0, customers: 0 };
-  const earningsRaw = Array.isArray(initial?.earnings) ? initial.earnings : [];
-  const categories = Array.isArray(initial?.categories) ? initial.categories : [];
+const [earningsRaw, setEarningsRaw] = useState<any[]>(
+  Array.isArray(initial?.earnings) ? initial.earnings : []
+);  const categories = Array.isArray(initial?.categories) ? initial.categories : [];
   const topProducts = Array.isArray(initial?.topProducts) ? initial.topProducts : [];
   const drivers = Array.isArray(initial?.drivers) ? initial.drivers : [];
 
-  // chart: convert backend format -> { day: string, value: number }
-  const earnings = useMemo(() => {
-    return earningsRaw.map((r: any) => ({
-      day: labelFromEarningsId(r?._id),
-      value: Number(r?.value) || 0,
-    }));
-  }, [earningsRaw]);
+const earnings = useMemo(() => {
+  return earningsRaw.map((r: any) => ({
+    day: labelFromEarningsId(r?._id),
+    value: Number(r?.value) || 0,
+  }));
+}, [earningsRaw]);
 
+useEffect(() => {
+  const group =
+    rangeMode === "Daily" ? "daily" : rangeMode === "Weekly" ? "weekly" : "monthly";
+
+  (async () => {
+    const res = await handleGetAdminEarnings({ group });
+
+    if (res?.success) {
+      setEarningsRaw(res.rows || []);
+    }
+  })();
+}, [rangeMode]);
   // KPI cards from real data (you can change titles)
   const kpis: KPI[] = useMemo(() => {
     return [
@@ -200,9 +202,26 @@ const countSpark = useMemo(() => {
     }));
   }, [topProducts]);
 
-  const earningsTotal = useMemo(() => {
+ const earningsTotal = useMemo(() => {
+  if (!earnings.length) return 0;
+
+  if (rangeMode === "Daily") {
+    // last day value
+    return Number(earnings[earnings.length - 1]?.value) || 0;
+  }
+
+  if (rangeMode === "Weekly") {
+    // sum current week (assuming backend grouped by week)
     return earnings.reduce((s: number, x: any) => s + (Number(x.value) || 0), 0);
-  }, [earnings]);
+  }
+
+  if (rangeMode === "Monthly") {
+    // sum current month (assuming backend grouped by month)
+    return earnings.reduce((s: number, x: any) => s + (Number(x.value) || 0), 0);
+  }
+
+  return 0;
+}, [earnings, rangeMode]);
 
 const topViewedRaw = Array.isArray(initial?.topViewed)
   ? initial.topViewed
@@ -232,8 +251,11 @@ const viewedCards = useMemo(() => {
          <div className="md:col-span-3">
           <div className="relative h-full rounded-2xl border border-gray-100 bg-white p-4 shadow-sm overflow-hidden">
             
-            <div className="text-sm text-gray-500">{greeting}</div>
-            <div className="mt-1 text-lg font-bold text-gray-900">{name}</div>
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          {greeting.icon}
+          <span>{greeting.text}</span>
+        </div>         
+           <div className="mt-1 text-lg font-bold text-gray-900">{name}</div>
 
             <p className="mt-2 text-sm text-gray-500">
               Here is your weekly <br /> overview report
@@ -242,7 +264,7 @@ const viewedCards = useMemo(() => {
             <img
               src="/Greetings.png"  
               alt="Greeting"
-              className="absolute bottom-3 right-3 w-30 opacity-90 pointer-events-none"
+              className="absolute bottom-3 right-2 w-25 opacity-90 pointer-events-none"
             />
             </div>
           </div>
@@ -274,7 +296,7 @@ const viewedCards = useMemo(() => {
         {/* Middle row */}
         <div className="mt-4 grid gap-4 md:grid-cols-12">
           <div className="md:col-span-8">
-            <Card
+            <Card 
               title={
                 <div className="flex items-center gap-2">
                   <span>Overall Earnings</span>
@@ -286,17 +308,21 @@ const viewedCards = useMemo(() => {
                   </span>
                 </div>
               }
-              right={
-                <select
-                  value={rangeMode}
-                  onChange={(e) => setRangeMode(e.target.value as any)}
-                  className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700"
-                >
-                  <option>Daily</option>
-                  <option>Weekly</option>
-                  <option>Monthly</option>
-                </select>
-              }
+          right={
+              <FormSelect<{ rangeMode: "Daily" | "Weekly" | "Monthly" }>
+                control={control}
+                name="rangeMode"
+                placeholder="Select"
+                options={[
+                  { value: "Daily", label: "Daily" },
+                  { value: "Weekly", label: "Weekly" },
+                  { value: "Monthly", label: "Monthly" },
+                ]}
+                className="h-10 rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-700"
+              />
+            }
+
+
               className="p-5"
             >
               <div className="h-64 w-full">
@@ -355,7 +381,8 @@ const viewedCards = useMemo(() => {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="font-semibold text-gray-800">{Number(c.value).toFixed(2)}%</span>
-                      <span className="text-green-600">↗</span>
+                      <span className="text-green-600">  <TrendingUp className="h-4 w-4 text-green-600" />
+</span>
                     </div>
                   </div>
                 ))}
@@ -394,7 +421,11 @@ const viewedCards = useMemo(() => {
 
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-semibold text-gray-800">{s.change}</span>
-                      <span className={s.up ? "text-green-600" : "text-red-600"}>{s.up ? "↗" : "↘"}</span>
+                      <span className={s.up ? "text-green-600" : "text-red-600"}>{s.up ? (
+  <TrendingUp className="h-4 w-4 text-green-600" />
+) : (
+  <TrendingDown className="h-4 w-4 text-red-600" />
+)}</span>
                     </div>
                   </div>
                 ))}
@@ -424,7 +455,11 @@ const viewedCards = useMemo(() => {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="text-sm font-semibold text-gray-800">{p.share}</div>
-                      <div className={p.up ? "text-green-600" : "text-red-600"}>{p.up ? "↗" : "↘"}</div>
+                      <div className={p.up ? "text-green-600" : "text-red-600"}>{p.up ?  (
+  <TrendingUp className="h-4 w-4 text-green-600" />
+) : (
+  <TrendingDown className="h-4 w-4 text-red-600" />
+)}</div>
                     </div>
                   </div>
                 ))}
@@ -462,7 +497,11 @@ const viewedCards = useMemo(() => {
           <div className="flex items-center gap-2">
             <div className="text-sm font-semibold text-gray-800">{p.share}</div>
             <div className={p.up ? "text-green-600" : "text-red-600"}>
-              {p.up ? "↗" : "↘"}
+              {p.up ?  (
+  <TrendingUp className="h-4 w-4 text-green-600" />
+) : (
+  <TrendingDown className="h-4 w-4 text-red-600" />
+)}
             </div>
           </div>
         </div>

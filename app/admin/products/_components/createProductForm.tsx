@@ -8,9 +8,17 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { handleCreateProduct } from "@/lib/actions/product-action";
 import {  ProductData, ProductSchema } from "../schema";
-import { Camera } from "lucide-react";
+import {  CalendarIcon, Camera } from "lucide-react";
 import { CategoryModal } from "./category_modal";
 import CreateProductStep1Skeleton from "./skeleton_add_prdocut";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 
 /** ---------------- helpers ---------------- */
 type ActionResponse =
@@ -44,13 +52,10 @@ function normalizeActionResponse(res: any): ActionResponse {
 }
 
 /** ---------------- main wizard ---------------- */
-type WizardData = ProductData & {
-  currency?: string; // optional: remove if you don't want currency
-};
-
+type WizardData = ProductData
 const stepFields: Record<number, (keyof WizardData)[]> = {
   1: ["name", "image", "description"],
-  2: ["currency", "price", "inStock", "category"],
+  2: [ "price", "inStock", "category"],
   3: [
     "manufacturer",
     "manufactureDate",
@@ -92,7 +97,6 @@ export default function CreateProductWizard() {
 });
 const [pageLoading, setPageLoading] = useState(true);
 
-  const selectedCurrency = watch("currency");
   const selectedCategory = watch("category");
 
   const clearImage = (onChange?: (file: File | undefined) => void) => {
@@ -158,8 +162,20 @@ console.log("schema.ts loaded (CreateProductWizard)");
       formData.append("description", data.description);
       formData.append("price", String(data.price));
       formData.append("manufacturer", data.manufacturer);
-      formData.append("manufactureDate", data.manufactureDate);
-      formData.append("expireDate", data.expireDate);
+
+          if (data.manufactureDate) {
+            formData.append(
+              "manufactureDate",
+              data.manufactureDate.toISOString()
+            );
+          }
+
+          if (data.expireDate) {
+            formData.append(
+              "expireDate",
+              data.expireDate.toISOString()
+            );
+          }
       formData.append("nutritionalInfo", data.nutritionalInfo);
       formData.append("category", data.category);
       formData.append("inStock", String(data.inStock ?? 0));
@@ -171,6 +187,7 @@ console.log("schema.ts loaded (CreateProductWizard)");
       const response = normalizeActionResponse(raw);
 
       if (!response.success) throw new Error(response.message || "Create product failed");
+    toast.success(response.message || "Product created successfully ");
 
       reset({ inStock: 0, image: [] }); 
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -199,12 +216,12 @@ console.log("schema.ts loaded (CreateProductWizard)");
         <span
           className={[
             "grid h-6 w-6 place-items-center rounded-full text-xs font-bold",
-            done ? "bg-blue-600 text-white" : active ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700",
+            done ? "bg-green-600 text-white" : active ? "bg-green-600 text-white" : "bg-gray-200 text-gray-700",
           ].join(" ")}
         >
           {done ? "✓" : n}
         </span>
-        <span className={active ? "text-sm font-semibold text-blue-600" : "text-sm text-gray-500"}>
+        <span className={active ? "text-sm font-semibold text-green-600" : "text-sm text-gray-500"}>
           {label}
         </span>
       </button>
@@ -301,7 +318,7 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="rounded-md bg-blue-600 px-3 py-2 text-xs font-semibold text-white"
+            className="rounded-md bg-green-600 px-3 py-2 text-xs font-semibold text-white"
           >
             Add more images
           </button>
@@ -351,40 +368,18 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
             transition={{ duration: 0.25 }}
             className="space-y-4"
           >
-            {/* Currency + Price */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-1">
-                <label className="text-sm font-medium">Currency</label>
-                <select
-                  className="h-10 w-full rounded-md border border-black/10 px-3 text-sm outline-none focus:border-black/40"
-                  {...register("currency")}
-                >
-                  <option value="">Select currency</option>
-                  <option value="NPR">NPR</option>
-                  <option value="USD">USD</option>
-                  <option value="INR">INR</option>
-                </select>
-                {!selectedCurrency && (
-                  <p className="text-xs text-gray-500">Please enter the product currency first.</p>
-                )}
-                {errors.currency?.message && (
-                  <p className="text-xs text-red-600">{String(errors.currency.message)}</p>
-                )}
-              </div>
-
               <div className="space-y-1">
                 <label className="text-sm font-medium">Product Price</label>
                 <input
                   type="number"
                   step="0.01"
-                  disabled={!selectedCurrency}
                   className="h-10 w-full rounded-md border border-black/10 px-3 text-sm outline-none focus:border-black/40 disabled:bg-gray-100"
                   {...register("price", { valueAsNumber: true })}
                   placeholder="0.00"
                 />
                 {errors.price?.message && <p className="text-xs text-red-600">{errors.price.message}</p>}
               </div>
-            </div>
+         
 
             {/* In Stock */}
             <div className="space-y-1">
@@ -454,29 +449,92 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
 
             {/* Dates */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-1">
-                <label className="text-sm font-medium">Manufacture Date</label>
-                <input
-                  type="date"
-                  className="h-10 w-full rounded-md border border-black/10 px-3 text-sm outline-none focus:border-black/40"
-                  {...register("manufactureDate")}
-                />
-                {errors.manufactureDate?.message && (
-                  <p className="text-xs text-red-600">{errors.manufactureDate.message}</p>
-                )}
-              </div>
+          <div className="space-y-1">
+  <label className="text-sm font-medium">Manufacture Date</label>
+
+  <Controller
+    control={control}
+    name="manufactureDate"
+    render={({ field }) => (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="h-10 w-full justify-start text-left font-normal"
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {field.value ? (
+              format(new Date(field.value), "PPP")
+            ) : (
+              <span className="text-muted-foreground">
+                Pick a date
+              </span>
+            )}
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent className="w-auto p-0">
+          <Calendar
+            mode="single"
+            selected={field.value ? new Date(field.value) : undefined}
+            onSelect={(date) => field.onChange(date)}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+    )}
+  />
+
+  {errors.manufactureDate?.message && (
+    <p className="text-xs text-red-600">
+      {errors.manufactureDate.message}
+    </p>
+  )}
+</div>
 
               <div className="space-y-1">
-                <label className="text-sm font-medium">Expire Date</label>
-                <input
-                  type="date"
-                  className="h-10 w-full rounded-md border border-black/10 px-3 text-sm outline-none focus:border-black/40"
-                  {...register("expireDate")}
-                />
-                {errors.expireDate?.message && (
-                  <p className="text-xs text-red-600">{errors.expireDate.message}</p>
-                )}
-              </div>
+  <label className="text-sm font-medium">Expire Date</label>
+
+  <Controller
+    control={control}
+    name="expireDate"
+    render={({ field }) => (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="h-10 w-full justify-start text-left font-normal"
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {field.value ? (
+              format(new Date(field.value), "PPP")
+            ) : (
+              <span className="text-muted-foreground">
+                Pick a date
+              </span>
+            )}
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent className="w-auto p-0">
+          <Calendar
+            mode="single"
+            selected={field.value ? new Date(field.value) : undefined}
+            onSelect={(date) => field.onChange(date)}
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+    )}
+  />
+
+  {errors.expireDate?.message && (
+    <p className="text-xs text-red-600">
+      {errors.expireDate.message}
+    </p>
+  )}
+</div>
+
             </div>
 
             {/* Nutritional Info */}
@@ -521,7 +579,7 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
           <button
             type="button"
             onClick={goNext}
-            className="h-10 rounded-md bg-blue-600 px-6 text-sm font-semibold text-white hover:opacity-90"
+            className="h-10 rounded-md bg-green-600 px-6 text-sm font-semibold text-white hover:opacity-90"
           >
             Continue
           </button>
@@ -529,7 +587,7 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
           <button
             type="submit"
             disabled={isSubmitting || pending}
-            className="h-10 rounded-md bg-blue-600 px-6 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
+            className="h-10 rounded-md bg-green-600 px-6 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-60"
           >
             {isSubmitting || pending ? "Saving..." : "Create Product"}
           </button>

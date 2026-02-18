@@ -78,7 +78,7 @@ export function CategoryModal({
                 />
 
                 <div>
-                  <p className="text-sm font-semibold text-blue-700">{c.label}</p>
+                  <p className="text-sm font-semibold text-lime-700">{c.label}</p>
                   <p className="text-xs text-gray-500">{c.description}</p>
                 </div>
               </label>
@@ -97,7 +97,7 @@ export function CategoryModal({
             onSave(temp as CategorySlug);
             onClose();
           }}
-          className="mt-5 h-10 w-full rounded-lg bg-blue-600 text-sm font-semibold text-white hover:opacity-90"
+          className="mt-5 h-10 w-full rounded-lg bg-lime-800 text-sm font-semibold text-white hover:opacity-90 cursor-pointer" 
         >
           Save
         </button>

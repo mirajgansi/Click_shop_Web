@@ -14,12 +14,8 @@ export const ProductSchema = z
 price: z.coerce.number().positive("Price must be greater than 0"),
     manufacturer: z.string().min(1, "Manufacturer is required"),
 
-    manufactureDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Invalid manufacture date",
-    }),
-    expireDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Invalid expire date",
-    }),
+   manufactureDate: z.date(),
+expireDate: z.date(),
 
     nutritionalInfo: z.string().min(1, "Nutritional info is required"),
    category: z.enum(CATEGORY_SLUGS, { message: "Category is required" }),
@@ -46,15 +42,8 @@ inStock: z.coerce.number().int("Stock must be an integer").min(0).default(0),
     averageRating: z.number().min(0).max(5).default(0),
     reviewCount: z.number().int().min(0).default(0),
   })
-  .superRefine((data, ctx) => {
-    if (Date.parse(data.expireDate) <= Date.parse(data.manufactureDate)) {
-      ctx.addIssue({
-        path: ["expireDate"],
-        message: "Expire date must be after manufacture date",
-        code: z.ZodIssueCode.custom,
-      });
-    }
-  });
+ 
+    
 
 export type ProductData = z.input<typeof ProductSchema>;
 
