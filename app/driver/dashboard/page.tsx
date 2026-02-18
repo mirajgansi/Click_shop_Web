@@ -10,6 +10,6 @@ export default async function Page() {
     if(!result.data){
             notFound();
             }
-      return <DriverDashboardPage />;
+      return <DriverDashboardPage user={result.data}/>;
 
 }

@@ -1,9 +1,12 @@
 "use client";
 
+import { FormSelect } from "@/app/_componets/dropdown";
 import { OrderStatusPill } from "@/app/_componets/OrderStatusPill";
 import { handleGetMyAssignedOrders } from "@/lib/actions/order-action";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import OrderCardSkeleton from "../../_components/sekeleton-load-componet";
 
 type OrderStatus = "pending" | "paid" | "shipped" | "delivered" | "cancelled";
 type PaymentStatus = "unpaid" | "paid";
@@ -91,6 +94,26 @@ setOrders(filtered);
     }
   };
 
+
+  type PageSizeForm = { size: string };
+  
+  const { control, watch, setValue } = useForm<PageSizeForm>({
+    defaultValues: { size: String(size) },
+  });
+  
+  const sizeWatch = watch("size");
+  
+  useEffect(() => {
+    if (!sizeWatch) return;
+    const next = Number(sizeWatch);
+    setPage(1);
+    setSize(next);
+  }, [sizeWatch]);
+    useEffect(() => {
+      load();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page, size]);
+
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,20 +131,16 @@ setOrders(filtered);
           </div>
 
           <div className="flex items-center gap-2">
-            <select
-              className="rounded-xl border bg-white px-3 py-2 text-sm"
-              value={size}
-              onChange={(e) => {
-                setPage(1);
-                setSize(Number(e.target.value));
-              }}
-            >
-              {[5, 10, 20, 50].map((n) => (
-                <option key={n} value={n}>
-                  {n} / page
-                </option>
-              ))}
-            </select>
+            <FormSelect<PageSizeForm>
+                            control={control}
+                            name="size"
+                            placeholder="Rows per page"
+                            className="h-10 rounded-xl border bg-white px-3 text-sm"
+                            options={[5, 10, 20, 50].map((n) => ({
+                              value: String(n),
+                              label: `${n} / page`,
+                            }))}
+                          />
 
             <button
               onClick={load}
@@ -139,11 +158,13 @@ setOrders(filtered);
         ) : null}
 
         <div className="mt-6 space-y-3">
-          {loading ? (
-            <div className="rounded-2xl border bg-white p-5 text-sm text-gray-600">
-              Loading orders...
-            </div>
-          ) : orders.length === 0 ? (
+        {loading ? (
+  <div className="space-y-3">
+    {[...Array(5)].map((_, i) => (
+      <OrderCardSkeleton key={i} />
+    ))}
+  </div>
+): orders.length === 0 ? (
             <div className="rounded-2xl border bg-white p-8 text-center">
               <p className="text-sm text-gray-600">No assigned orders found.</p>
             </div>

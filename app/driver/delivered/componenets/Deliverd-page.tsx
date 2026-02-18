@@ -6,6 +6,7 @@ import { handleGetMyAssignedOrders } from "@/lib/actions/order-action";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import OrderCardSkeleton from "../../_components/sekeleton-load-componet";
 
 type OrderStatus = "pending" | "paid" | "shipped" | "delivered" | "cancelled";
 type PaymentStatus = "unpaid" | "paid";
@@ -150,11 +151,13 @@ useEffect(() => {
         ) : null}
 
         <div className="mt-6 space-y-3">
-          {loading ? (
-            <div className="rounded-2xl border bg-white p-5 text-sm text-gray-600">
-              Loading orders...
-            </div>
-          ) : orders.length === 0 ? (
+         {loading ? (
+  <div className="space-y-3">
+    {[...Array(5)].map((_, i) => (
+      <OrderCardSkeleton key={i} />
+    ))}
+  </div>
+): orders.length === 0 ? (
             <div className="rounded-2xl border bg-white p-8 text-center">
               <p className="text-sm text-gray-600">No assigned orders found.</p>
             </div>
