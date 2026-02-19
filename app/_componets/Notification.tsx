@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Bell } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   DropdownMenu,
@@ -83,7 +84,6 @@ export default function NotificationBell({
   useEffect(() => {
     if (!userId) return;
 
-    // ✅ join personal room so server can do io.to(userId).emit(...)
     socket.emit("join", userId);
 
     startTransition(() => {
@@ -94,10 +94,18 @@ export default function NotificationBell({
       })();
     });
 
-    const onNotif = (n: Notif) => {
-      setItems((prev) => [n, ...prev]);
-      setUnread((u) => u + 1);
-    };
+   const onNotif = (n: Notif) => {
+  setItems((prev) => [n, ...prev]);
+  setUnread((u) => u + 1);
+
+  toast(n.title, {
+    description: n.message,
+    action: {
+      label: "Open",
+      onClick: () => router.push(resolveNotifUrl(n, role)),
+    },
+  });
+};
 
     socket.on("notification", onNotif);
 

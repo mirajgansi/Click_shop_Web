@@ -132,3 +132,10 @@ input[type="number"] {
     @apply bg-background text-foreground;
   }
 }
+[data-sonner-toast][data-mounted="true"] {
+  animation: sonner-slide-in-right 180ms ease-out;
+}
+
+[data-sonner-toast][data-removed="true"] {
+  animation: sonner-slide-out-right 160ms ease-in;
+}
