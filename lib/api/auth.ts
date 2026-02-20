@@ -97,3 +97,18 @@ export const deleteMe = async (password: string) => {
     throw new Error(err.response?.data?.message || "Deleting account failed");
   }
 };
+export const verifyResetCode = async (email: string, code: string) => {
+  try {
+    const response = await axios.post(API.AUTH.VERIFY_RESET_CODE, {
+      email,
+      code: code.trim(),
+    });
+    return response.data; // { success, message }
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ||
+        error.message ||
+        "Verify reset code failed",
+    );
+  }
+};

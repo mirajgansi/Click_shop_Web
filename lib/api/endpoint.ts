@@ -6,6 +6,7 @@ export const API = {
     WHOAMI: "/api/auth/whoami",
     UPDATEPROFILE: "/api/auth/update-profile",
     REQUEST_PASSWORD_RESET: "/api/auth/request-password-reset",
+    VERIFY_RESET_CODE: "/api/auth/verify-reset-code",
     RESET_PASSWORD: `/api/auth/reset-password`,
     DELETEME: "/api/auth/me",
   },

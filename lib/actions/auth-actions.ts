@@ -10,6 +10,7 @@ import {
   requestPasswordReset,
   resetPassword,
   deleteMe,
+  verifyResetCode,
 } from "../api/auth";
 import { setAuthToken, setUserData } from "../cookie";
 import { revalidatePath } from "next/cache";
@@ -18,12 +19,10 @@ export async function handleRegister(formData: any) {
   try {
     const result = await register(formData);
 
-    // ✅ guard
     if (!result) {
       return { success: false, message: "No response from server" };
     }
 
-    // If backend already returns success boolean
     if (result.success === false) {
       return {
         success: false,
@@ -178,3 +177,25 @@ export async function handleDeleteMe(password: string) {
     return { success: false, message: err.message };
   }
 }
+export const handleVerifyResetCode = async (email: string, code: string) => {
+  try {
+    const response = await verifyResetCode(email, code);
+
+    if (response.success) {
+      return {
+        success: true,
+        message: response.message || "Code verified",
+      };
+    }
+
+    return {
+      success: false,
+      message: response.message || "Invalid reset code",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Verify reset code action failed",
+    };
+  }
+};

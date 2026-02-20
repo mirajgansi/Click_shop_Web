@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import OtpInput from "../_componets/OPTIput";
+import { handleVerifyResetCode } from "@/lib/actions/auth-actions";
 
 export default function ResetCodePasswordPage() {
   const router = useRouter();
@@ -17,16 +18,25 @@ export default function ResetCodePasswordPage() {
     if (e) setEmail(e);
   }, [searchParams]);
 
-  function onNext(e: React.FormEvent) {
-    e.preventDefault();
+ async function onNext(e: React.FormEvent) {
+  e.preventDefault();
 
-    if (!email.trim()) return toast.error("Email is required");
-    if (!/^\d{6}$/.test(code)) return toast.error("Code must be 6 digits");
+  const em = email.trim();
+  const cd = code.trim();
 
-    router.push(
-      `/reset-password?email=${encodeURIComponent(email.trim())}&code=${encodeURIComponent(code)}`
-    );
+  if (!em) return toast.error("Email is required");
+  if (!/^\d{6}$/.test(cd)) return toast.error("Code must be 6 digits");
+
+  const res = await handleVerifyResetCode(em, cd);
+
+  if (!res.success) {
+    return toast.error(res.message || "Invalid reset code");
   }
+
+  router.push(
+    `/reset-password?email=${encodeURIComponent(em)}&code=${encodeURIComponent(cd)}`
+  );
+}
 
   return (
     <div className=" flex justify-center ">
@@ -34,7 +44,7 @@ export default function ResetCodePasswordPage() {
         <h1 className="text-2xl font-semibold">Verify code</h1>
         <p className="text-sm text-gray-600 mt-1">
           Enter the 6-digit code email            {email}
-.
+        
         </p>
         <form onSubmit={onNext} className="mt-6 space-y-4">
         

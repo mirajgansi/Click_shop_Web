@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import AnimatedTextField from "./AnimatedTextFeild"; // adjust path
+import { watch } from "fs/promises";
 
 const resetSchema = z
   .object({
@@ -33,6 +34,7 @@ export default function ResetPasswordPage() {
     handleSubmit,
     setValue,
     setError,
+     watch,
     formState: { errors },
   } = useForm<ResetData>({
     resolver: zodResolver(resetSchema),
@@ -60,7 +62,6 @@ export default function ResetPasswordPage() {
         toast.success(res?.message || "Password reset successful");
         router.push("/login");
       } catch (err: any) {
-        // ✅ make it shake on server error too
         setError("code", {
           type: "manual",
           message: err?.message || "Reset password failed",
@@ -74,7 +75,7 @@ export default function ResetPasswordPage() {
   const onInvalid = () => {
     toast.error("Please fix the validation errors");
   };
-
+const emailValue = watch("email");
   return (
     <div className="flex justify-center px-4">
       <div className="w-full max-w-md rounded-2xl bg-white shadow p-6">
@@ -83,28 +84,13 @@ export default function ResetPasswordPage() {
         <form onSubmit={handleSubmit(submit, onInvalid)} className="mt-6 space-y-4">
           {/* Email (hidden or readonly if you want) */}
           <div className="space-y-1">
-            <label className="text-sm font-medium">Email</label>
-            <AnimatedTextField
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              register={register("email")}
-              error={errors.email}
-              inputClassName="bg-gray-50"
-            />
+           <p className="mt-1 text-sm text-gray-600">
+  Set new password for{" "}
+  <span className="font-semibold text-gray-900">{emailValue || "—"}</span>
+</p>
           </div>
 
-          {/* Code */}
-          <div className="space-y-1">
-            <label className="text-sm font-medium">6-digit code</label>
-            <AnimatedTextField
-              id="code"
-              type="text"
-              placeholder="123456"
-              register={register("code")}
-              error={errors.code}
-            />
-          </div>
+         
 
           {/* New password */}
           <div className="space-y-1">
