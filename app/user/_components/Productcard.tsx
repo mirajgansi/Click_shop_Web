@@ -11,7 +11,6 @@ type ProductCardProps = {
   price: number;
   unit?: string;
   inStock?: number;
-  isFavorite: boolean;
   onAddToCart?: () => void;
   onToggleWishlist?: () => void;
 };
@@ -23,26 +22,13 @@ export default function ProductCard({
   price,
   unit = "per kg",
   inStock = 0,
-  isFavorite,
   onAddToCart,
   onToggleWishlist,
 }: ProductCardProps) {
   return (
     <div className="w-full bg-white rounded-2xl p-3 shadow-sm relative">
       {/* Wishlist */}
-      <button
-        type="button"
-        onClick={() => onToggleWishlist?.()}
-        className="absolute top-3 right-3 z-10"
-        aria-label="Toggle wishlist"
-      >
-        <Heart
-          className={`h-5 w-5 transition ${
-            isFavorite ? "text-red-500" : "text-gray-400"
-          }`}
-          fill={isFavorite ? "currentColor" : "none"}
-        />
-      </button>
+    
 
       <Link href={`/user/products/${id}`} className="block">
         {/* Smaller image box */}

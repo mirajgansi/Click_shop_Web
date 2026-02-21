@@ -32,15 +32,42 @@ type Notif = {
   read: boolean;
   createdAt: string;
   data?: {
+      orderId?: string;
+productId?: string;
     url?: string; // fallback (old notifications)
     urlByRole?: Partial<Record<Role, string>>; // preferred
   };
 };
 function resolveNotifUrl(n: Notif, role: Role) {
-  if (role === "user") return "/user/orders";
+  // 1) Prefer role-specific mapping by type + ids
+  switch (n.type) {
+    case "driver_assigned":
+    case "driver_eta":
+    case "order_shipped":
+    case "order_delivered": {
+      const orderId = n.data?.orderId;
+      if (!orderId) break;
 
-  // driver/admin keep their own
-  return n.data?.urlByRole?.[role] ?? n.data?.url ?? "/notifications";
+      if (role === "user") return `/user/orders/${orderId}`;
+      if (role === "driver") return `/driver/orders/${orderId}`;
+      return `/admin/orders/${orderId}`;
+    }
+
+    case "product_added": {
+      const productId = n.data?.productId;
+      if (!productId) break;
+
+      if (role === "user") return `/user/products/${productId}`;
+      if (role === "admin") return `/admin/products/${productId}`;
+      return `/products/${productId}`;
+    }
+  }
+
+  // 2) Only if we couldn't build a url, use backend url (old notifications)
+  if (n.data?.url) return n.data.url;
+
+  // 3) Final fallback
+  return "/notifications";
 }
 
 function timeAgo(iso: string) {
