@@ -4,20 +4,27 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
-import { Camera } from "lucide-react";
+import { CalendarIcon, Camera } from "lucide-react";
 import Image from "next/image";
 import { ProductEditSchema, type ProductEditData } from "@/app/admin/products/schema";
 import { handleUpdateProduct } from "@/lib/actions/product-action";
 import { CategoryModal } from "../../_components/category_modal";
 
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+
 export default function EditProductForm({ product }: { product?: any }) {
   const [pending, startTransition] = useTransition();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // don't render until product exists (prevents undefined crashes)
   if (!product) return null;
 
-  // store old images (from backend)
   const [existingImages, setExistingImages] = useState<string[]>(
     Array.isArray(product?.images)
       ? product.images
@@ -103,6 +110,7 @@ export default function EditProductForm({ product }: { product?: any }) {
     if (current.length + valid.length > maxCount) toast.error(`Max ${maxCount} images allowed`);
 
     onChange(merged);
+    
   };
 
   const onSubmit = (data: ProductEditData) => {
@@ -119,8 +127,20 @@ export default function EditProductForm({ product }: { product?: any }) {
 
         // optional fields
         fd.append("manufacturer", data.manufacturer ?? "");
-        fd.append("manufactureDate", data.manufactureDate ?? "");
-        fd.append("expireDate", data.expireDate ?? "");
+     
+          if (data.manufactureDate) {
+            fd.append(
+              "manufactureDate",
+              data.manufactureDate
+            );
+          }
+
+          if (data.expireDate) {
+            fd.append(
+              "expireDate",
+              data.expireDate
+            );
+          }
         fd.append("nutritionalInfo", data.nutritionalInfo ?? "");
 
         // keep existing images list
@@ -239,7 +259,6 @@ export default function EditProductForm({ product }: { product?: any }) {
     <label className="text-sm font-semibold text-gray-800">Manufacturer</label>
     <input
       {...register("manufacturer")}
-      placeholder="e.g. Nestle"
       className="h-11 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400"
     />
     {errors.manufacturer?.message && (
@@ -250,10 +269,26 @@ export default function EditProductForm({ product }: { product?: any }) {
   {/* Manufacture Date */}
   <div className="space-y-1">
     <label className="text-sm font-semibold text-gray-800">Manufacture Date</label>
-    <input
-      type="date"
-      {...register("manufactureDate")}
-      className="h-11 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400"
+    <Controller
+      control={control}
+      name="manufactureDate"
+      render={({ field }) => (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="h-11 w-full justify-start text-left font-normal">
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {field.value ? format(field.value, "PPP") : <span className="text-muted-foreground">Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              onSelect={(d) => field.onChange(d)}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      )}
     />
     {errors.manufactureDate?.message && (
       <p className="text-xs text-red-600">{String(errors.manufactureDate.message)}</p>
@@ -263,10 +298,26 @@ export default function EditProductForm({ product }: { product?: any }) {
   {/* Expire Date */}
   <div className="space-y-1">
     <label className="text-sm font-semibold text-gray-800">Expire Date</label>
-    <input
-      type="date"
-      {...register("expireDate")}
-      className="h-11 w-full rounded-xl border border-gray-200 px-3 text-sm outline-none focus:border-gray-400"
+    <Controller
+      control={control}
+      name="expireDate"
+      render={({ field }) => (
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="h-11 w-full justify-start text-left font-normal">
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {field.value ? format(field.value, "PPP") : <span className="text-muted-foreground">Pick a date</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              onSelect={(d) => field.onChange(d)}
+              initialFocus
+            />
+          </PopoverContent>
+        </Popover>
+      )}
     />
     {errors.expireDate?.message && (
       <p className="text-xs text-red-600">{String(errors.expireDate.message)}</p>
@@ -315,10 +366,12 @@ export default function EditProductForm({ product }: { product?: any }) {
                 multiple
                 accept=".jpg,.jpeg,.png,.webp"
                 className="hidden"
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
-                  handleImagesChange(files, onChange, value as any);
-                }}
+               onChange={(e) => {
+              const files = Array.from(e.target.files || []);
+              handleImagesChange(files, onChange, value as File[]); 
+
+              if (fileInputRef.current) fileInputRef.current.value = "";
+            }}
               />
 
               {value.length ? (
@@ -357,7 +410,9 @@ export default function EditProductForm({ product }: { product?: any }) {
                       <Camera className="h-6 w-6 text-gray-700" />
                     </div>
                     <p className="text-sm text-gray-600">Browse or Drag & Drop</p>
-                    <p className="text-xs text-gray-400">Up to 5 images</p>
+                    <p className="text-xs text-gray-400">Up to 4 images</p>
+          <p className="text-xs text-red-400">use Png image is possible</p>
+
                   </div>
                 </button>
               )}
@@ -372,7 +427,7 @@ export default function EditProductForm({ product }: { product?: any }) {
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-gray-900 text-sm font-semibold text-white hover:bg-black disabled:opacity-60"
+        className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-green-700 text-sm font-semibold text-white hover:bg-green-800 cursor-pointer disabled:opacity-60"
       >
         {pending ? "Updating..." : "Update Product"}
       </button>

@@ -14,9 +14,8 @@ export const ProductSchema = z
 price: z.coerce.number().positive("Price must be greater than 0"),
     manufacturer: z.string().min(1, "Manufacturer is required"),
 
-   manufactureDate: z.date(),
-expireDate: z.date(),
-
+   manufactureDate: z.string().datetime().optional().nullable(),
+  expireDate: z.string().datetime().optional().nullable(),
     nutritionalInfo: z.string().min(1, "Nutritional info is required"),
    category: z.enum(CATEGORY_SLUGS, { message: "Category is required" }),
 
@@ -29,7 +28,7 @@ expireDate: z.date(),
   })
   .refine((files) => files.every((f) => ACCEPTED_IMAGE_TYPES.includes(f.type)), {
     message: "Only .jpg, .jpeg, .png and .webp formats are supported",
-  }),
+  }).optional(),
 
 inStock: z.coerce.number().int("Stock must be an integer").min(0).default(0),
 

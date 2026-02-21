@@ -162,7 +162,8 @@ export async function handleUpdateProduct(
       revalidatePath("/admin/products");
       revalidatePath(`/admin/products/edit/${productId}`);
     }
-
+    console.log("FILES:", (res as any).files?.length);
+    console.log("existingImages:", res?.existingImages);
     return res;
   } catch (error: any) {
     return {

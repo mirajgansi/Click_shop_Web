@@ -166,21 +166,21 @@ console.log("schema.ts loaded (CreateProductWizard)");
           if (data.manufactureDate) {
             formData.append(
               "manufactureDate",
-              data.manufactureDate.toISOString()
+              data.manufactureDate
             );
           }
 
           if (data.expireDate) {
             formData.append(
               "expireDate",
-              data.expireDate.toISOString()
+              data.expireDate
             );
           }
       formData.append("nutritionalInfo", data.nutritionalInfo);
       formData.append("category", data.category);
       formData.append("inStock", String(data.inStock ?? 0));
 
-    data.image.forEach((file) => formData.append("image", file));
+     data.image?.forEach((file) => formData.append("image", file));
 
 
       const raw = await handleCreateProduct(formData);
@@ -452,38 +452,29 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
           <div className="space-y-1">
   <label className="text-sm font-medium">Manufacture Date</label>
 
-  <Controller
-    control={control}
-    name="manufactureDate"
-    render={({ field }) => (
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="h-10 w-full justify-start text-left font-normal"
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {field.value ? (
-              format(new Date(field.value), "PPP")
-            ) : (
-              <span className="text-muted-foreground">
-                Pick a date
-              </span>
-            )}
-          </Button>
-        </PopoverTrigger>
+ <Controller
+  control={control}
+  name="manufactureDate"
+  render={({ field }) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="h-10 w-full justify-start text-left font-normal">
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {field.value ? format(new Date(field.value), "PPP") : <span className="text-muted-foreground">Pick a date</span>}
+        </Button>
+      </PopoverTrigger>
 
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={field.value ? new Date(field.value) : undefined}
-            onSelect={(date) => field.onChange(date)}
-            initialFocus
-          />
-        </PopoverContent>
-      </Popover>
-    )}
-  />
+      <PopoverContent className="w-auto p-0">
+        <Calendar
+          mode="single"
+          selected={field.value ? new Date(field.value) : undefined}
+          onSelect={(date) => field.onChange(date ? date.toISOString() : null)}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  )}
+/>
 
   {errors.manufactureDate?.message && (
     <p className="text-xs text-red-600">
@@ -495,39 +486,29 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
               <div className="space-y-1">
   <label className="text-sm font-medium">Expire Date</label>
 
-  <Controller
-    control={control}
-    name="expireDate"
-    render={({ field }) => (
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className="h-10 w-full justify-start text-left font-normal"
-          >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {field.value ? (
-              format(new Date(field.value), "PPP")
-            ) : (
-              <span className="text-muted-foreground">
-                Pick a date
-              </span>
-            )}
-          </Button>
-        </PopoverTrigger>
+<Controller
+  control={control}
+  name="expireDate"
+  render={({ field }) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="h-10 w-full justify-start text-left font-normal">
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {field.value ? format(new Date(field.value), "PPP") : <span className="text-muted-foreground">Pick a date</span>}
+        </Button>
+      </PopoverTrigger>
 
-        <PopoverContent className="w-auto p-0">
-          <Calendar
-            mode="single"
-            selected={field.value ? new Date(field.value) : undefined}
-            onSelect={(date) => field.onChange(date)}
-            initialFocus
-          />
-        </PopoverContent>
-      </Popover>
-    )}
-  />
-
+      <PopoverContent className="w-auto p-0">
+        <Calendar
+          mode="single"
+          selected={field.value ? new Date(field.value) : undefined}
+          onSelect={(date) => field.onChange(date ? date.toISOString() : null)}
+          initialFocus
+        />
+      </PopoverContent>
+    </Popover>
+  )}
+/>
   {errors.expireDate?.message && (
     <p className="text-xs text-red-600">
       {errors.expireDate.message}

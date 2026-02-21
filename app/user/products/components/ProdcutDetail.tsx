@@ -14,6 +14,7 @@ type Product = {
   name: string;
   description?: string;
   image?: string;
+    images?: string[];
   price: number;
   category?: string;
   inStock?: number;

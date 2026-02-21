@@ -6,20 +6,17 @@ import ToastProvider from "@/app/_componets/ToastProvider";
 export default async function Page({
   params,
 }: {
-  params: Promise<{ id: string }>; // ✅ if you keep it as Promise
+  params: Promise<{ id: string }>; 
 }) {
-  const { id } = await params; // ✅ unwrap first
-
+  const { id } = await params;
   const res = await handleGetProductById(id);
 
   if (!res.success) {
     return <p className="text-red-600">{res.message || "Product not found"}</p>;
   }
 
-  // if you changed action to return data:
-  // const product = res.data;
 
-  const product = res.product; // ✅ if your action returns { product }
+  const product = res.product; 
 
   return (
     <div className="p-6">
