@@ -112,7 +112,7 @@ const handleImagesChange = (
 ) => {
   const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
   const maxSize = 5 * 1024 * 1024;
-  const maxCount = 5;
+  const maxCount = 3;
 
   const valid = newFiles.filter((f) => allowed.includes(f.type) && f.size <= maxSize);
 
@@ -276,7 +276,7 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
       onDrop={(e) => {
         e.preventDefault();
         const files = Array.from(e.dataTransfer.files || []);
-        handleImagesChange(files, onChange);
+        handleImagesChange(files, onChange, value);
       }}
     >
       <input
@@ -287,7 +287,7 @@ if (pageLoading) return <CreateProductStep1Skeleton />;
         className="hidden"
         onChange={(e) => {
           const files = Array.from(e.target.files || []);
-          handleImagesChange(files, onChange);
+          handleImagesChange(files, onChange, value);
         }}
       />
 
