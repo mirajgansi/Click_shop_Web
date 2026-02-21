@@ -85,9 +85,9 @@ const emailValue = watch("email");
           {/* Email (hidden or readonly if you want) */}
           <div className="space-y-1">
            <p className="mt-1 text-sm text-gray-600">
-  Set new password for{" "}
-  <span className="font-semibold text-gray-900">{emailValue || "—"}</span>
-</p>
+            Set new password for{" "}
+            <span className="font-semibold text-gray-900">{emailValue || "—"}</span>
+          </p>
           </div>
 
          
