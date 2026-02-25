@@ -39,7 +39,6 @@ productId?: string;
   };
 };
 function resolveNotifUrl(n: Notif, role: Role) {
-  // 1) Prefer role-specific mapping by type + ids
   switch (n.type) {
     case "driver_assigned":
     case "driver_eta":

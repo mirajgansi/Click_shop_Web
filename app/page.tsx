@@ -10,7 +10,6 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    // wait until auth state is resolved
     if (loading) return;
 
     if (isAuthenticated && user) {
@@ -26,10 +25,8 @@ export default function Home() {
     
   }, [isAuthenticated, user, loading, router]);
 
-  // While checking auth → render nothing (or spinner)
   if (loading) return null;
 
-  // Not logged in → show onboarding
  if (!loading && !isAuthenticated) {
   return (
     <div className="flex min-h-screen items-center justify-center">
@@ -37,6 +34,5 @@ export default function Home() {
     </div>
   );
 }
-  // Logged in but redirecting
   return null;
 }
