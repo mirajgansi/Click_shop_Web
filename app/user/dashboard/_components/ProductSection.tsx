@@ -1,7 +1,7 @@
 "use client";
 
 import ProductCard from "@/app/user/_components/Productcard";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "react-toastify";
 import { SkeletonCard } from "../../_components/skeletonCard";
 import { handleAddCartItem } from "@/lib/actions/cart-action";
@@ -17,7 +17,10 @@ import {
   handleGetPopularProducts,
   handleGetRecentProducts,
   handleGetTrendingProducts,
+  handleToggleFavoriteProduct,
+  handleGetFavoritesMe,
 } from "@/lib/actions/product-action";
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type Product = {
@@ -55,18 +58,59 @@ export default function ProductSection({
 }) {
   const SIZE = 4;
 
+  const [pending, startTransition] = useTransition();
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [adding, setAdding] = useState<Record<string, boolean>>({});
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
+  const [favLoaded, setFavLoaded] = useState(false);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  // ✅ Load favorites once (like cart) so hearts are correct everywhere
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await handleGetFavoritesMe();
+        if (res?.success) {
+          const map: Record<string, boolean> = {};
+          for (const p of res.data ?? []) map[p._id] = true;
+          setFavorites(map);
+        }
+      } catch {
+        // ignore
+      } finally {
+        setFavLoaded(true);
+      }
+    })();
+  }, []);
+
   const toggleFavorite = (id: string) => {
-    setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
+    startTransition(async () => {
+      const current = !!favorites[id];
+
+      // optimistic
+      setFavorites((prev) => ({ ...prev, [id]: !current }));
+
+      try {
+        const res = await handleToggleFavoriteProduct(id);
+
+        if (!res?.success) {
+          setFavorites((prev) => ({ ...prev, [id]: current }));
+          toast.error(res?.message || "Failed to toggle favorite");
+          return;
+        }
+
+        toast.success(!current ? "Added to favorites" : "Removed from favorites");
+      } catch (e: any) {
+        setFavorites((prev) => ({ ...prev, [id]: current }));
+        toast.error(e?.message || "Failed to toggle favorite");
+      }
+    });
   };
 
   const fetchProducts = async (nextPage = 1) => {
@@ -99,8 +143,6 @@ export default function ProductSection({
           break;
 
         case "category":
-          // ⚠️ only works page-by-page if your backend supports page/size for category too.
-          // If it doesn't, it will always return same products.
           res = await getProductsByCategory(category || "");
           break;
 
@@ -109,12 +151,26 @@ export default function ProductSection({
           break;
       }
 
-      const list: Product[] = res?.data ?? [];
+      // normalize
+      const list: Product[] =
+        res?.data?.products ?? res?.data ?? res?.products ?? [];
+
       const tp = res?.pagination?.totalPages ?? 1;
 
-      setProducts(list);
+      setProducts(Array.isArray(list) ? list : []);
       setTotalPages(tp);
       setPage(nextPage);
+
+      // ✅ if backend provides isFavorite in list, merge it (optional)
+      setFavorites((prev) => {
+        const next = { ...prev };
+        for (const p of list ?? []) {
+          if (typeof (p as any).isFavorite === "boolean") {
+            next[p._id] = (p as any).isFavorite;
+          }
+        }
+        return next;
+      });
     } catch (e: any) {
       setError(e.message || "Failed to load products");
     } finally {
@@ -141,8 +197,8 @@ export default function ProductSection({
       setAdding((prev) => ({ ...prev, [p._id]: true }));
       const res = await handleAddCartItem({ productId: p._id, quantity: 1 });
 
-      if (!res.success) {
-        toast.error(res.message);
+      if (!res?.success) {
+        toast.error(res?.message || "Failed to add to cart");
         return;
       }
 
@@ -169,7 +225,6 @@ export default function ProductSection({
 
   return (
     <section className="w-full py-6">
-      {/* Header */}
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-lg md:text-xl text-black font-semibold">{title}</h2>
 
@@ -206,7 +261,6 @@ export default function ProductSection({
           <ChevronRight size={18} />
         </button>
 
-        {/* Fixed-width row: no growing */}
         <div className="px-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {showSkeleton
@@ -225,6 +279,7 @@ export default function ProductSection({
                       onToggleWishlist={() => toggleFavorite(p._id)}
                       onAddToCart={() => onAddCart(p)}
                     />
+
                     {adding[p._id] && (
                       <div className="absolute inset-0 grid place-items-center rounded-3xl bg-white/60">
                         <span className="text-xs font-medium">Adding…</span>
@@ -234,7 +289,6 @@ export default function ProductSection({
                 ))}
           </div>
 
-          {/* optional page indicator */}
           <div className="mt-3 text-xs text-gray-500 text-center">
             Page {page} of {totalPages}
           </div>

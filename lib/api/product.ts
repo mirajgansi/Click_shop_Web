@@ -26,6 +26,7 @@ export const getAllProduct = async (params?: {
   try {
     const response = await axios.get(API.PRODUCT.GET_ALL, {
       params,
+      withCredentials: true,
     });
     return response.data;
   } catch (error: any) {
@@ -35,6 +36,12 @@ export const getAllProduct = async (params?: {
         "Failed to fetch products",
     );
   }
+};
+export const getMyFavoriteProducts = async () => {
+  const res = await axiosInstance.get(API.PRODUCT.FAVORITES_ME, {
+    withCredentials: true,
+  });
+  return res.data;
 };
 export const getProductById = async (id: string) => {
   if (!id) throw new Error("Product id is required");
@@ -176,6 +183,76 @@ export const getOutOfStockProducts = async (params?: {
       error.response?.data?.message ||
         error.message ||
         "Failed to fetch out of stock products",
+    );
+  }
+};
+// RATE PRODUCT
+export const rateProduct = async (id: string, payload: { rating: number }) => {
+  if (!id) throw new Error("Product id is required");
+
+  try {
+    const response = await axiosInstance.post(API.PRODUCT.RATE(id), payload, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || error.message || "Rating product failed",
+    );
+  }
+};
+
+export const toggleFavoriteProduct = async (id: string) => {
+  if (!id) throw new Error("Product id is required");
+
+  try {
+    const response = await axiosInstance.post(
+      API.PRODUCT.FAVORITE_TOGGLE(id),
+      {},
+      { withCredentials: true },
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ||
+        error.message ||
+        "Toggling favorite failed",
+    );
+  }
+};
+
+export const addProductComment = async (
+  id: string,
+  payload: { comment: string },
+) => {
+  if (!id) throw new Error("Product id is required");
+
+  try {
+    const response = await axiosInstance.post(
+      API.PRODUCT.ADD_COMMENT(id),
+      payload,
+      { withCredentials: true },
+    );
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || error.message || "Adding comment failed",
+    );
+  }
+};
+
+// GET PRODUCT COMMENTS
+export const getProductComments = async (id: string) => {
+  if (!id) throw new Error("Product id is required");
+
+  try {
+    const response = await axios.get(API.PRODUCT.GET_COMMENTS(id));
+    return response.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message ||
+        error.message ||
+        "Fetching comments failed",
     );
   }
 };

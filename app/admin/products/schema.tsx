@@ -11,7 +11,7 @@ export const ProductSchema = z
   .object({
     name: z.string().min(2, "Name must be at least 2 characters"),
     description: z.string().min(10, "Description must be at least 10 characters"),
-price: z.coerce.number().positive("Price must be greater than 0"),
+  price: z.coerce.number().positive("Price must be greater than 0"),
     manufacturer: z.string().min(1, "Manufacturer is required"),
 
    manufactureDate: z.string().datetime().optional().nullable(),

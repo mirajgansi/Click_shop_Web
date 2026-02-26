@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { handleGetProductsByCategory } from "@/lib/actions/product-action";
 import CategoryProductsClient from "../component/page";
+import ProductsGrid from "../../_components/ProdcutGrid";
 
 function formatSlug(slug: string) {
   return slug
@@ -37,8 +38,11 @@ export default async function CategoryPage({
 
         {/* Products */}
         {products.length ? (
-          <CategoryProductsClient products={products} />
-        ) : (
+<ProductsGrid
+  title="Category Products"
+  mode="prefetched"
+  initialProducts={products}
+/>        ) : (
           <div className="mt-10 rounded-2xl border bg-white p-8 text-center">
             <p className="text-gray-500">
               No products available in {formattedName} at the moment.

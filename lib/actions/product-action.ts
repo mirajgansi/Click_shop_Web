@@ -1,16 +1,21 @@
 "use server";
 import {
+  addProductComment,
   createProduct,
   deleteProduct,
   getAllProduct,
+  getMyFavoriteProducts,
   getOutOfStockProducts,
   getPopularProducts,
   getProductById,
+  getProductComments,
   getProductsByCategory,
   getRecentProducts,
   getTrendingProducts,
   incrementProductView,
+  rateProduct,
   restockProduct,
+  toggleFavoriteProduct,
   updateProduct,
 } from "@/lib/api/product";
 import { revalidatePath } from "next/cache";
@@ -265,6 +270,83 @@ export async function handleGetOutOfStockProducts(params?: {
     return {
       success: false,
       message: error.message || "Failed to fetch out of stock products",
+    };
+  }
+}
+export async function handleRateProduct(
+  productId: string,
+  payload: { rating: number },
+) {
+  try {
+    const res = await rateProduct(productId, payload);
+
+    if (res?.success) {
+      revalidatePath(`/products/${productId}`);
+      revalidatePath("/products");
+    }
+
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to rate product",
+    };
+  }
+}
+
+export async function handleToggleFavoriteProduct(productId: string) {
+  try {
+    const res = await toggleFavoriteProduct(productId);
+
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to toggle favorite",
+    };
+  }
+}
+
+export async function handleAddProductComment(
+  productId: string,
+  payload: { comment: string },
+) {
+  try {
+    const res = await addProductComment(productId, payload);
+
+    if (res?.success) {
+      revalidatePath(`/products/${productId}`);
+    }
+
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to add comment",
+    };
+  }
+}
+export async function handleGetFavoritesMe() {
+  try {
+    const res = await getMyFavoriteProducts();
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch favorites",
+    };
+  }
+}
+export async function handleGetProductComments(productId: string) {
+  try {
+    const res = await getProductComments(productId);
+
+    // res should already be { success, data, message } from backend
+    return res;
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || "Failed to fetch product comments",
     };
   }
 }

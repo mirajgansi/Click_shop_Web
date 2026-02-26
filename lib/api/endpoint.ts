@@ -27,8 +27,14 @@ export const API = {
     POPULAR: "/api/products/popular",
     TOP_RATED: "/api/products/top-rated",
     OUT_OF_STOCK: "/api/products/out-of-stock",
+    FAVORITES_ME: "/api/products/favorites/me",
     RESTOCK: (id: string) => `/api/products/${id}/restock`,
     INCREMENT_VIEW: (id: string) => `/api/products/${id}/view`,
+
+    RATE: (id: string) => `/api/products/${id}/rate`,
+    FAVORITE_TOGGLE: (id: string) => `/api/products/${id}/favorite`,
+    ADD_COMMENT: (id: string) => `/api/products/${id}/comment`,
+    GET_COMMENTS: (id: string) => `/api/products/${id}/comments`,
   },
 
   ADMIN: {
