@@ -69,7 +69,18 @@
           </div>
         );
         }
+function formatDate(value?: string) {
+  if (!value) return "—";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "—";
 
+  // Option 1: nice readable (Jan 31, 2026)
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  });
+}
         export default function ProductDetailClient({
         product,
         images,
@@ -370,7 +381,7 @@
                   <div>
                     <p className="text-xs font-semibold text-gray-500">Expiry date</p>
                     <p className="mt-1 font-medium text-gray-900">
-                      {product.expireDate ?? "—"}
+  {formatDate(product.expireDate)}
                     </p>
                   </div>
 
@@ -379,7 +390,7 @@
                       Manufacture date
                     </p>
                     <p className="mt-1 font-medium text-gray-900">
-                      {product.manufactureDate ?? "—"}
+            {formatDate(product.manufactureDate)}
                     </p>
                   </div>
 
