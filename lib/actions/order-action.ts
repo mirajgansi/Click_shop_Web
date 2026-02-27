@@ -27,7 +27,18 @@ function getErrMsg(err: any, fallback = "Something went wrong") {
  * Backend computes items/totals from cart, so payload only has shipping/payment info.
  */
 export async function handleCreateOrder(payload: {
+  userId: string;
+  items: {
+    productId: string;
+    name: string;
+    price: number;
+    image?: string;
+    quantity: number;
+    lineTotal: number;
+  }[];
+  subtotal: number;
   shippingFee?: number;
+  total: number;
   shippingAddress?: {
     userName?: string;
     phone?: string;

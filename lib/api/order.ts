@@ -4,12 +4,26 @@ import { API } from "./endpoint";
 
 /* ---------------- CREATE ORDER ---------------- */
 export const createOrder = async (payload: {
+  userId: string;
+  items: {
+    productId: string;
+    name: string;
+    price: number;
+    image?: string;
+    quantity: number;
+    lineTotal: number;
+  }[];
+  subtotal: number;
   shippingFee?: number;
+  total: number;
   shippingAddress?: {
     userName?: string;
     phone?: string;
     address1?: string;
+    address2?: string;
     city?: string;
+    state?: string;
+    zip?: string;
   };
   notes?: string;
 }) => {

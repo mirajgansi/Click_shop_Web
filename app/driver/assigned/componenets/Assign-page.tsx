@@ -59,11 +59,13 @@ export default function DriverOrdersPage() {
       setLoading(true);
       setErr(null);
 
-
 const res: any = await handleGetMyAssignedOrders({ page, size });
 
 if (res?.success === false) {
-  setErr(res.message);
+  if (res?.status === 401) {
+    setErr("Unauthorized. Please login again.");
+  }
+  else setErr(res.message);
   return;
 }
 

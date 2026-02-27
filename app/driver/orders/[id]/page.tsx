@@ -7,9 +7,7 @@ export default async function Page() {
     if(!result.success){
         throw new Error("Error fetching user data")
     }
-    if(!result.data){
-            notFound();
-            }
+   
       return <DriverOrderDetailPage />;
 
 }

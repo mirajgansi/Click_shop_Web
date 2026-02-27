@@ -14,6 +14,7 @@ import {
 import { createOrder } from "@/lib/api/order";
 import { handleWhoami } from "@/lib/actions/auth-actions";
 import ShippingAddressModal from "./shippingAddressModal";
+import { handleCreateOrder } from "@/lib/actions/order-action";
 
 type Product = {
   _id: string;
@@ -161,27 +162,75 @@ const [mounted, setMounted] = useState(false);
     setShippingOpen(true);
   };
 
-  const onConfirmShipping = async (address: ShippingAddress) => {
-    try {
-      const res = await createOrder({
-        shippingFee: 0,
-        shippingAddress: address,
-      });
+ const onConfirmShipping = async (address: ShippingAddress) => {
+  try {
+    // 1) real user id
+    const who = await handleWhoami();
+    const user = who?.data || who;
+    const userId = user?._id;
 
-      if (!res.success) {
-        toast.error(res.message || "Checkout failed");
-        return;
-      }
-
-      toast.success("Order placed successfully ");
-      setShippingOpen(false);
-      await fetchCart();
-      onClose(); 
-    } catch (e: any) {
-      toast.error(e.message || "Checkout failed");
+    if (!userId) {
+      toast.error("User not found. Please login again.");
+      return;
     }
-  };
 
+    // 2) build items from populated product
+    const items = cart.items
+      .map((item) => {
+        const product = getProduct(item);
+        if (!product) return null;
+
+        return {
+          productId: product._id,                 // ✅ string
+          name: product.name,                     // ✅
+          price: product.price,                   // ✅
+          image: product.image,                   // ✅ optional
+          quantity: item.quantity,                // ✅
+          lineTotal: product.price * item.quantity, // ✅ REQUIRED
+        };
+      })
+      .filter(Boolean) as {
+        productId: string;
+        name: string;
+        price: number;
+        image?: string;
+        quantity: number;
+        lineTotal: number;
+      }[];
+
+    if (!items.length) {
+      toast.error("Cart items are missing product details (populate cart in backend).");
+      return;
+    }
+
+    // 3) totals
+    const subtotal = items.reduce((sum, it) => sum + it.lineTotal, 0);
+    const shippingFee = 0;
+    const totalAmount = subtotal + shippingFee;
+
+    // 4) send full payload
+    const res = await handleCreateOrder({
+      userId,
+      items,
+      subtotal,
+      shippingFee,
+      total: totalAmount,
+      shippingAddress: address,
+    });
+
+    if (!res.success) {
+      toast.error(res.message || "Checkout failed");
+      return;
+    }
+
+    toast.success("Order placed successfully ");
+    setShippingOpen(false);
+    await fetchCart();
+    onClose();
+  } catch (e: any) {
+    toast.error(e.message || "Checkout failed");
+  }
+};
 const [visible, setVisible] = useState(false);
 
 useEffect(() => {

@@ -75,7 +75,7 @@ useEffect(() => {
           className="text-gray-600 hover:text-black transition"
           aria-label="Search"
         >
-          <Search size={20} />
+          <Heart size={20} href="/user/favorites"/>
         </button>
 
         {/* Wishlist */}

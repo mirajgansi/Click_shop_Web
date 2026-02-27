@@ -112,7 +112,7 @@ export default function ShippingAddressModal({
           <button
             onClick={submit}
             disabled={!form.userName || !form.phone || !form.address1}
-            className="rounded-2xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-black disabled:opacity-50"
+            className="rounded-2xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
           >
             Save Address
           </button>

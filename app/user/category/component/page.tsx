@@ -1,7 +1,5 @@
 "use client";
 
-// import { handleCartItem } from "@/lib/actions/cart-action"; // if you have it
-// import { toggleWishlist } from "@/lib/actions/wishlist-action"; // if you have it
 import { useState } from "react";
 import { toast } from "react-toastify";
 import ProductCard from "../../_components/Productcard";
@@ -16,10 +14,10 @@ function buildImageUrl(image?: string) {
 
 export default function CategoryProductsClient({ products }: { products: any[] }) {
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
-
+const safeProducts = products ?? []; 
   return (
     <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
-      {products.map((p) => (
+      {safeProducts.map((p) => (
         <ProductCard
           key={p._id}
           id={p._id}
