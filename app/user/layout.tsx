@@ -21,7 +21,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased">
-        <Header user={user} children={undefined} />
+        <Header user={user} />
         {children}
       </body>
     </html>

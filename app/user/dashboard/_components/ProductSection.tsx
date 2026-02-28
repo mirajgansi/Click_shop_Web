@@ -71,7 +71,6 @@ export default function ProductSection({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // ✅ Load favorites once (like cart) so hearts are correct everywhere
   useEffect(() => {
     (async () => {
       try {
@@ -228,12 +227,6 @@ export default function ProductSection({
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-lg md:text-xl text-black font-semibold">{title}</h2>
 
-        <Link
-          href={`/user/products?type=${kind}`}
-          className="text-green-600 text-sm font-medium hover:underline"
-        >
-          See all
-        </Link>
       </div>
 
       {error && <p className="mb-3 text-xs text-red-600">{error}</p>}

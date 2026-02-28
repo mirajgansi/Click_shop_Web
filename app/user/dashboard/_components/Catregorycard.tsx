@@ -20,7 +20,7 @@ export default function CategoryCard({
       className="
         group
         flex items-center gap-4
-        px-4 py-3
+        px-4 py-2
         rounded-xl
         border border-gray-200
         bg-white

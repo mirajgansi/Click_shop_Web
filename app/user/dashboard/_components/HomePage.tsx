@@ -10,91 +10,93 @@ const HomePage = () => {
   const router = useRouter();
 
   return (
-    <div className="flex-1 min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50">
       {/* HERO */}
-      <section className="relative h-[48vh] sm:h-[52vh] md:h-[55vh] w-full">
+      <section className="relative h-[42vh] sm:h-[50vh] md:h-[56vh] w-full">
         <Image
           src="/hero-store.jpg"
           fill
           className="object-cover"
           alt="Store"
           priority
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-black/35" />
+        <div className="absolute inset-0 bg-black/40" />
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 flex flex-col justify-center h-full text-white">
-          <h1 className="text-3xl md:text-4xl font-bold max-w-2xl leading-tight">
-            All Your Daily Needs, All in One Place!
-          </h1>
-          <p className="mt-3 text-base md:text-lg text-white/90 max-w-xl">
-            Enjoy the convenience of shopping without having to leave your home.
-          </p>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center">
+          <div className="text-white max-w-2xl">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
+              All Your Daily Needs, All in One Place!
+            </h1>
+            <p className="mt-2 sm:mt-3 text-sm sm:text-base md:text-lg text-white/90 max-w-xl">
+              Enjoy the convenience of shopping without having to leave your home.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* FILTER */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-8 relative z-10">
-        <ProductFilterBar
-          onSubmit={({ search, category }) => {
-            const sp = new URLSearchParams();
-            if (search.trim()) sp.set("search", search.trim());
-            if (category && category !== "all") sp.set("category", category);
-            router.push(`/user/products?${sp.toString()}`);
-          }}
-        />
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-7 sm:-mt-8 relative z-10">
+        <div className=" p-3 sm:p-4">
+          <ProductFilterBar
+            onSubmit={({ search, category }) => {
+              const sp = new URLSearchParams();
+              if (search.trim()) sp.set("search", search.trim());
+              if (category && category !== "all") sp.set("category", category);
+              router.push(`/user/products?${sp.toString()}`);
+            }}
+          />
+        </div>
       </section>
 
       {/* CATEGORY + PRODUCTS */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
-        <div className="flex flex-col lg:flex-row gap-6">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
           {/* MOBILE: horizontal categories row */}
           <div className="lg:hidden">
-            <h3 className="text-base font-semibold mb-3">Categories</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-semibold">Categories</h3>
+            </div>
 
-            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-              <div className="flex-none w-[210px]">
-                <CategoryCard title="Meat & Fish" image="/categories/meat.png" href="/user/category/meat" />
-              </div>
-              <div className="flex-none w-[210px]">
-                <CategoryCard title="Cooking Oil & Ghee" image="/categories/oil.png" href="/user/category/oil" />
-              </div>
-              <div className="flex-none w-[210px]">
-                <CategoryCard title="Pulses" image="/categories/pluse.png" href="/user/category/pulses" />
-              </div>
-              <div className="flex-none w-[210px]">
-                <CategoryCard title="Bakery" image="/categories/bakery.png" href="/user/category/bakery" />
-              </div>
-              <div className="flex-none w-[210px]">
-                <CategoryCard title="Snacks" image="/categories/snacks.png" href="/user/category/snacks" />
-              </div>
-              <div className="flex-none w-[210px]">
-                <CategoryCard title="Beverages" image="/categories/beverages.png" href="/user/category/beverages" />
-              </div>
+            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
+              {[
+                { title: "Meat & Fish", image: "/categories/meat.png", href: "/user/category/meat" },
+                { title: "Cooking Oil & Ghee", image: "/categories/oil.png", href: "/user/category/oil" },
+                { title: "Pulses", image: "/categories/pluse.png", href: "/user/category/pulses" },
+                { title: "Bakery", image: "/categories/bakery.png", href: "/user/category/bakery" },
+                { title: "Snacks", image: "/categories/snacks.png", href: "/user/category/snacks" },
+                { title: "Beverages", image: "/categories/beverages.png", href: "/user/category/beverages" },
+              ].map((c) => (
+                <div key={c.href} className="flex-none w-[200px] sm:w-[230px]">
+                  <CategoryCard title={c.title} image={c.image} href={c.href} />
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* DESKTOP: left sidebar */}
-          <div className="hidden lg:block w-75 bg-white rounded-2xl border border-gray-200 p-5 space-y-3 h-fit">
-            <h3 className="text-lg font-semibold mb-1">Categories</h3>
+          <aside className="hidden lg:block">
+            <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3 h-fit lg:sticky lg:top-20">
+              <h3 className="text-lg font-semibold mb-1">Categories</h3>
 
-            <CategoryCard title="Meat & Fish" image="/categories/meat.png" href="/user/category/meat" />
-            <CategoryCard title="Cooking Oil & Ghee" image="/categories/oil.png" href="/user/category/oil" />
-            <CategoryCard title="Pulses" image="/categories/pluse.png" href="/user/category/pulses" />
-            <CategoryCard title="Bakery" image="/categories/bakery.png" href="/user/category/bakery" />
-            <CategoryCard title="Snacks" image="/categories/snacks.png" href="/user/category/snacks" />
-            <CategoryCard title="Beverages" image="/categories/beverages.png" href="/user/category/beverages" />
-          </div>
+              <CategoryCard title="Meat & Fish" image="/categories/meat.png" href="/user/category/meat" />
+              <CategoryCard title="Cooking Oil & Ghee" image="/categories/oil.png" href="/user/category/oil" />
+              <CategoryCard title="Pulses" image="/categories/pluse.png" href="/user/category/pulses" />
+              <CategoryCard title="Bakery" image="/categories/bakery.png" href="/user/category/bakery" />
+              <CategoryCard title="Snacks" image="/categories/snacks.png" href="/user/category/snacks" />
+              <CategoryCard title="Beverages" image="/categories/beverages.png" href="/user/category/beverages" />
+            </div>
+          </aside>
 
           {/* RIGHT CONTENT */}
-          <div className="flex-1 w-100 space-y-6">
+          <div className="space-y-10 ">
             <ProductSection title="Trending items" kind="trending" />
             <ProductSection title="Recently Added" kind="recent" />
             <ProductSection title="Best Seller" kind="bestSeller" />
             <ProductSection title="Favorites" kind="popular" />
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 
