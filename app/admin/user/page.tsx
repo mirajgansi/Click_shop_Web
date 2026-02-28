@@ -7,15 +7,13 @@ export default async function Page({
 }: {
   searchParams?: { search?: string; page?: string };
 }) {
-  const search = searchParams?.search ?? "";
-  const page = Number(searchParams?.page ?? "1");
-  const size = 10;
-
-  const res = await handleGetAllUSER({ page, size, search });
+   const res = await handleGetAllUSER({ page: 1, size: 10, search: "" });
 
   if (!res.success) {
     return <p className="text-red-600">{res.message || "Failed to fetch users"}</p>;
   }
+
+
 
   return (
     <div className="p-4">
@@ -23,7 +21,7 @@ export default async function Page({
     <UsersTable
       users={res.users ?? []}
       pagination={res.pagination}
-      search={search}
+      search={searchParams?.search ?? ""}
     />
     </div>
   );

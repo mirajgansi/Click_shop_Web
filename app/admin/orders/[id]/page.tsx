@@ -3,7 +3,6 @@ import Link from "next/link";
 import { handleGetOrderById } from "@/lib/actions/order-action";
 import { OrderStatusPill } from "../../../_componets/OrderStatusPill"; // adjust path
 import OrderProgress from "./componenets/OrderProgress";
-import UpdateOrderStatusPanel from "./componenets/UpdateOrderStatusPanel";
 import OrderDetailShell from "./componenets/OrderDetailShell";
 
 
@@ -139,13 +138,7 @@ export default async function OrderDetailPage({
               </div>
 
               {/* admin update */}
-              <div className="mt-5 border-t border-gray-100 pt-4">
-                <UpdateOrderStatusPanel
-                  orderId={order._id}
-                  currentStatus={order.status}
-                  currentPayment={order.paymentStatus}
-                />
-              </div>
+              
             </div>
      </OrderDetailShell>
   );

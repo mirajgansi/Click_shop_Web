@@ -4,6 +4,8 @@ import { OrderStatusPill } from "@/app/_componets/OrderStatusPill";
 import Link from "next/link";
 import OrderProgress from "./OrderProgress";
 import OrderButton from "./orderButton";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 type OrderStatus = "pending" | "paid" | "shipped" | "delivered" | "cancelled";
 type PaymentStatus = "unpaid" | "paid";
@@ -38,6 +40,31 @@ export default function OrderDetailShell({
 }) {
   const items = order?.items ?? [];
   const addr = order?.shippingAddress;
+
+
+  const DEFAULT_AVATAR = "/cookie.jpg"; // put happy.png inside /public
+
+const user =
+  order?.user || order?.customer || order?.userId || order?.createdBy || null;
+
+const name =
+  user?.username || user?.name || addr?.userName || "Unknown";
+
+const avatar =
+  user?.avatar || user?.image || user?.profileImage || null;
+
+const avatarUrl =
+  avatar && typeof avatar === "string"
+    ? avatar.startsWith("http")
+      ? avatar
+      : `${process.env.NEXT_PUBLIC_API_BASE_URL}/${avatar.replace(/^\/+/, "")}`
+    : null;
+
+const [imgSrc, setImgSrc] = useState<string>(avatarUrl || DEFAULT_AVATAR);
+
+useEffect(() => {
+  setImgSrc(avatarUrl || DEFAULT_AVATAR);
+}, [avatarUrl]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -118,58 +145,63 @@ export default function OrderDetailShell({
           <div className="lg:col-span-4 space-y-6">
             {/* Customer */}
             <div className="rounded-3xl bg-white p-5 ring-1 ring-gray-100">
-              <h3 className="text-base font-semibold text-gray-900">Customer</h3>
+  <h3 className="text-base font-semibold text-gray-900">Customer</h3>
 
-              <div className="mt-4 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-2xl bg-gray-100" />
-                <div className="min-w-0">
-                  <p className="font-semibold text-gray-900 truncate">
-                    {addr?.userName || "Unknown"}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Total: {countItems(items)} items
-                  </p>
-                </div>
-              </div>
-            </div>
+  <div className="mt-4 flex items-center gap-3">
+    <div className="relative h-10 w-10 overflow-hidden rounded-2xl bg-gray-100 ring-1 ring-gray-200">
+      <Image
+        src={imgSrc}
+        alt={name}
+        fill
+        className="object-cover"
+        sizes="40px"
+        onError={() => setImgSrc(DEFAULT_AVATAR)}
+      />
+    </div>
 
+    <div className="min-w-0">
+      <p className="font-semibold text-gray-900 truncate">{name}</p>
+      <p className="text-xs text-gray-500">Total: {countItems(items)} items</p>
+    </div>
+  </div>
+</div>
             {/* Shipping Address */}
             <div className="rounded-3xl bg-white p-5 ring-1 ring-gray-100">
+              
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-semibold text-gray-900">Shipping Address</h3>
               </div>
 
-{addr ? (
-  <iframe
-    className="mt-4 h-32 w-full rounded-2xl border-0"
-    loading="lazy"
-    src={`https://www.google.com/maps?q=${encodeURIComponent(
-      formatAddress(addr)
-    )}&z=15&output=embed`}
-  />
-) : (
-  <div className="mt-4 h-32 w-full rounded-2xl bg-gray-100 flex items-center justify-center text-sm text-gray-500">
-    Address not available
-  </div>
-)}
+              {addr ? (
+                <iframe
+                  className="mt-4 h-32 w-full rounded-2xl border-0"
+                  loading="lazy"
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(
+                    formatAddress(addr)
+                  )}&z=15&output=embed`}
+                />
+              ) : (
+                <div className="mt-4 h-32 w-full rounded-2xl bg-gray-100 flex items-center justify-center text-sm text-gray-500">
+                  Address not available
+                </div>
+              )}
               <p className="mt-3 text-sm font-semibold text-gray-900">{addr?.userName || "N/A"}</p>
               <p className="mt-1 text-sm text-gray-600">{formatAddress(addr)}</p>
 
              <a
-  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formatAddress(addr))}`}
-  target="_blank"
-  rel="noopener noreferrer"
-  className="mt-3 text-sm font-semibold text-blue-600 hover:text-blue-700"
->
-  View on Map
-</a>
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(formatAddress(addr))}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 text-sm font-semibold text-blue-600 hover:text-blue-700"
+          >
+            View on Map
+          </a>
             </div>
 
             {/* Contact */}
             <div className="rounded-3xl bg-white p-5 ring-1 ring-gray-100">
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-semibold text-gray-900">Contact Information</h3>
-                <button className="text-sm font-semibold text-gray-600 hover:text-gray-900">✎</button>
               </div>
 
               <div className="mt-4 space-y-2 text-sm">
