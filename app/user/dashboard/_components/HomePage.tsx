@@ -50,8 +50,9 @@ const HomePage = () => {
       </section>
 
       {/* CATEGORY + PRODUCTS */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <section className="max-w-6xl mx-auto px-1 sm:px-1 py-8 sm:py-10">
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
+          
           {/* MOBILE: horizontal categories row */}
           <div className="lg:hidden">
             <div className="flex items-center justify-between mb-3">
