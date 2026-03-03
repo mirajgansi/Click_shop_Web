@@ -6,7 +6,9 @@ export default async function Page() {
     const result = await handleWhoami();
    
     if(!result.data){
-redirect("/unauthorized");            }
+redirect("/unauthorized");    
+        }
+        
       return <DriverDashboard />;
 
 }

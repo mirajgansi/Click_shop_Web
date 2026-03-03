@@ -1,28 +1,18 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import Header from "./_components/header/Header";
-import "react-toastify/dist/ReactToastify.css";
-import ToastProvider from "../_componets/ToastProvider";
 import { handleWhoami } from "@/lib/actions/auth-actions";
+import { AuthProvider } from "@/context/AuthContext";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
-
-
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const result = await handleWhoami();
-
   const user = result?.success ? result.data : null;
 
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="antialiased">
-        <Header user={user} />
-        {children}
+    <html lang="en">
+      <body>
+        <AuthProvider>
+          <Header user={user} />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

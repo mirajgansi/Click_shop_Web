@@ -16,7 +16,6 @@ export default function DriverLayoutClient({
   const { setUser } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // keep your auth user setup
   useEffect(() => {
     if (user?._id) setUser(user);
   }, [user, setUser]);
@@ -26,16 +25,16 @@ export default function DriverLayoutClient({
     if (!user?._id) return;
 
     const onConnect = () => {
-      console.log("✅ SOCKET CONNECTED:", socket.id);
+      console.log(" SOCKET CONNECTED:", socket.id);
       socket.emit("join", user._id);
     };
 
     const onConnectError = (err: any) => {
-      console.log("❌ SOCKET CONNECT ERROR:", err?.message ?? err);
+      console.log("SOCKET CONNECT ERROR:", err?.message ?? err);
     };
 
     const onNotification = (data: any) => {
-      console.log("🔔 notification:", data);
+      console.log(" notification:", data);
     };
 
     socket.on("connect", onConnect);

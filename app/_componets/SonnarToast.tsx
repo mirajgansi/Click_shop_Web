@@ -1,23 +1,47 @@
-// "use client";
+"use client";
 
-// import * as React from "react";
-// import { Toaster as SonnerToaster } from "sonner";
+import { useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { socket } from "@/lib/socket";
 
-// type Props = React.ComponentProps<typeof SonnerToaster>;
+export default function UserSocketClient() {
+  const { user, loading } = useAuth();
 
-// /**
-//  * Shadcn-style Sonner toaster wrapper.
-//  * Put this once in your root layout (app/layout.tsx) near the end of <body>.
-//  */
-// export function Toaster(props: Props) {
-//   return (
-//     <SonnerToaster
-//       position="top-right"
-//       richColors
-//       closeButton
-//       expand
-//       duration={3500}
-//       {...props}
-//     />
-//   );
-// }
+  useEffect(() => {
+    if (loading || !user?._id) return;
+
+    const onConnect = () => {
+      console.log("SOCKET CONNECTED:", socket.id);
+      socket.emit("join", user._id); // join personal room
+    };
+
+    const onConnectError = (err: any) => {
+      console.log("SOCKET CONNECT ERROR:", err?.message ?? err);
+    };
+
+    const onNotification = (data: any) => {
+      console.log("NOTIFICATION:", data);
+
+      // Option 1: tell your bell to refetch
+      window.dispatchEvent(new Event("NOTIFICATION_UPDATED"));
+
+      // Option 2: show toast (if you use sonner/toast)
+      // toast.success(data?.title ?? "New notification");
+    };
+
+    socket.on("connect", onConnect);
+    socket.on("connect_error", onConnectError);
+    socket.on("notification", onNotification);
+
+    if (!socket.connected) socket.connect();
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("connect_error", onConnectError);
+      socket.off("notification", onNotification);
+      // optional: socket.disconnect(); (only if you want disconnect on leaving user pages)
+    };
+  }, [loading, user?._id]);
+
+  return null;
+}

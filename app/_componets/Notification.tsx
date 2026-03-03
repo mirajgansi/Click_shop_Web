@@ -34,8 +34,8 @@ type Notif = {
   data?: {
       orderId?: string;
 productId?: string;
-    url?: string; // fallback (old notifications)
-    urlByRole?: Partial<Record<Role, string>>; // preferred
+    url?: string; 
+    urlByRole?: Partial<Record<Role, string>>; 
   };
 };
 function resolveNotifUrl(n: Notif, role: Role) {
