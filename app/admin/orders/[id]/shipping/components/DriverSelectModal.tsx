@@ -121,7 +121,7 @@ toast.error(res?.message || "Failed to assign driver");
                       <div className="min-w-0">
                         <p className="font-semibold text-gray-900 truncate">{d.username}</p>
                         <p className="text-sm text-gray-600">
-                          {d.phoneNumber || "No phone"} • {d.vehicleType || "No vehicle"}
+                          {d.phoneNumber || "No phone"} • {d.vehicleType || " Truck"}
                         </p>
                       </div>
 

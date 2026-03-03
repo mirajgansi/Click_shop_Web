@@ -29,6 +29,7 @@ export default function Nav({
         My orders
       </Link>
 
+      {/* Desktop dropdown only */}
       {!isMobile && (
         <div className="relative group">
           <button className="flex items-center gap-1 text-sm font-medium text-gray-700 hover:text-green-600 transition">

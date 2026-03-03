@@ -93,7 +93,7 @@ const HomePage = () => {
             <ProductSection title="Trending items" kind="trending" />
             <ProductSection title="Recently Added" kind="recent" />
             <ProductSection title="Best Seller" kind="bestSeller" />
-            <ProductSection title="Favorites" kind="popular" />
+            <ProductSection title="Top Viewed" kind="popular" />
           </div>
         </div>
       </section>

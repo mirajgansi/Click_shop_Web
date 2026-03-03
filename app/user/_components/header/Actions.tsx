@@ -70,6 +70,7 @@ useEffect(() => {
   return (
     <>
       <div className="flex items-center gap-5">
+        {/* Search */}
         <Link
   href="/user/favorites"
   className="text-gray-600 hover:text-black transition"
@@ -77,10 +78,12 @@ useEffect(() => {
 >
   <Heart size={20} />
 </Link>
+        {/* Wishlist */}
       <div className="flex justify-center xl:justify-end ">
               {user?._id &&<NotificationBell userId={user._id} role={user.role} />}
             </div>
 
+        {/* Cart (opens drawer) */}
         <button
           type="button"
           onClick={() => setCartOpen(true)}
@@ -96,6 +99,7 @@ useEffect(() => {
           )}
         </button>
 
+        {/* User menu */}
         <AvatarMenu displayName={displayName} roleLabel=""  image={user?.image}  profileHref="/user/profile" />
         
       </div>

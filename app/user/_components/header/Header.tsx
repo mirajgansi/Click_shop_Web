@@ -7,13 +7,15 @@ import Actions from "./Actions";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
-export default function Header({ user }: { user: any }) {
+export default function Header() {
   const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        {/* Left */}
         <div className="flex items-center gap-3">
+          {/* ✅ Mobile menu button in Header */}
           <div className="md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
@@ -37,8 +39,10 @@ export default function Header({ user }: { user: any }) {
           <div className="text-xl font-bold text-green-600">Click Shop</div>
         </div>
 
+        {/* Desktop nav */}
         <Nav />
 
+        {/* Right */}
         <Actions />
       </div>
     </header>
