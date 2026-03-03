@@ -193,7 +193,7 @@ export default function NotificationBell({
           <button
             onClick={handleReadAll}
             disabled={isPending || unread === 0}
-            className="text-xs font-medium text-green-700 disabled:opacity-50"
+            className="text-xs font-medium text-green-700 disabled:opacity-50 hover:text-green-900 transition cursor-pointer"
           >
             Mark all read
           </button>
@@ -247,7 +247,7 @@ export default function NotificationBell({
             onClick={() => router.push(role === "user" ? "/user/notifications"
   : role === "driver" ? "/driver/notifications"
   : "/admin/notifications")}
-            className="w-full rounded-md bg-gray-900 py-2 text-sm font-semibold text-white"
+            className="w-full rounded-md bg-gray-900 py-2 text-sm font-semibold text-white  cursor-pointer hover:bg-gray-700 transition"
           >
             View all
           </button>
