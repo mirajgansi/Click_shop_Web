@@ -244,7 +244,9 @@ export default function NotificationBell({
 
         <div className="px-3 py-2">
           <button
-            onClick={() => router.push("/notifications")}
+            onClick={() => router.push(role === "user" ? "/user/notifications"
+  : role === "driver" ? "/driver/notifications"
+  : "/admin/notifications")}
             className="w-full rounded-md bg-gray-900 py-2 text-sm font-semibold text-white"
           >
             View all

@@ -15,7 +15,6 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Left */}
         <div className="flex items-center gap-3">
-          {/* ✅ Mobile menu button in Header */}
           <div className="md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
