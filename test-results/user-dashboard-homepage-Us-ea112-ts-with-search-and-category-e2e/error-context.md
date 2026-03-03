@@ -1,0 +1,325 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e5]: Click Shop
+      - generic [ref=e6]:
+        - link "Home" [ref=e7] [cursor=pointer]:
+          - /url: /user/dashboard
+        - link "My orders" [ref=e8] [cursor=pointer]:
+          - /url: /user/orders
+        - button "Categories" [ref=e10]:
+          - text: Categories
+          - img [ref=e11]
+      - generic [ref=e13]:
+        - link "Favorites" [ref=e14] [cursor=pointer]:
+          - /url: /user/favorites
+          - img [ref=e15]
+        - button "Notifications" [ref=e18]:
+          - img [ref=e19]
+        - button "Cart" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+        - button "Open user menu" [ref=e27]:
+          - generic [ref=e28]: TE
+  - main [ref=e29]:
+    - main [ref=e31]:
+      - generic [ref=e32]:
+        - img "Store" [ref=e33]
+        - generic [ref=e36]:
+          - heading "All Your Daily Needs, All in One Place!" [level=1] [ref=e37]
+          - paragraph [ref=e38]: Enjoy the convenience of shopping without having to leave your home.
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - heading "Find your products" [level=3] [ref=e43]
+          - heading "Choose type" [level=3] [ref=e44]
+        - generic [ref=e45]:
+          - generic [ref=e46]:
+            - img [ref=e47]
+            - textbox "What are you looking for" [active] [ref=e50]
+          - generic [ref=e51]:
+            - img [ref=e52]
+            - combobox [ref=e57]:
+              - option "All Categories" [selected]
+              - option "Snacks"
+              - option "Bakery"
+              - option "Beverages"
+              - option "Meat & Fish"
+          - button "Find Product" [ref=e58]
+      - generic [ref=e60]:
+        - complementary [ref=e61]:
+          - generic [ref=e62]:
+            - heading "Categories" [level=3] [ref=e63]
+            - link "Meat & Fish Meat & Fish" [ref=e64] [cursor=pointer]:
+              - /url: /user/category/meat
+              - img "Meat & Fish" [ref=e66]
+              - generic [ref=e67]: Meat & Fish
+            - link "Cooking Oil & Ghee Cooking Oil & Ghee" [ref=e68] [cursor=pointer]:
+              - /url: /user/category/oil
+              - img "Cooking Oil & Ghee" [ref=e70]
+              - generic [ref=e71]: Cooking Oil & Ghee
+            - link "Pulses Pulses" [ref=e72] [cursor=pointer]:
+              - /url: /user/category/pulses
+              - img "Pulses" [ref=e74]
+              - generic [ref=e75]: Pulses
+            - link "Bakery Bakery" [ref=e76] [cursor=pointer]:
+              - /url: /user/category/bakery
+              - img "Bakery" [ref=e78]
+              - generic [ref=e79]: Bakery
+            - link "Snacks Snacks" [ref=e80] [cursor=pointer]:
+              - /url: /user/category/snacks
+              - img "Snacks" [ref=e82]
+              - generic [ref=e83]: Snacks
+            - link "Beverages Beverages" [ref=e84] [cursor=pointer]:
+              - /url: /user/category/beverages
+              - img "Beverages" [ref=e86]
+              - generic [ref=e87]: Beverages
+        - generic [ref=e88]:
+          - generic [ref=e89]:
+            - heading "Trending items" [level=2] [ref=e91]
+            - generic [ref=e92]:
+              - button "Previous" [disabled] [ref=e93]:
+                - img [ref=e94]
+              - button "Next" [ref=e96]:
+                - img [ref=e97]
+              - generic [ref=e99]:
+                - generic [ref=e100]:
+                  - generic [ref=e102]:
+                    - button "Toggle favorite" [ref=e103]:
+                      - img [ref=e104]
+                    - link "Sunflower Oil 1970 in stock Sunflower Oil" [ref=e106] [cursor=pointer]:
+                      - /url: /user/products/699da1f1fe0ab8dab6a85977
+                      - img "Sunflower Oil" [ref=e108]
+                      - generic [ref=e109]:
+                        - img [ref=e110]
+                        - text: 1970 in stock
+                      - heading "Sunflower Oil" [level=3] [ref=e113]
+                    - generic [ref=e114]:
+                      - paragraph [ref=e115]:
+                        - text: RS120.00
+                        - generic [ref=e116]: /per kg
+                      - button "Add to cart" [ref=e117]:
+                        - img [ref=e118]
+                  - generic [ref=e124]:
+                    - button "Toggle favorite" [ref=e125]:
+                      - img [ref=e126]
+                    - link "footi 1997 in stock footi" [ref=e128] [cursor=pointer]:
+                      - /url: /user/products/699d9fc0fe0ab8dab6a85798
+                      - img "footi" [ref=e130]
+                      - generic [ref=e131]:
+                        - img [ref=e132]
+                        - text: 1997 in stock
+                      - heading "footi" [level=3] [ref=e135]
+                    - generic [ref=e136]:
+                      - paragraph [ref=e137]:
+                        - text: RS25.00
+                        - generic [ref=e138]: /per kg
+                      - button "Add to cart" [ref=e139]:
+                        - img [ref=e140]
+                  - generic [ref=e146]:
+                    - button "Toggle favorite" [ref=e147]:
+                      - img [ref=e148]
+                    - link "cookies 195 in stock cookies" [ref=e150] [cursor=pointer]:
+                      - /url: /user/products/699d9f33fe0ab8dab6a85703
+                      - img "cookies" [ref=e152]
+                      - generic [ref=e153]:
+                        - img [ref=e154]
+                        - text: 195 in stock
+                      - heading "cookies" [level=3] [ref=e157]
+                    - generic [ref=e158]:
+                      - paragraph [ref=e159]:
+                        - text: RS200.00
+                        - generic [ref=e160]: /per kg
+                      - button "Add to cart" [ref=e161]:
+                        - img [ref=e162]
+                  - generic [ref=e168]:
+                    - button "Toggle favorite" [ref=e169]:
+                      - img [ref=e170]
+                    - link "Sausage 198 in stock Sausage" [ref=e172] [cursor=pointer]:
+                      - /url: /user/products/699d9eddfe0ab8dab6a856ad
+                      - img "Sausage" [ref=e174]
+                      - generic [ref=e175]:
+                        - img [ref=e176]
+                        - text: 198 in stock
+                      - heading "Sausage" [level=3] [ref=e179]
+                    - generic [ref=e180]:
+                      - paragraph [ref=e181]:
+                        - text: RS120.00
+                        - generic [ref=e182]: /per kg
+                      - button "Add to cart" [ref=e183]:
+                        - img [ref=e184]
+                - generic [ref=e189]: Page 1 of 3
+          - generic [ref=e190]:
+            - heading "Recently Added" [level=2] [ref=e192]
+            - generic [ref=e193]:
+              - button "Previous" [disabled] [ref=e194]:
+                - img [ref=e195]
+              - button "Next" [ref=e197]:
+                - img [ref=e198]
+              - generic [ref=e200]:
+                - generic [ref=e201]:
+                  - generic [ref=e203]:
+                    - button "Toggle favorite" [ref=e204]:
+                      - img [ref=e205]
+                    - link "Sunflower Oil 1970 in stock Sunflower Oil" [ref=e207] [cursor=pointer]:
+                      - /url: /user/products/699da1f1fe0ab8dab6a85977
+                      - img "Sunflower Oil" [ref=e209]
+                      - generic [ref=e210]:
+                        - img [ref=e211]
+                        - text: 1970 in stock
+                      - heading "Sunflower Oil" [level=3] [ref=e214]
+                    - generic [ref=e215]:
+                      - paragraph [ref=e216]:
+                        - text: RS120.00
+                        - generic [ref=e217]: /per kg
+                      - button "Add to cart" [ref=e218]:
+                        - img [ref=e219]
+                  - generic [ref=e225]:
+                    - button "Toggle favorite" [ref=e226]:
+                      - img [ref=e227]
+                    - link "frozen fish 181 in stock frozen fish" [ref=e229] [cursor=pointer]:
+                      - /url: /user/products/699da127fe0ab8dab6a858df
+                      - img "frozen fish" [ref=e231]
+                      - generic [ref=e232]:
+                        - img [ref=e233]
+                        - text: 181 in stock
+                      - heading "frozen fish" [level=3] [ref=e236]
+                    - generic [ref=e237]:
+                      - paragraph [ref=e238]:
+                        - text: RS120.00
+                        - generic [ref=e239]: /per kg
+                      - button "Add to cart" [ref=e240]:
+                        - img [ref=e241]
+                  - generic [ref=e247]:
+                    - button "Toggle favorite" [ref=e248]:
+                      - img [ref=e249]
+                    - link "Bread 99 in stock Bread" [ref=e251] [cursor=pointer]:
+                      - /url: /user/products/699da0d6fe0ab8dab6a85881
+                      - img "Bread" [ref=e253]
+                      - generic [ref=e254]:
+                        - img [ref=e255]
+                        - text: 99 in stock
+                      - heading "Bread" [level=3] [ref=e258]
+                    - generic [ref=e259]:
+                      - paragraph [ref=e260]:
+                        - text: RS50.00
+                        - generic [ref=e261]: /per kg
+                      - button "Add to cart" [ref=e262]:
+                        - img [ref=e263]
+                  - generic [ref=e269]:
+                    - button "Toggle favorite" [ref=e270]:
+                      - img [ref=e271]
+                    - link "kurkure 1999 in stock kurkure" [ref=e273] [cursor=pointer]:
+                      - /url: /user/products/699da084fe0ab8dab6a8584d
+                      - img "kurkure" [ref=e275]
+                      - generic [ref=e276]:
+                        - img [ref=e277]
+                        - text: 1999 in stock
+                      - heading "kurkure" [level=3] [ref=e280]
+                    - generic [ref=e281]:
+                      - paragraph [ref=e282]:
+                        - text: RS50.00
+                        - generic [ref=e283]: /per kg
+                      - button "Add to cart" [ref=e284]:
+                        - img [ref=e285]
+                - generic [ref=e290]: Page 1 of 3
+          - generic [ref=e291]:
+            - heading "Best Seller" [level=2] [ref=e293]
+            - generic [ref=e294]:
+              - button "Previous" [disabled] [ref=e295]:
+                - img [ref=e296]
+              - button "Next" [ref=e298]:
+                - img [ref=e299]
+              - generic [ref=e301]:
+                - generic [ref=e302]:
+                  - generic [ref=e304]:
+                    - button "Toggle favorite" [ref=e305]:
+                      - img [ref=e306]
+                    - link "Sunflower Oil 1970 in stock Sunflower Oil" [ref=e308] [cursor=pointer]:
+                      - /url: /user/products/699da1f1fe0ab8dab6a85977
+                      - img "Sunflower Oil" [ref=e310]
+                      - generic [ref=e311]:
+                        - img [ref=e312]
+                        - text: 1970 in stock
+                      - heading "Sunflower Oil" [level=3] [ref=e315]
+                    - generic [ref=e316]:
+                      - paragraph [ref=e317]:
+                        - text: RS120.00
+                        - generic [ref=e318]: /per kg
+                      - button "Add to cart" [ref=e319]:
+                        - img [ref=e320]
+                  - generic [ref=e326]:
+                    - button "Toggle favorite" [ref=e327]:
+                      - img [ref=e328]
+                    - link "footi 1997 in stock footi" [ref=e330] [cursor=pointer]:
+                      - /url: /user/products/699d9fc0fe0ab8dab6a85798
+                      - img "footi" [ref=e332]
+                      - generic [ref=e333]:
+                        - img [ref=e334]
+                        - text: 1997 in stock
+                      - heading "footi" [level=3] [ref=e337]
+                    - generic [ref=e338]:
+                      - paragraph [ref=e339]:
+                        - text: RS25.00
+                        - generic [ref=e340]: /per kg
+                      - button "Add to cart" [ref=e341]:
+                        - img [ref=e342]
+                  - generic [ref=e348]:
+                    - button "Toggle favorite" [ref=e349]:
+                      - img [ref=e350]
+                    - link "cookies 195 in stock cookies" [ref=e352] [cursor=pointer]:
+                      - /url: /user/products/699d9f33fe0ab8dab6a85703
+                      - img "cookies" [ref=e354]
+                      - generic [ref=e355]:
+                        - img [ref=e356]
+                        - text: 195 in stock
+                      - heading "cookies" [level=3] [ref=e359]
+                    - generic [ref=e360]:
+                      - paragraph [ref=e361]:
+                        - text: RS200.00
+                        - generic [ref=e362]: /per kg
+                      - button "Add to cart" [ref=e363]:
+                        - img [ref=e364]
+                  - generic [ref=e370]:
+                    - button "Toggle favorite" [ref=e371]:
+                      - img [ref=e372]
+                    - link "Sausage 198 in stock Sausage" [ref=e374] [cursor=pointer]:
+                      - /url: /user/products/699d9eddfe0ab8dab6a856ad
+                      - img "Sausage" [ref=e376]
+                      - generic [ref=e377]:
+                        - img [ref=e378]
+                        - text: 198 in stock
+                      - heading "Sausage" [level=3] [ref=e381]
+                    - generic [ref=e382]:
+                      - paragraph [ref=e383]:
+                        - text: RS120.00
+                        - generic [ref=e384]: /per kg
+                      - button "Add to cart" [ref=e385]:
+                        - img [ref=e386]
+                - generic [ref=e391]: Page 1 of 3
+          - generic [ref=e392]:
+            - heading "Favorites" [level=2] [ref=e394]
+            - generic [ref=e395]:
+              - button "Previous" [disabled] [ref=e396]:
+                - img [ref=e397]
+              - button "Next" [disabled] [ref=e399]:
+                - img [ref=e400]
+              - generic [ref=e420]: Page 1 of 1
+  - region "Notifications alt+T"
+  - region "Notifications Alt+T"
+  - generic [ref=e425] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e426]:
+      - img [ref=e427]
+    - generic [ref=e430]:
+      - button "Open issues overlay" [ref=e431]:
+        - generic [ref=e432]:
+          - generic [ref=e433]: "4"
+          - generic [ref=e434]: "5"
+        - generic [ref=e435]:
+          - text: Issue
+          - generic [ref=e436]: s
+      - button "Collapse issues badge" [ref=e437]:
+        - img [ref=e438]
+  - alert [ref=e440]
+```

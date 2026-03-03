@@ -118,7 +118,7 @@ const submit = async (values: LoginData) => {
         disabled={isSubmitting || pending}
         className="h-10 w-full rounded-md bg-[#4CAF50] text-white font-semibold disabled:opacity-60"
       >
- Log in
+        Log in
       </button>
       <div className="text-right text-sm">
          <Link href="/request-reset-password" className="font-medium hover:underline ">

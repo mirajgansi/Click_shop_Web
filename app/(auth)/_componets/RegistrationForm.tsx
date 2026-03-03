@@ -6,11 +6,8 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { RegisterData, registerSchema } from "../schema";
-import { Eye, EyeOff } from "lucide-react";
 import { handleRegister } from "@/lib/actions/auth-actions";
 import AnimatedTextField from "./AnimatedTextFeild";
-
-
 export default function RegisterForm() {
   const router = useRouter();
 

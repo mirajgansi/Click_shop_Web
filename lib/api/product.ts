@@ -26,7 +26,6 @@ export const getAllProduct = async (params?: {
   try {
     const response = await axios.get(API.PRODUCT.GET_ALL, {
       params,
-      withCredentials: true,
     });
     return response.data;
   } catch (error: any) {
