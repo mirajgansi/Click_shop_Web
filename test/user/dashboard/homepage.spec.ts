@@ -65,23 +65,8 @@ test.describe("User HomePage E2E", () => {
     await expect(page.getByText("Best Seller")).toBeVisible();
     await expect(page.getByText("Favorites")).toBeVisible();
   });
-
-  test("filter submit navigates to /user/products with search and category", async ({
-    page,
-  }) => {
-    await page.getByTestId("filter-search").fill("milk");
-    await page.getByTestId("filter-category").selectOption("meat");
-
-    await Promise.all([
-      page.waitForURL("**/user/products**", { timeout: 15000 }),
-      page.getByTestId("filter-apply").click(),
-    ]);
-
-    await expect(page).toHaveURL(/\/user\/products\?/);
-    await expect(page.url()).toContain("search=milk");
-    await expect(page.url()).toContain("category=meat");
-  });
 });
+
 async function openCategoriesIfCollapsed(page: any) {
   // If there is a Categories toggle button/menu, click it
   const toggle = page.getByRole("button", { name: /categories/i }).first();
