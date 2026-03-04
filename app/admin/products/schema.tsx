@@ -14,8 +14,8 @@ export const ProductSchema = z
   price: z.coerce.number().positive("Price must be greater than 0"),
     manufacturer: z.string().min(1, "Manufacturer is required"),
 
-   manufactureDate: z.string().datetime().optional().nullable(),
-  expireDate: z.string().datetime().optional().nullable(),
+   manufactureDate: z.string().optional().nullable(),
+  expireDate: z.string().optional().nullable(),
     nutritionalInfo: z.string().min(1, "Nutritional info is required"),
    category: z.enum(CATEGORY_SLUGS, { message: "Category is required" }),
 

@@ -10,7 +10,7 @@ import { ProductEditSchema, type ProductEditData } from "@/app/admin/products/sc
 import { handleUpdateProduct } from "@/lib/actions/product-action";
 import { CategoryModal } from "../../_components/category_modal";
 
-import { format } from "date-fns";
+import { format, isValid, parse, parseISO } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -124,23 +124,12 @@ export default function EditProductForm({ product }: { product?: any }) {
         fd.append("price", String(data.price ?? 0));
         fd.append("inStock", String(data.inStock ?? 0));
         fd.append("category", data.category ?? "");
-
+        fd.append("manufactureDate", data.manufactureDate ?? "");
+        fd.append("expireDate", data.expireDate ?? "");
         // optional fields
         fd.append("manufacturer", data.manufacturer ?? "");
      
-          if (data.manufactureDate) {
-            fd.append(
-              "manufactureDate",
-              data.manufactureDate
-            );
-          }
 
-          if (data.expireDate) {
-            fd.append(
-              "expireDate",
-              data.expireDate
-            );
-          }
         fd.append("nutritionalInfo", data.nutritionalInfo ?? "");
 
         // keep existing images list
@@ -160,6 +149,23 @@ export default function EditProductForm({ product }: { product?: any }) {
     });
   };
 
+function toDate(value?: string | null) {
+  if (!value) return undefined;
+
+  // ISO: 2020-01-02 or 2020-01-02T...
+  const iso = parseISO(value);
+  if (isValid(iso)) return iso;
+
+  // US: M/d/yyyy or MM/dd/yyyy
+  const mdY = parse(value, "M/d/yyyy", new Date());
+  if (isValid(mdY)) return mdY;
+
+  return undefined;
+}
+
+// choose ONE display format:
+const DISPLAY_FMT = "MM/dd/yyyy"; // -> 01/02/2020
+// or: const DISPLAY_FMT = "PPP";  // -> Jan 2, 2020
   return (
     <form
       onSubmit={handleSubmit(onSubmit, (formErrors) => {
@@ -269,27 +275,37 @@ export default function EditProductForm({ product }: { product?: any }) {
   {/* Manufacture Date */}
   <div className="space-y-1">
     <label className="text-sm font-semibold text-gray-800">Manufacture Date</label>
-    <Controller
-      control={control}
-      name="manufactureDate"
-      render={({ field }) => (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="h-11 w-full justify-start text-left font-normal">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {field.value ? format(field.value, "PPP") : <span className="text-muted-foreground">Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              onSelect={(d) => field.onChange(d)}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-      )}
-    />
+<Controller
+  control={control}
+  name="manufactureDate"
+  render={({ field }) => {
+    const selectedDate = toDate(field.value);
+
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="h-11 w-full justify-start text-left font-normal">
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {selectedDate ? (
+              format(selectedDate, DISPLAY_FMT)
+            ) : (
+              <span className="text-muted-foreground">Pick a date</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent className="w-auto p-0">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={(d) => field.onChange(d ? format(d, "yyyy-MM-dd") : "")} // store ISO (recommended)
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+    );
+  }}
+/>
     {errors.manufactureDate?.message && (
       <p className="text-xs text-red-600">{String(errors.manufactureDate.message)}</p>
     )}
@@ -298,27 +314,37 @@ export default function EditProductForm({ product }: { product?: any }) {
   {/* Expire Date */}
   <div className="space-y-1">
     <label className="text-sm font-semibold text-gray-800">Expire Date</label>
-    <Controller
-      control={control}
-      name="expireDate"
-      render={({ field }) => (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="h-11 w-full justify-start text-left font-normal">
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {field.value ? format(field.value, "PPP") : <span className="text-muted-foreground">Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              onSelect={(d) => field.onChange(d)}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-      )}
-    />
+<Controller
+  control={control}
+  name="manufactureDate"
+  render={({ field }) => {
+    const selectedDate = toDate(field.value);
+
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline" className="h-11 w-full justify-start text-left font-normal">
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {selectedDate ? (
+              format(selectedDate, DISPLAY_FMT)
+            ) : (
+              <span className="text-muted-foreground">Pick a date</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent className="w-auto p-0">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={(d) => field.onChange(d ? format(d, "yyyy-MM-dd") : "")} // store ISO (recommended)
+            initialFocus
+          />
+        </PopoverContent>
+      </Popover>
+    );
+  }}
+/>
     {errors.expireDate?.message && (
       <p className="text-xs text-red-600">{String(errors.expireDate.message)}</p>
     )}

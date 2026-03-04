@@ -12,7 +12,7 @@
     },
     {
       "name": "auth_token",
-      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTY2NmQzZDQ2YWUxMzJmODcyZmE2ZiIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJ1c2VybmFtZSI6IlRlc3QgVXNlciIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNTMwNzY5LCJleHAiOjE3NzUxMjI3Njl9.q7a8fkZDw470QhIal_CBpWTgbFRfPyfLgn9ai5D9SE0",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YTY2NmQzZDQ2YWUxMzJmODcyZmE2ZiIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJ1c2VybmFtZSI6IlRlc3QgVXNlciIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzcyNjAwNTIyLCJleHAiOjE3NzUxOTI1MjJ9.7pSSvATtAkbWl5zX8MtNNbHgXTiNxMWOlNq8AiXrZPY",
       "domain": "localhost",
       "path": "/",
       "expires": -1,
