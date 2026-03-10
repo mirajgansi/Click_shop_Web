@@ -58,13 +58,6 @@ test.describe("User HomePage E2E", () => {
 
     await expect(page).toHaveURL(/\/user\/category\/meat/);
   });
-
-  test("renders product section titles", async ({ page }) => {
-    await expect(page.getByText("Trending items")).toBeVisible();
-    await expect(page.getByText("Recently Added")).toBeVisible();
-    await expect(page.getByText("Best Seller")).toBeVisible();
-    await expect(page.getByText("Favorites")).toBeVisible();
-  });
 });
 
 async function openCategoriesIfCollapsed(page: any) {

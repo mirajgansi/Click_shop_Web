@@ -1,7 +1,6 @@
 "use server";
 
 import { set } from "zod";
-//Server  side actions
 import {
   register,
   login,
